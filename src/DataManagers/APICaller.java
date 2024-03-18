@@ -47,7 +47,4 @@ public class APICaller {
         }
     }
 
-    public static void main(String[] args) {
-        sendPostRequest("6229EN");
-    }
 }

@@ -6,13 +6,16 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class APICaller {
+public class APICaller{
 
     /**
-     * This methods sends a POST request to the API in order to retrieve the coordinates of a postal code
+     * This method sends a POST request to the API in order to retrieve the coordinates of a postal code
      * @param postcode address post code in Maastricht
      */
-    public static void sendPostRequest(String postcode) {
+    protected static String sendPostRequest(String postcode) {
+
+        String finalResponse = "";
+
         try {
             URL url = new URL("https://computerscience.dacs.unimaas.nl/get_coordinates?postcode={postcode}");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -43,6 +46,8 @@ public class APICaller {
 
                 // Print the response body
                 System.out.println(response.toString());
+                finalResponse = response.toString();
+
             } else {
                 System.out.println("POST request not worked");
             }
@@ -50,9 +55,8 @@ public class APICaller {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return finalResponse;
     }
 
-    public static void main(String[] args) {
-        sendPostRequest("6216EG");
-    }
 }

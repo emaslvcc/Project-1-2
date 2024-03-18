@@ -22,11 +22,10 @@ public class DistanceCalculatorPythagoras implements Calculator {
         double longitude1 = Math.toRadians(postCode1.getLongitude());
         double longitude2 = Math.toRadians(postCode2.getLongitude());
 
-        // Conversion of degrees to radians
         double latDistance = latitude2 - latitude1;
-        double lonDistance = (longitude2 - longitude1); // * Math.cos((latitude1 + latitude2) / 2);
+        double lonDistance = longitude2 - longitude1; // * Math.cos((latitude1 + latitude2) / 2);
 
-        double distance = Math.sqrt(latDistance * latDistance + lonDistance * lonDistance);
+        double distance = Math.sqrt(latDistance * latDistance + lonDistance * lonDistance) * earthRadius;
         return distance;
     }
 

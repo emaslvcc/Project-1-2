@@ -55,6 +55,7 @@ public class DataBaseReader {
 
             System.out.println("The distance is: " + distance + " kilometers.");
         } else {
+
             System.out.println("Not found");
         }
 

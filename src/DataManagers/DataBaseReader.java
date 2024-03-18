@@ -19,27 +19,35 @@ public class DataBaseReader {
         Map<String, double[]> dataMap = new HashMap<>();
 
         String path = "src/DataManagers/MassZipLatLon.csv";
-        String line = "";
+
+        int a = 1;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            br.readLine();
+            String line;
             while ((line = br.readLine()) != null) {
+
                 // Use comma to separate entries
                 String[] data = line.split(",");
-                dataMap.put(data[0], new double[] { Double.parseDouble(data[1]), Double.parseDouble(data[2]) });
+
+                double lat = Double.parseDouble(data[1]);
+                double lon = Double.parseDouble(data[2]);
+                dataMap.put(data[0], new double[] { lat, lon });
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Input
-        // String startZipCode = "6211AP";
+        // String startZipCode = "6211AL";
         // String endZipCode = "6216EG";
 
         System.out.println("Enter your start zip code: ");
-        String startZipCode = scanner.next();
+        String startZipCode = scanner.nextLine();
 
         System.out.println("Enter your end zip code: ");
-        String endZipCode = scanner.next();
+        String endZipCode = scanner.nextLine();
 
         scanner.close();
 
@@ -52,7 +60,7 @@ public class DataBaseReader {
 
             double distance = DistanceCalculator.distanceCalculator(startlat, startlon, endlat, endlon);
 
-            System.out.println("The distance is: " + distance + " kilometers.");
+            System.out.println("The distance is: " + String.format("%.3f", distance) + " kilometers.");
         } else {
             System.out.println("Not found");
         }

@@ -4,7 +4,7 @@ import DataManagers.PostCode;
 
 public class DistanceCalculatorHaversine implements Calculator {
 
-    public double distance;
+    private double distance;
 
     public DistanceCalculatorHaversine(PostCode postCode1, PostCode postCode2) {
         this.distance = calculate(postCode1, postCode2);
@@ -37,8 +37,8 @@ public class DistanceCalculatorHaversine implements Calculator {
                                     * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 
         double centralAngle = 2 * Math.atan2(Math.sqrt(chordLengthParameter), Math.sqrt(1 - chordLengthParameter));
-
         double distance = earthRadius * centralAngle;
+
         return distance;
     }
 

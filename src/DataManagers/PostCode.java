@@ -1,16 +1,21 @@
 package DataManagers;
 
+import java.util.Map;
+import java.util.Scanner;
+
 public class PostCode {
     
     public String postCode;
     public double latitude;
     public double longitude;
 
+
     public PostCode(String postCode, double latitude, double longitude) {
         this.postCode = postCode;
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
 
     public String getPostCode() {
         return this.postCode;

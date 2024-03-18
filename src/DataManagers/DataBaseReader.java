@@ -33,7 +33,7 @@ public class DataBaseReader {
 
         // Input
         // String startZipCode = "6211AP";
-        // String endZipCode = "6211JK";
+        // String endZipCode = "6216EG";
 
         System.out.println("Enter your start zip code: ");
         String startZipCode = scanner.next();
@@ -43,7 +43,6 @@ public class DataBaseReader {
 
         scanner.close();
 
-        // 根据输入查找并打印第二和第三个值
         if (dataMap.containsKey(startZipCode) && dataMap.containsKey(endZipCode)) {
             double startlat = dataMap.get(startZipCode)[0];
             double startlon = dataMap.get(startZipCode)[1];
@@ -55,7 +54,6 @@ public class DataBaseReader {
 
             System.out.println("The distance is: " + distance + " kilometers.");
         } else {
-
             System.out.println("Not found");
         }
 

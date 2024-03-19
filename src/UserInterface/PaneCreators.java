@@ -1,5 +1,6 @@
 package UserInterface;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.SubScene;
@@ -16,9 +17,16 @@ public class PaneCreators {
     private final String buttonStyle = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1b2940";
     private int min;
     private double distance;
-    private final MapFrame mapFrame = new MapFrame();
-    private final SubSceneHandler SSHandler = new SubSceneHandler(mapFrame.getOuterFrameWidth(), mapFrame.getOuterFrameHeight());
 
+
+    private int outerFrameHeight;
+    private int outerFrameWidth ;
+    private final SubSceneHandler SSHandler = new SubSceneHandler(outerFrameWidth, outerFrameHeight);
+
+    public PaneCreators(int outerFrameWidth, int outerFrameHeight) {
+        this.outerFrameHeight = outerFrameHeight;
+        this.outerFrameWidth = outerFrameWidth;
+    }
 
     public BorderPane createTopPane() {
         BorderPane topPane = new BorderPane();
@@ -27,8 +35,8 @@ public class PaneCreators {
         BorderPane centerPane = createTopCenterPane();
         topPane.setLeft(startCodePane);
         topPane.setRight(endCodePane);
-        BorderPane.setMargin(startCodePane, new javafx.geometry.Insets(0, 0, 0, 50));
-        BorderPane.setMargin(endCodePane, new javafx.geometry.Insets(0, 45, 0, 0));
+        BorderPane.setMargin(startCodePane, new Insets(0, 0, 0, 50));
+        BorderPane.setMargin(endCodePane, new Insets(0, 45, 0, 0));
         topPane.setCenter(centerPane);
 
         return topPane;
@@ -41,7 +49,7 @@ public class PaneCreators {
         TextField startCodeField = new TextField();
         startCodePane.setTop(startCodeLabel);
         startCodePane.setCenter(startCodeField);
-        BorderPane.setMargin(startCodeLabel, new javafx.geometry.Insets(0, 0, 5, 20));
+        BorderPane.setMargin(startCodeLabel, new Insets(0, 0, 5, 20));
         return startCodePane;
     }
 
@@ -79,7 +87,7 @@ public class PaneCreators {
         TextField endCodeField = new TextField();
         endCodePane.setTop(endCodeLabel);
         endCodePane.setCenter(endCodeField);
-        BorderPane.setMargin(endCodeLabel, new javafx.geometry.Insets(0, 0, 5, 5));
+        BorderPane.setMargin(endCodeLabel, new Insets(0, 0, 5, 5));
         return endCodePane;
     }
 
@@ -87,7 +95,7 @@ public class PaneCreators {
         BorderPane centerPane = new BorderPane();
         SubScene mapSubscene = SSHandler.createMapSubscene();
         centerPane.setCenter(mapSubscene);
-        centerPane.setStyle("-fx-background-color: black;");
+       // centerPane.setStyle("-fx-background-color: black;");
         return centerPane;
     }
 

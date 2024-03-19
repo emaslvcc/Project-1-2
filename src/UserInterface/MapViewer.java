@@ -6,7 +6,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+
+import javafx.scene.shape.Line;
+import java.util.Random;
 
 public class MapViewer extends Application {
 
@@ -35,7 +40,7 @@ public class MapViewer extends Application {
             if (deltaY < 0) {
                 zoomFactor = 1 / zoomFactor;
             }
-            if ((mapView.getScaleX() * zoomFactor) >= minZoom && (mapView.getScaleX() * zoomFactor) <=maxZoom) {
+            if ((mapView.getScaleX() * zoomFactor) >= minZoom && (mapView.getScaleX() * zoomFactor) <= maxZoom) {
                 mapView.setScaleX(mapView.getScaleX() * zoomFactor);
                 mapView.setScaleY(mapView.getScaleY() * zoomFactor);
             }
@@ -61,8 +66,38 @@ public class MapViewer extends Application {
             dragStartY = event.getSceneY();
         });
 
-        // Create a StackPane to hold the map
-        StackPane root = new StackPane(mapView);
+        // START OF DOTS CODE
+
+        double mapWidth = 4493;
+        double mapHeight = 3178;
+
+        double minLongitude = 5.4875;
+        double maxLongitude = 5.9022;
+        double minLatitude = 50.7636;
+        double maxLatitude = 50.9383;
+
+        double pointLongitude1 = 5.692237193;
+        double pointLatitude1 = 50.85523285;
+
+        double pointLongitude2 = 5.669601806;
+        double pointLatitude2 = 50.84760565;
+
+        // Calculate scale factors to convert latitude and longitude differences to pixel differences
+        double xScale = mapWidth / (maxLongitude - minLongitude);
+        double yScale = mapHeight / (maxLatitude - minLatitude);
+
+        // Convert real latitude and longitude to pixel coordinates
+        double pixelX1 = (pointLongitude1 - minLongitude) * xScale;
+        double pixelY1 = (maxLatitude - pointLatitude1) * yScale;
+        double pixelX2 = (pointLongitude2 - minLongitude) * xScale;
+        double pixelY2 = (maxLatitude - pointLatitude2) * yScale;
+
+        Line line = new Line(pixelX1, pixelY1, pixelX2, pixelY2);
+        line.setStroke(Color.RED); // Set the line color
+
+        StackPane root = new StackPane(mapView, line);
+
+        // END OF DOTS CODE
 
         // Create the scene
         Scene scene = new Scene(root, 500, 500);

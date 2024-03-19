@@ -13,14 +13,14 @@ public class MapViewer {
     final private int maxZoom = 6;
     public SubScene createMapSubScene(int width, int height) {
         // Load the image
-        Image mapImage = new Image("/images/map.png");
+        Image mapImage = new Image("/images/mapBig.png");
 
         // Create the ImageView
         ImageView mapView = new ImageView(mapImage);
         mapView.setPreserveRatio(true);
         mapView.setSmooth(true);
         mapView.setCache(true);
-        mapView.setFitWidth(width);
+        mapView.setFitWidth(2000);
 
         // Add zoom functionality
         mapView.setOnScroll((ScrollEvent event) -> {

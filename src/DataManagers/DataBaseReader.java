@@ -32,6 +32,9 @@ public class DataBaseReader extends APICaller{
             e.printStackTrace();
         }
     }
+    public void createHashMap(){
+        csvToHashMap();
+    }
 
     public void saveNewPostCode(String zipCode){
         try {

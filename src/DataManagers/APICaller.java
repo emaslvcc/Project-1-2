@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class APICaller{
+public class APICaller {
 
     /**
      * This method sends a POST request to the API in order to retrieve the coordinates of a postal code
@@ -17,7 +17,8 @@ public class APICaller{
         String finalResponse = "";
 
         try {
-            URL url = new URL("https://computerscience.dacs.unimaas.nl/get_coordinates?postcode={postcode}");
+            String urlString = "https://computerscience.dacs.unimaas.nl/get_coordinates?postcode=" + postcode;
+            URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("POST");
@@ -58,5 +59,4 @@ public class APICaller{
 
         return finalResponse;
     }
-
 }

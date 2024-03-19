@@ -1,15 +1,10 @@
 package UserInterface;
 
 import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
-import javafx.scene.SubScene;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -17,7 +12,7 @@ import javafx.stage.StageStyle;
 public class MapFrame extends Application {
     private final int outerFrameHeight = 600;
     private final int outerFrameWidth = 800;
-    final private PaneCreators paneCreators = new PaneCreators();
+    final private PaneCreators paneCreators = new PaneCreators(outerFrameWidth, outerFrameHeight);
 
     public void start(Stage primaryStage) {
         final BorderPane root = new BorderPane();
@@ -40,14 +35,6 @@ public class MapFrame extends Application {
         primaryStage.setResizable(false);
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
-    }
-
-    public int getOuterFrameHeight() {
-        return outerFrameHeight;
-    }
-
-    public int getOuterFrameWidth() {
-        return outerFrameWidth;
     }
 
 

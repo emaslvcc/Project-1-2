@@ -1,4 +1,4 @@
-package com.group18.project121;
+package com.group18.project121.UserInterface;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

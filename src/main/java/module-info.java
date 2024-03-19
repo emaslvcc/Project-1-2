@@ -10,6 +10,6 @@ module com.group18.project121 {
     requires org.kordamp.bootstrapfx.core;
     requires com.almasb.fxgl.all;
 
-    opens com.group18.project121 to javafx.fxml;
-    exports com.group18.project121;
+    exports com.group18.project121.UserInterface;
+    opens com.group18.project121.UserInterface to javafx.fxml;
 }

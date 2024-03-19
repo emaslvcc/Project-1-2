@@ -1,66 +1,61 @@
 package UserInterface;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
+import javafx.scene.SubScene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
-
 import javafx.scene.shape.Line;
-import java.util.Random;
 
-public class MapViewer extends Application {
-
-    private ImageView mapView;
+public class MapViewer {
     private double dragStartX;
     private double dragStartY;
     final private int minZoom = 1;
     final private int maxZoom = 3;
-
-    @Override
-    public void start(Stage primaryStage) {
-        // Load the map image
+    public SubScene createMapSubScene(int width, int height) {
+        // Load the image
         Image mapImage = new Image("/images/mapBig.png");
 
-        // Create the ImageView for the map
-        mapView = new ImageView(mapImage);
+        // Create the ImageView
+        ImageView mapView = new ImageView(mapImage);
         mapView.setPreserveRatio(true);
-        mapView.setSmooth(true);
+        mapView.setSmooth(false);
         mapView.setCache(true);
         mapView.setFitWidth(2000);
 
+        // Create a StackPane to add map and shapes to draw
+        StackPane mapPane = new StackPane(mapView);
+
         // Add zoom functionality
-        mapView.setOnScroll((ScrollEvent event) -> {
+        mapPane.setOnScroll((ScrollEvent event) -> {
             double deltaY = event.getDeltaY();
-            double zoomFactor = 1.1;
+            double zoomFactor = 1.25;
             if (deltaY < 0) {
                 zoomFactor = 1 / zoomFactor;
             }
-            if ((mapView.getScaleX() * zoomFactor) >= minZoom && (mapView.getScaleX() * zoomFactor) <= maxZoom) {
-                mapView.setScaleX(mapView.getScaleX() * zoomFactor);
-                mapView.setScaleY(mapView.getScaleY() * zoomFactor);
+            if ((mapPane.getScaleX() * zoomFactor) >= minZoom && (mapPane.getScaleX() * zoomFactor) <=maxZoom) {
+                mapPane.setScaleX(mapPane.getScaleX() * zoomFactor);
+                mapPane.setScaleY(mapPane.getScaleY() * zoomFactor);
             }
         });
 
         // Add panning functionality
-        mapView.setOnMousePressed(event -> {
+        mapPane.setOnMousePressed(event -> {
             dragStartX = event.getSceneX();
             dragStartY = event.getSceneY();
         });
 
-        mapView.setOnMouseDragged(event -> {
+        mapPane.setOnMouseDragged(event -> {
             double offsetX = event.getSceneX() - dragStartX;
             double offsetY = event.getSceneY() - dragStartY;
 
-            double newTranslateX = mapView.getTranslateX() + offsetX;
-            double newTranslateY = mapView.getTranslateY() + offsetY;
+            double newTranslateX = mapPane.getTranslateX() + offsetX;
+            double newTranslateY = mapPane.getTranslateY() + offsetY;
 
-            mapView.setTranslateX(newTranslateX);
-            mapView.setTranslateY(newTranslateY);
+            mapPane.setTranslateX(newTranslateX);
+            mapPane.setTranslateY(newTranslateY);
 
             dragStartX = event.getSceneX();
             dragStartY = event.getSceneY();
@@ -94,21 +89,17 @@ public class MapViewer extends Application {
 
         Line line = new Line(pixelX1, pixelY1, pixelX2, pixelY2);
         line.setStroke(Color.RED); // Set the line color
+        mapPane.getChildren().add(line);
 
-        StackPane root = new StackPane(mapView, line);
+        addPoint(100, 100, mapPane);
 
-        // END OF DOTS CODE
-
-        // Create the scene
-        Scene scene = new Scene(root, 500, 500);
-
-        // Set up the stage
-        primaryStage.setTitle("Map Viewer");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        return new SubScene(mapPane, width, height);
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    private void addPoint(double x, double y, StackPane pane) {
+        Circle point = new Circle(5, Color.RED); // Adjust size and color as needed
+        point.setTranslateX(x);
+        point.setTranslateY(y);
+        pane.getChildren().add(point);
     }
 }

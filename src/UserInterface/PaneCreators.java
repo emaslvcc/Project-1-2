@@ -21,7 +21,7 @@ public class PaneCreators {
 
     private int outerFrameHeight;
     private int outerFrameWidth ;
-    private final SubSceneHandler SSHandler = new SubSceneHandler(outerFrameWidth, outerFrameHeight);
+
 
     public PaneCreators(int outerFrameWidth, int outerFrameHeight) {
         this.outerFrameHeight = outerFrameHeight;
@@ -93,6 +93,7 @@ public class PaneCreators {
 
     public BorderPane createCenterPane() {
         BorderPane centerPane = new BorderPane();
+        SubSceneHandler SSHandler = new SubSceneHandler(outerFrameWidth, outerFrameHeight);
         SubScene mapSubscene = SSHandler.createMapSubscene();
         centerPane.setCenter(mapSubscene);
        // centerPane.setStyle("-fx-background-color: black;");

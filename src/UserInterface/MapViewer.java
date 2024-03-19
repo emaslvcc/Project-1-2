@@ -14,19 +14,19 @@ public class MapViewer extends Application {
     private double dragStartX;
     private double dragStartY;
     final private int minZoom = 1;
-    final private int maxZoom = 6;
+    final private int maxZoom = 3;
 
     @Override
     public void start(Stage primaryStage) {
         // Load the map image
-        Image mapImage = new Image("/images/map.png");
+        Image mapImage = new Image("/images/mapBig.png");
 
         // Create the ImageView for the map
         mapView = new ImageView(mapImage);
         mapView.setPreserveRatio(true);
         mapView.setSmooth(true);
         mapView.setCache(true);
-        mapView.setFitWidth(500);
+        mapView.setFitWidth(2000);
 
         // Add zoom functionality
         mapView.setOnScroll((ScrollEvent event) -> {

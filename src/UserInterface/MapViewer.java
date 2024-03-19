@@ -14,6 +14,7 @@ public class MapViewer {
     private double dragStartY;
     final private int minZoom = 1;
     final private int maxZoom = 3;
+
     public SubScene createMapSubScene(int width, int height) {
         // Load the image
         Image mapImage = new Image("/images/mapBig.png");
@@ -61,15 +62,13 @@ public class MapViewer {
             dragStartY = event.getSceneY();
         });
 
-        // START OF DOTS CODE
-
-        double mapWidth = 4493;
-        double mapHeight = 3178;
+        double mapWidth = 4493.8582677;
+        double mapHeight = 3178.5826772;
 
         double minLongitude = 5.4875;
         double maxLongitude = 5.9022;
-        double minLatitude = 50.7636;
-        double maxLatitude = 50.9383;
+        double minLatitude = 50.9383;
+        double maxLatitude = 50.7636;
 
         double pointLongitude1 = 5.692237193;
         double pointLatitude1 = 50.85523285;
@@ -77,29 +76,42 @@ public class MapViewer {
         double pointLongitude2 = 5.669601806;
         double pointLatitude2 = 50.84760565;
 
-        // Calculate scale factors to convert latitude and longitude differences to pixel differences
-        double xScale = mapWidth / (maxLongitude - minLongitude);
-        double yScale = mapHeight / (maxLatitude - minLatitude);
+        double pointLongitude3 = 5.710954;
+        double pointLatitude3 = 50.834869;
 
-        // Convert real latitude and longitude to pixel coordinates
-        double pixelX1 = (pointLongitude1 - minLongitude) * xScale;
-        double pixelY1 = (maxLatitude - pointLatitude1) * yScale;
-        double pixelX2 = (pointLongitude2 - minLongitude) * xScale;
-        double pixelY2 = (maxLatitude - pointLatitude2) * yScale;
+        double x1 = getX(pointLongitude1);
+        double y1 = getY(pointLatitude1);
+        double x2 = getX(pointLongitude2);
+        double y2 = getY(pointLatitude2);
+        double x3 = getX(pointLongitude3);
+        double y3 = getY(pointLatitude3);
 
-        Line line = new Line(pixelX1, pixelY1, pixelX2, pixelY2);
+        Line line = new Line(x1, y1, x2, y2);
         line.setStroke(Color.RED); // Set the line color
         mapPane.getChildren().add(line);
 
-        addPoint(100, 100, mapPane);
-
+        addPoint(x1, y1, mapPane);
+        addPoint(x2, y2, mapPane);
+        addPoint(x3, y3, mapPane);
         return new SubScene(mapPane, width, height);
     }
 
     private void addPoint(double x, double y, StackPane pane) {
-        Circle point = new Circle(5, Color.RED); // Adjust size and color as needed
+        Circle point = new Circle(1, Color.RED); // Adjust size and color as needed
         point.setTranslateX(x);
         point.setTranslateY(y);
         pane.getChildren().add(point);
+    }
+
+    private double getX(double realLongitude) {
+        double longitudeRatio = (10 - 15) / (5.697302 - 5.698019);
+        double x = 10 + (realLongitude - 5.697302) * longitudeRatio;
+        return x;
+    }
+
+    private double getY(double realLatitude) {
+        double latitudeRatio = (50 - 10) / (50.846210 - 50.851855);
+        double y = 50 + (realLatitude - 50.846210) * latitudeRatio;
+        return y;
     }
 }

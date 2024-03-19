@@ -5,10 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f241ee4f-d14d-4efd-890d-15b63e0ac6c7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/UserInterface/PaneCreators.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/UserInterface/SubSceneHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UserInterface/Launcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/UserInterface/Launcher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UserInterface/MapFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/UserInterface/MapFrame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx-swt.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.base.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.controls.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.fxml.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.graphics.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.media.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.swing.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.web.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/images/map.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,15 +30,20 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Joel" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2dsCs4Zkm5xIi2v3uxdPl3OrpG5" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -42,22 +54,33 @@
     "Application.Unnamed.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Joel",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "Noah",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/joeld/Downloads/openjfx-21.0.1_windows-x64_bin-sdk/javafx-sdk-21.0.1/lib",
+    "last_opened_file_path": "G:/My Drive/Computer Science/Year 1/Project1-2/Code/MapVisualiser",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="G:\My Drive\Computer Science\Year 1\Project1-2\Code\Git\project_1-2_18\src\Libraries\JavaFX" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="G:\My Drive\Computer Science\Year 1\Project1-2\Code\Git\project_1-2_18\src\images" />
+    </key>
+  </component>
   <component name="RunManager">
-    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="Launcher" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="20" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="UserInterface.Launcher" />
       <module name="project_1-2_18" />
       <option name="VM_PARAMETERS" value="--module-path=&quot;C:\Users\joeld\Downloads\openjfx-21.0.1_windows-x64_bin-sdk\javafx-sdk-21.0.1\lib&quot; --add-modules=javafx.controls" />
@@ -82,6 +105,7 @@
       <option name="presentableId" value="Default" />
       <updated>1710787603362</updated>
       <workItem from="1710787606199" duration="1004000" />
+      <workItem from="1710854471500" duration="1140000" />
     </task>
     <servers />
   </component>

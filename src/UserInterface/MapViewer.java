@@ -4,6 +4,7 @@ import javafx.scene.SubScene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -13,21 +14,30 @@ public class MapViewer {
     private double dragStartX;
     private double dragStartY;
     final private int minZoom = 1;
-    final private int maxZoom = 3;
+    final private int maxZoom = 7;
+    private Pane pointsPane;
+    private Pane linesPane;
+    private ImageView mapView;
 
     public SubScene createMapSubScene(int width, int height) {
         // Load the image
         Image mapImage = new Image("/images/mapBig.png");
 
         // Create the ImageView
-        ImageView mapView = new ImageView(mapImage);
+        mapView = new ImageView(mapImage);
         mapView.setPreserveRatio(true);
         mapView.setSmooth(false);
         mapView.setCache(true);
         mapView.setFitWidth(2000);
 
+        // Create a Pane to hold the points
+        pointsPane = new Pane();
+
+        // Create a Pane to hold the lines
+        linesPane = new Pane();
+
         // Create a StackPane to add map and shapes to draw
-        StackPane mapPane = new StackPane(mapView);
+        StackPane mapPane = new StackPane(mapView, linesPane, pointsPane);
 
         // Add zoom functionality
         mapPane.setOnScroll((ScrollEvent event) -> {
@@ -62,8 +72,10 @@ public class MapViewer {
             dragStartY = event.getSceneY();
         });
 
-        double mapWidth = 4493.8582677;
-        double mapHeight = 3178.5826772;
+//        double mapWidth = 4493.8582677;
+//        double mapHeight = 3178.5826772;
+        double mapWidth = 14043;
+        double mapHeight = 9933;
 
         double minLongitude = 5.4875;
         double maxLongitude = 5.9022;
@@ -86,32 +98,41 @@ public class MapViewer {
         double x3 = getX(pointLongitude3);
         double y3 = getY(pointLatitude3);
 
-        Line line = new Line(x1, y1, x2, y2);
-        line.setStroke(Color.RED); // Set the line color
-        mapPane.getChildren().add(line);
+        addLine(x1,y1,x2,y2);
+        addLine(x1,y1,x3,y3);
 
-        addPoint(x1, y1, mapPane);
-        addPoint(x2, y2, mapPane);
-        addPoint(x3, y3, mapPane);
+        addPoint(x1, y1);
+        addPoint(x2, y2);
+        addPoint(x3, y3);
+
+        System.out.println(x1 + " " + y1);
+        System.out.println(x2 + " " + y2);
+
         return new SubScene(mapPane, width, height);
     }
 
-    private void addPoint(double x, double y, StackPane pane) {
-        Circle point = new Circle(1, Color.RED); // Adjust size and color as needed
+    private void addPoint(double x, double y) {
+        Circle point = new Circle(3, Color.RED); // Adjust size and color as needed
         point.setTranslateX(x);
         point.setTranslateY(y);
-        pane.getChildren().add(point);
+        pointsPane.getChildren().add(point);
+    }
+
+    private void addLine(double startX, double startY, double endX, double endY) {
+        Line line = new Line(startX, startY, endX, endY); // Adjust size and color as needed
+        line.setStroke(Color.RED);
+        linesPane.getChildren().add(line);
     }
 
     private double getX(double realLongitude) {
         double longitudeRatio = (10 - 15) / (5.697302 - 5.698019);
-        double x = 10 + (realLongitude - 5.697302) * longitudeRatio;
+        double x = 406 + (realLongitude - 5.697302) * longitudeRatio;
         return x;
     }
 
     private double getY(double realLatitude) {
         double latitudeRatio = (50 - 10) / (50.846210 - 50.851855);
-        double y = 50 + (realLatitude - 50.846210) * latitudeRatio;
+        double y = 248 + (realLatitude - 50.846210) * latitudeRatio;
         return y;
     }
 }

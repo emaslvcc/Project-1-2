@@ -7,36 +7,49 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataBaseReader extends APICaller{
+/**
+ * The DataBaseReader class extends APICaller and provides functionality to read data from a CSV 
+ * file and interact with a data map containing postal code coordinates.
+ */
+public class DataBaseReader extends APICaller {
 
     protected Map<String, double[]> dataMap = new HashMap<>();
     private final String PATH = "src/DataManagers/MassZipLatLon.csv";
 
-    //translates csv file to a HashMap
+    /**
+     * Translates the CSV file to a HashMap containing postal codes and their coordinates.
+     */
     private void csvToHashMap (){
 
         try (BufferedReader br = new BufferedReader(new FileReader(PATH))) {
-            br.readLine();
+            br.readLine(); // Skips header line
             String line;
             while ((line = br.readLine()) != null) {
-
-                // Use comma to separate entries
-                String[] data = line.split(",");
-
+                String[] data = line.split(","); // Use a comma to separate entries
                 double lat = Double.parseDouble(data[1]);
                 double lon = Double.parseDouble(data[2]);
                 dataMap.put(data[0], new double[] { lat, lon });
-
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Creates a HashMap from the CSV file.
+     */
     public void createHashMap(){
         csvToHashMap();
     }
 
-    public void saveNewPostCode(String zipCode){
+    /**
+     * Saves a new postal code and its coordinates to the CSV file and updates the data map.
+     * 
+     * @param zipCode The postal code to be saved.
+     */
+    public void saveNewPostCode(String zipCode) {
+
         try {
             // Call the API to get coordinates for the given postal code
             String apiResponse = sendPostRequest(zipCode);
@@ -48,38 +61,54 @@ public class DataBaseReader extends APICaller{
             // Update the CSV file with the new postal code and coordinates
             updateCSVFile(zipCode, latitude, longitude);
 
-            //update the dataMap HashMap
+            // Update the dataMap HashMap
             csvToHashMap();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Updates the CSV file with the new postal code and coordinates.
+     * 
+     * @param zipCode The postal code to save.
+     * @param latitude The latitude of the postal code.
+     * @param longitude The longitude of the postal code.
+     * @throws IOException If an I/O error occurs.
+     */
     private void updateCSVFile(String zipCode, String latitude, String longitude) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PATH, true))) {
             // Append the new postal code and coordinates to the CSV file
             writer.write(zipCode + "," + latitude + "," + longitude + "\n");
         }
     }
-    private String extractLatitude(String apiResponse) {
 
+    /**
+     * Extracts the latitude from the API response.
+     * 
+     * @param apiResponse The response from the API.
+     * @return The latitude extracted from the response.
+     */
+    private String extractLatitude(String apiResponse) {
         String latitude;
         int startIndex = apiResponse.indexOf("\"latitude\":") + "\"latitude\":".length() + 1;
         int endIndex = apiResponse.indexOf(",", startIndex);
-
         latitude = apiResponse.substring(startIndex, endIndex);
-
         return latitude.trim();
     }
 
+    /**
+     * Extracts the longitude from the API response.
+     * 
+     * @param apiResponse The response from the API.
+     * @return The longitude extracted from the response.
+     */
     private String extractLongitude(String apiResponse) {
-
         String longitude;
         int startIndex = apiResponse.indexOf("\"longitude\":") + "\"longitude\":".length() + 1;
         int endIndex = apiResponse.indexOf(",", startIndex);
-
         longitude = apiResponse.substring(startIndex, endIndex);
-
         return longitude.trim();
     }
 }

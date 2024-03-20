@@ -1,5 +1,10 @@
 package DataManagers;
 
+import Calculators.DistanceCalculatorHaversine;
+import Calculators.FastTimeCalculator;
+import Calculators.MediumTimeCalculator;
+import Calculators.SlowTimeCalculator;
+
 import java.util.Map;
 import java.util.Scanner;
 
@@ -13,14 +18,9 @@ public class GetUserData extends DataBaseReader{
      * Takes user's input and creates a PostCode object.
      * 
      * @param dataMap The map containing postal code data.
-     * @param txt Additional text to display for user input prompt.
-     * @param scanner The scanner object for user input.
      * @return The PostCode object created based on user input.
      */
-    protected PostCode getZipCode(Map<String, double[]> dataMap, String txt, Scanner scanner) {
-        System.out.println("Enter your "+ txt +" zip code: ");
-        String zipCode = scanner.nextLine();
-        zipCode = zipCode.toUpperCase();
+    protected PostCode getZipCode(Map<String, double[]> dataMap, String zipCode) {
 
         PostCode postCode = createPostCode(dataMap, zipCode);
         return postCode;
@@ -41,5 +41,14 @@ public class GetUserData extends DataBaseReader{
             saveNewPostCode(zipCode);
             return createPostCode(dataMap, zipCode);
         }
+    }
+
+    public double calculateAfterPressedButton(PostCode startPostCode, PostCode endPostCode) {
+
+        //calculate the distance (two different methods)
+        DistanceCalculatorHaversine calc1 = new DistanceCalculatorHaversine(startPostCode, endPostCode);
+
+        double distance = calc1.getDistance();
+        return distance;
     }
 }

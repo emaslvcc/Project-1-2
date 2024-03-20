@@ -55,8 +55,8 @@ public class DataBaseReader extends APICaller {
             String apiResponse = sendPostRequest(zipCode);
 
             // Parse the API response to extract latitude and longitude
-            String latitude = extractLatitude(apiResponse);
-            String longitude = extractLongitude(apiResponse);
+            double latitude = extractLatitude(apiResponse);
+            double longitude = extractLongitude(apiResponse);
 
             // Update the CSV file with the new postal code and coordinates
             updateCSVFile(zipCode, latitude, longitude);
@@ -77,10 +77,10 @@ public class DataBaseReader extends APICaller {
      * @param longitude The longitude of the postal code.
      * @throws IOException If an I/O error occurs.
      */
-    private void updateCSVFile(String zipCode, String latitude, String longitude) throws IOException {
+    private void updateCSVFile(String zipCode, double latitude, double longitude) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PATH, true))) {
             // Append the new postal code and coordinates to the CSV file
-            writer.write(zipCode + "," + latitude + "," + longitude + "\n");
+            writer.write( zipCode + "," + latitude + "," + longitude + "\n");
         }
     }
 
@@ -90,12 +90,18 @@ public class DataBaseReader extends APICaller {
      * @param apiResponse The response from the API.
      * @return The latitude extracted from the response.
      */
-    private String extractLatitude(String apiResponse) {
+    private double extractLatitude(String apiResponse) {
+
         String latitude;
+        double finalLatitude;
+
         int startIndex = apiResponse.indexOf("\"latitude\":") + "\"latitude\":".length() + 1;
         int endIndex = apiResponse.indexOf(",", startIndex);
         latitude = apiResponse.substring(startIndex, endIndex);
-        return latitude.trim();
+        latitude = latitude.replaceAll("\"", "");
+        finalLatitude = Double.parseDouble(latitude);
+
+        return finalLatitude;
     }
 
     /**
@@ -104,11 +110,17 @@ public class DataBaseReader extends APICaller {
      * @param apiResponse The response from the API.
      * @return The longitude extracted from the response.
      */
-    private String extractLongitude(String apiResponse) {
+    private double extractLongitude(String apiResponse) {
+
         String longitude;
+        double finalLongitude;
+
         int startIndex = apiResponse.indexOf("\"longitude\":") + "\"longitude\":".length() + 1;
         int endIndex = apiResponse.indexOf(",", startIndex);
         longitude = apiResponse.substring(startIndex, endIndex);
-        return longitude.trim();
+        longitude = longitude.replaceAll("\"", "");
+        finalLongitude = Double.parseDouble(longitude);
+
+        return finalLongitude;
     }
 }

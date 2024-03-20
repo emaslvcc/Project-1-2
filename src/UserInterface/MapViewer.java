@@ -16,8 +16,8 @@ public class MapViewer {
     private double dragStartY;
     final private int minZoom = 1;
     final private int maxZoom = 7;
-    public Pane pointsPane;
-    public Pane linesPane;
+    public static Pane pointsPane;
+    public static Pane linesPane;
     private ImageView mapView;
 
     private static double startX, startY, endX, endY;
@@ -75,17 +75,6 @@ public class MapViewer {
             dragStartY = event.getSceneY();
         });
 
-        // Calculate is clicked:
-        // Generate coordinates from postal codes is called
-        MapCoordinates location1 = new MapCoordinates(startX, startY);
-        MapCoordinates location2 = new MapCoordinates(endX, endY);
-        pointsPane.getChildren().add(location1.circle);
-        pointsPane.getChildren().add(location2.circle);
-
-        Line line = new Line(location1.x, location1.y, location2.x, location2.y); // Adjust size and color as needed
-        line.setStroke(Color.RED);
-        linesPane.getChildren().add(line);
-
         return new SubScene(mapPane, width, height);
     }
 
@@ -94,5 +83,18 @@ public class MapViewer {
         startY = startPostCode.getLongitude();
         endX = endPostCode.getLatitude();
         endY = endPostCode.getLongitude();
+
+        // Calculate is clicked:
+        // Generate coordinates from postal codes is called
+        MapCoordinates location1 = new MapCoordinates(startX, startY);
+        MapCoordinates location2 = new MapCoordinates(endX, endY);
+        pointsPane.getChildren().clear();
+        pointsPane.getChildren().add(location1.circle);
+        pointsPane.getChildren().add(location2.circle);
+
+        Line line = new Line(location1.x, location1.y, location2.x, location2.y); // Adjust size and color as needed
+        line.setStroke(Color.RED);
+        linesPane.getChildren().clear();
+        linesPane.getChildren().add(line);
     }
 }

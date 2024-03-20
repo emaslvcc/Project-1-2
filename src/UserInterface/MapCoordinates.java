@@ -24,12 +24,10 @@ public class MapCoordinates {
     }
 
     public double getX(double realLongitude) {
-        double longitudeRatio = (10 - 15) / (5.697302 - 5.698019);
-        return 406 + (realLongitude - 5.697302) * longitudeRatio;
+        return -606.5 + (realLongitude -  5.487500) * (1982/0.414722);
     }
 
     public double getY(double realLatitude) {
-        double latitudeRatio = (50 - 10) / (50.846210 - 50.851855);
-        return 248 + (realLatitude - 50.846210) * latitudeRatio;
+        return -428 + (realLatitude - 50.938333) * (1284/-0.174722);
     }
 }

@@ -4,18 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f241ee4f-d14d-4efd-890d-15b63e0ac6c7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx-swt.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.base.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.controls.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.fxml.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.graphics.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.media.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.swing.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Libraries/JavaFX/javafx.web.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/images/map.png" afterDir="false" />
+    <list default="true" id="4895b3fb-1984-4b73-800b-39a46fc5233f" name="Changes" comment="Code for coordinates placement">
+      <change afterPath="$PROJECT_DIR$/src/UserInterface/MapCoordinates.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project_1-2_18.iml" beforeDir="false" afterPath="$PROJECT_DIR$/project_1-2_18.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UserInterface/MapViewer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/UserInterface/MapViewer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +25,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Joel" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -40,76 +33,87 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;customColor&quot;: &quot;&quot;,
-  &quot;associatedIndex&quot;: 2
-}</component>
-  <component name="ProjectId" id="2dsCs4Zkm5xIi2v3uxdPl3OrpG5" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2dvHMvHhlMw9E9OZ9PALV174yJV" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.Unnamed.executor": "Run",
+    "Application.Launcher.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "Noah",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "G:/My Drive/Computer Science/Year 1/Project1-2/Code/MapVisualiser",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="G:\My Drive\Computer Science\Year 1\Project1-2\Code\Git\project_1-2_18\src\Libraries\JavaFX" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="G:\My Drive\Computer Science\Year 1\Project1-2\Code\Git\project_1-2_18\src\images" />
-    </key>
-  </component>
   <component name="RunManager">
-    <configuration name="Launcher" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="20" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <configuration name="Launcher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="UserInterface.Launcher" />
       <module name="project_1-2_18" />
-      <option name="VM_PARAMETERS" value="--module-path=&quot;C:\Users\joeld\Downloads\openjfx-21.0.1_windows-x64_bin-sdk\javafx-sdk-21.0.1\lib&quot; --add-modules=javafx.controls" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;$USER_HOME$/Documents/javafx-sdk-21.0.1/lib&quot; --add-modules=javafx.controls" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="UserInterface.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Launcher" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021" />
+        <option value="jdk-17.0.10-corretto-17.0.10-4caba194b151-53826d6a" />
       </set>
     </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="f241ee4f-d14d-4efd-890d-15b63e0ac6c7" name="Changes" comment="" />
-      <created>1710787603362</created>
+      <changelist id="4895b3fb-1984-4b73-800b-39a46fc5233f" name="Changes" comment="" />
+      <created>1710881587470</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1710787603362</updated>
-      <workItem from="1710787606199" duration="1004000" />
-      <workItem from="1710854471500" duration="1140000" />
+      <updated>1710881587470</updated>
+      <workItem from="1710881588653" duration="9060000" />
     </task>
+    <task id="LOCAL-00001" summary="Code for coordinates placement">
+      <option name="closed" value="true" />
+      <created>1710889416141</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1710889416141</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Code for coordinates placement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Code for coordinates placement" />
   </component>
 </project>

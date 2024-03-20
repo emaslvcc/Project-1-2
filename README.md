@@ -1,7 +1,7 @@
-#Project 1-2 group 18
+Project 1-2 group 18
 
-#To run the code
+To run the code
 
-#To run JavaFX
+To run JavaFX
 
 

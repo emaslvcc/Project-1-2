@@ -64,7 +64,7 @@ public class PaneCreators extends GetUserData {
         BorderPane topCenterPane = new BorderPane();
         Button calculateButton = new Button("Calculate");
         calculateButton.setOnAction(e -> {
-            System.out.println("Hi");
+            System.out.println("Calculating");
             createHashMap();
             startPostCode = getStartZip();
             endPostCode = getEndZip();

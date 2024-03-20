@@ -66,8 +66,16 @@ public class PaneCreators extends GetUserData {
         calculateButton.setOnAction(e -> {
             System.out.println("Calculating");
             createHashMap();
-            startPostCode = getStartZip();
-            endPostCode = getEndZip();
+            try {
+                startPostCode = getStartZip();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            try {
+                endPostCode = getEndZip();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
             MapViewer.updateCord(startPostCode,endPostCode);
             distance = Math.round(calculateAfterPressedButton(startPostCode,endPostCode)* 100d) / 100d;
             setDistance(distance);
@@ -93,17 +101,34 @@ public class PaneCreators extends GetUserData {
         return topCenterPane;
     }
 
-    private PostCode getStartZip() {
+    private PostCode getStartZip() throws Exception {
         String startCode = startCodeField.getText().toUpperCase();
+        validatePostcode(startCode);
         startPostCode = getZipCode(dataMap, startCode );
         return startPostCode;
     }
-    private PostCode getEndZip() {
+    private PostCode getEndZip() throws Exception{
 
         String endCode = endCodeField.getText().toUpperCase();
+        validatePostcode(endCode);
         endPostCode = getZipCode(dataMap, endCode);
         return endPostCode;
     }
+
+    private void validatePostcode(String postcode) throws Exception {
+        if (postcode.length() != 6) {
+            throw new Exception("Postcode " + postcode + " is invalid: incorrect length.");
+        } else if (Character.isDigit(postcode.charAt(4)) || Character.isDigit(postcode.charAt(5))) {
+            throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+        } 
+        
+        for (int i = 0; i < 4; i++) {
+            if(!Character.isDigit(postcode.charAt(i))) {
+                throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+            }
+        }
+    }
+
 
     private void setTime(int min) {
         this.min = min;

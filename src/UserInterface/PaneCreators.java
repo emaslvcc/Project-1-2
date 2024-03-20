@@ -69,7 +69,7 @@ public class PaneCreators extends GetUserData {
             startPostCode = getStartZip();
             endPostCode = getEndZip();
             MapViewer.updateCord(startPostCode,endPostCode);
-            distance = calculateAfterPressedButton(startPostCode,endPostCode);
+            distance = Math.round(calculateAfterPressedButton(startPostCode,endPostCode)* 100d) / 100d;
             setDistance(distance);
 
         });

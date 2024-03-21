@@ -1,7 +1,7 @@
 package DataManagers;
 
 import Calculators.DistanceCalculatorHaversine;
-
+import javafx.scene.control.TextField;
 import java.util.Map;
 
 /**
@@ -10,13 +10,15 @@ import java.util.Map;
  */
 public class GetUserData extends DataBaseReader{
 
+    protected PostCode startPostCode, endPostCode;
+
     /**
      * Takes user's input and creates a PostCode object.
      * 
      * @param dataMap The map containing postal code data.
      * @return The PostCode object created based on user input.
      */
-    protected PostCode getZipCode(Map<String, double[]> dataMap, String zipCode) {
+    private PostCode getZipCode(Map<String, double[]> dataMap, String zipCode) {
         return createPostCode(dataMap, zipCode);
     }
 
@@ -41,5 +43,32 @@ public class GetUserData extends DataBaseReader{
         DistanceCalculatorHaversine calc1 = new DistanceCalculatorHaversine(startPostCode, endPostCode);
 
         return calc1.getDistance();
+    }
+    protected PostCode getStartZip(TextField startCodeField) throws Exception {
+        String startCode = startCodeField.getText().toUpperCase();
+        validatePostcode(startCode);
+        startPostCode = getZipCode(dataMap, startCode );
+        return startPostCode;
+    }
+    protected PostCode getEndZip(TextField endCodeField) throws Exception{
+
+        String endCode = endCodeField.getText().toUpperCase();
+        validatePostcode(endCode);
+        endPostCode = getZipCode(dataMap, endCode);
+        return endPostCode;
+    }
+
+    private void validatePostcode(String postcode) throws Exception {
+        if (postcode.length() != 6) {
+            throw new Exception("Postcode " + postcode + " is invalid: incorrect length.");
+        } else if (Character.isDigit(postcode.charAt(4)) || Character.isDigit(postcode.charAt(5))) {
+            throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if(!Character.isDigit(postcode.charAt(i))) {
+                throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+            }
+        }
     }
 }

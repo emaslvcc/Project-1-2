@@ -23,35 +23,11 @@ public class PostCode {
     }
 
     /**
-     * Retrieves the postal code.
-     * @return The postal code.
-     */
-    public String getPostCode() {
-        return this.postCode;
-    }
-
-    /**
-     * Sets the postal code.
-     * @param postCode The postal code to set.
-     */
-    public void setPostCode(String postCode) {
-        this.postCode = postCode;
-    }
-
-    /**
      * Retrieves the latitude.
      * @return The latitude.
      */
     public double getLatitude() {
         return this.latitude;
-    }
-
-    /**
-     * Sets the latitude.
-     * @param latitude The latitude to set.
-     */
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
     }
 
     /**
@@ -62,11 +38,5 @@ public class PostCode {
         return this.longitude;
     }
 
-    /**
-     * Sets the longitude.
-     * @param longitude The longitude to set.
-     */
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
+
 }

@@ -8,7 +8,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 public class MapViewer {
@@ -81,13 +80,8 @@ public class MapViewer {
         return new SubScene(mapPane, width, height);
     }
 
-    public static void updateCord(PostCode startPostCode,PostCode endPostCode){
-        startX = startPostCode.getLatitude();
-        startY = startPostCode.getLongitude();
-        endX = endPostCode.getLatitude();
-        endY = endPostCode.getLongitude();
+    public static void drawLine(){
 
-        // Calculate is clicked:
         // Generate coordinates from postal codes is called
         MapCoordinates location1 = new MapCoordinates(startX, startY);
         MapCoordinates location2 = new MapCoordinates(endX, endY);
@@ -99,5 +93,12 @@ public class MapViewer {
         line.setStroke(Color.RED);
         linesPane.getChildren().clear();
         linesPane.getChildren().add(line);
+    }
+
+    public static void updateCord(PostCode startPostCode,PostCode endPostCode){
+        startX = startPostCode.getLatitude();
+        startY = startPostCode.getLongitude();
+        endX = endPostCode.getLatitude();
+        endY = endPostCode.getLongitude();
     }
 }

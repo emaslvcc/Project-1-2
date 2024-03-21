@@ -9,6 +9,7 @@ import DataManagers.PostCode;
 public class DistanceCalculatorHaversine implements DistanceCalculator {
 
     private double distance;
+    private double latitude1, latitude2, longitude1, longitude2;
 
     /**
      * Constructs a DistanceCalculatorHaversine object and calculates the distance
@@ -33,10 +34,10 @@ public class DistanceCalculatorHaversine implements DistanceCalculator {
         // Radius of the earth in kilometers
         final int earthRadius = 6371;
 
-        double latitude1 = postCode1.getLatitude();
-        double latitude2 = postCode2.getLatitude();
-        double longitude1 = postCode1.getLongitude();
-        double longitude2 = postCode2.getLongitude();
+        latitude1 = postCode1.getLatitude();
+        latitude2 = postCode2.getLatitude();
+        longitude1 = postCode1.getLongitude();
+        longitude2 = postCode2.getLongitude();
 
         // Conversion of degrees to radians
         double latDistance = Math.toRadians(latitude2 - latitude1);

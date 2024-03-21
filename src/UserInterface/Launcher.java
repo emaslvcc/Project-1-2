@@ -1,14 +1,11 @@
 package UserInterface;
 
-import Calculators.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
 public class Launcher extends Application {
-    private double walkingTime;
-    private double cyclingTime;
-    private TimeCalculator timeCalc;
+
     public static void main(String[] args) {
 
         //call a method to start a program

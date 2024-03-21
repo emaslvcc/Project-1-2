@@ -30,29 +30,28 @@ public class GetUserData extends DataBaseReader{
      * @param zipCode The zip code to create a PostCode object for.
      * @return The PostCode object created based on the provided zip code.
      */
-    private PostCode createPostCode(Map<String, double[]> dataMap, String zipCode){
-        if (dataMap.containsKey(zipCode)) {
-            return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
-        } else {
-
-            if (callCounter == 0){
-
-                callCounter++;
-                saveNewPostCode(zipCode);
-                return createPostCode(dataMap, zipCode);
+    private PostCode createPostCode(Map<String, double[]> dataMap, String zipCode) {
+        try {
+            if (dataMap.containsKey(zipCode)) {
+                return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
             } else {
-
-                try {
-
-                    Thread.sleep(6000);
+                if (callCounter == 0) {
                     callCounter++;
                     saveNewPostCode(zipCode);
                     return createPostCode(dataMap, zipCode);
-
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                } else {
+                    Thread.sleep(6000); // Wait for 6 seconds
+                    callCounter++;
+                    saveNewPostCode(zipCode);
+                    return createPostCode(dataMap, zipCode);
                 }
             }
+        } catch (InterruptedException e) {
+            // Handle the InterruptedException
+            e.printStackTrace(); // You can log the error message or take other actions
+            // Optionally, rethrow the exception
+            // throw new RuntimeException("Thread interrupted while waiting for 6 seconds", e);
+            return null; // or return some default value
         }
     }
 

@@ -81,6 +81,12 @@ public class PaneCreators extends LogicManager {
         modeBox.setCursor(Cursor.HAND);
         modeBox.setPrefSize(100, 10);
 
+        // time is being recalculated if transportation mode changes
+        modeBox.setOnAction((event) -> {
+            calculateLogic(startCodeField, endCodeField, modeBox);
+            setTime(time);
+        });
+
         VBox frameBox = new VBox(calculateButton, modeBox);
         frameBox.setAlignment(Pos.CENTER);
         topCenterPane.setCenter(frameBox);

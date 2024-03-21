@@ -23,10 +23,10 @@ public class MapCoordinates {
     }
 
     public double getX(double realLongitude) {
-        return -606.5 + (realLongitude -  5.487500) * (1982/0.414722);
+        return -606.5 + (realLongitude -  5.487500) * (1982/0.414722222222222);
     }
 
     public double getY(double realLatitude) {
-        return -428 + (realLatitude - 50.938333) * (1284/-0.174722);
+        return -428 + (realLatitude - 50.93833333333333) * (1284/-0.17472222222222);
     }
 }

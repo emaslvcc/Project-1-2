@@ -24,7 +24,7 @@ public class MapViewer {
 
     public SubScene createMapSubScene(int width, int height) {
         // Load the image
-        Image mapImage = new Image("/images/mapBig.png");
+        Image mapImage = new Image("/Images/mapBig.png");
 
         // Create the ImageView
         mapView = new ImageView(mapImage);

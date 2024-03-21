@@ -1,8 +1,5 @@
 package DataManagers;
 
-import java.util.Map;
-import java.util.Scanner;
-
 /**
  * The PostCode class represents a postal code with its corresponding latitude and longitude.
  */

@@ -7,7 +7,7 @@ import DataManagers.PostCode;
  * The DistanceCalculatorPythagoras class implements the generic Calculator interface to calculate the
  * aerial distance between two PostCode objects with the Pythagorean formula.
  */
-public class DistanceCalculatorPythagoras implements Calculator {
+public class DistanceCalculatorPythagoras implements DistanceCalculator {
 
     public double distance;
 
@@ -43,8 +43,7 @@ public class DistanceCalculatorPythagoras implements Calculator {
         // Formula application
         double latDistance = latitude2 - latitude1;
         double lonDistance = longitude2 - longitude1;
-        double distance = Math.sqrt(latDistance * latDistance + lonDistance * lonDistance) * earthRadius;
-        return distance;
+        return Math.sqrt(latDistance * latDistance + lonDistance * lonDistance) * earthRadius;
     }
 
     /**

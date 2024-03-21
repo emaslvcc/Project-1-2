@@ -51,7 +51,7 @@ public class APICaller {
                 }
                 in.close();
 
-                System.out.println(response.toString());
+                System.out.println(response);
                 finalResponse = response.toString();
 
             } else {

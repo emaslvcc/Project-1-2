@@ -5,7 +5,7 @@ import DataManagers.PostCode;
 /**
  * The Calculator interface defines a base for classes that perform calculations based on two PostCode objects.
  */
-public interface Calculator {
+public interface DistanceCalculator {
     
     /**
      * Calculates a result based on two PostCode objects.

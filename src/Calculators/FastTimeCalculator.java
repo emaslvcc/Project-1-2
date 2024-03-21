@@ -4,7 +4,7 @@ package Calculators;
  * The FastTimeCalculator class extends the GenericCalculator class and calculates walking and 
  * cycling times based on the provided distance using predefined fast walking and cycling speeds.
  */
-public class FastTimeCalculator extends GenericCalculator{
+public class FastTimeCalculator extends TimeCalculator {
 
     private final double fastWalkSpeed = 7.283038;
     private static final double fastCyclingSpeed = 24.928449;

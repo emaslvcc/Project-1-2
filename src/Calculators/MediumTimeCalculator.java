@@ -4,7 +4,7 @@ package Calculators;
  * The MediumTimeCalculator class extends the GenericCalculator class and calculates walking and 
  * cycling times based on the provided distance using predefined medium walking and cycling speeds.
  */
-public class MediumTimeCalculator extends GenericCalculator {
+public class MediumTimeCalculator extends TimeCalculator {
 
     private static final double mediumCyclingSpeed = 19.938204;
     private final double mediumWalkSpeed = 5.0148;

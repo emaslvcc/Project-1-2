@@ -3,7 +3,7 @@ package Calculators;
 /**
  * The GenericCalculator class provides a base for calculating walking and cycling times.
  */
-public abstract class GenericCalculator {
+public abstract class TimeCalculator {
 
     double walkingTime;
     double cyclingTime;
@@ -16,9 +16,8 @@ public abstract class GenericCalculator {
      * @return The time required to cover the distance at the given speed.
      */
     protected double calculateTime(double distance, double speed) {
-        double time = distance / speed;
-        return time;
-    };
+        return distance / speed;
+    }
 
     /**
      * Retrieves the walking time calculated by the calculator.

@@ -4,7 +4,7 @@ package Calculators;
  * The SlowTimeCalculator class extends the GenericCalculator class and calculates walking and 
  * cycling times based on the provided distance using predefined slow walking and cycling speeds.
  */
-public class SlowTimeCalculator extends GenericCalculator {
+public class SlowTimeCalculator extends TimeCalculator {
 
     private final double slowWalkSpeed = 2.02777344;
     private final double slowCyclingSpeed = 13.92383;

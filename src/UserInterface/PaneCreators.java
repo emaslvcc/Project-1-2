@@ -26,8 +26,8 @@ public class PaneCreators extends GetUserData {
     private Label timeLabelValue;
     private Label distanceLabelValue;
     private PostCode startPostCode, endPostCode;
-    private int outerFrameHeight;
-    private int outerFrameWidth;
+    private final int outerFrameHeight;
+    private final int outerFrameWidth;
 
 
     public PaneCreators(int outerFrameWidth, int outerFrameHeight) {
@@ -164,9 +164,7 @@ public class PaneCreators extends GetUserData {
         Button exitButton = new Button("Exit");
         exitButton.setStyle(buttonStyle);
         exitButton.setPrefSize(100, 30);
-        exitButton.setOnAction(e -> {
-            System.exit(0);
-        });
+        exitButton.setOnAction(e -> System.exit(0));
 
         Label timeLabelTitle = new Label("Time:");
         timeLabelTitle.setStyle(titleStyle);
@@ -175,7 +173,7 @@ public class PaneCreators extends GetUserData {
 
         Label distanceLabelTitle = new Label("Distance: ");
         distanceLabelTitle.setStyle(titleStyle);
-        distanceLabelValue = new Label(Double.toString(distance) + " km");
+        distanceLabelValue = new Label(distance + " km");
         distanceLabelValue.setStyle(textStyle);
 
 

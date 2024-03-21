@@ -1,12 +1,8 @@
 package DataManagers;
 
 import Calculators.DistanceCalculatorHaversine;
-import Calculators.FastTimeCalculator;
-import Calculators.MediumTimeCalculator;
-import Calculators.SlowTimeCalculator;
 
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  * The GetUserData class extends DataBaseReader and provides functionality to get user input
@@ -21,9 +17,7 @@ public class GetUserData extends DataBaseReader{
      * @return The PostCode object created based on user input.
      */
     protected PostCode getZipCode(Map<String, double[]> dataMap, String zipCode) {
-
-        PostCode postCode = createPostCode(dataMap, zipCode);
-        return postCode;
+        return createPostCode(dataMap, zipCode);
     }
 
     /**
@@ -35,8 +29,7 @@ public class GetUserData extends DataBaseReader{
      */
     private PostCode createPostCode(Map<String, double[]> dataMap, String zipCode){
         if (dataMap.containsKey(zipCode)) {
-            PostCode postCode = new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
-            return postCode;
+            return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
         } else {
             saveNewPostCode(zipCode);
             return createPostCode(dataMap, zipCode);
@@ -44,11 +37,9 @@ public class GetUserData extends DataBaseReader{
     }
 
     public double calculateAfterPressedButton(PostCode startPostCode, PostCode endPostCode) {
-
         //calculate the distance (two different methods)
         DistanceCalculatorHaversine calc1 = new DistanceCalculatorHaversine(startPostCode, endPostCode);
 
-        double distance = calc1.getDistance();
-        return distance;
+        return calc1.getDistance();
     }
 }

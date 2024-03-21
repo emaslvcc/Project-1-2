@@ -6,7 +6,7 @@ import DataManagers.PostCode;
  * The DistanceCalculatorHaversine class implements the generic Calculator interface to calculate the
  * aerial distance between two PostCode objects with the Haversine formula.
  */
-public class DistanceCalculatorHaversine implements Calculator {
+public class DistanceCalculatorHaversine implements DistanceCalculator {
 
     private double distance;
 
@@ -48,9 +48,7 @@ public class DistanceCalculatorHaversine implements Calculator {
                                     * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 
         double centralAngle = 2 * Math.atan2(Math.sqrt(chordLengthParameter), Math.sqrt(1 - chordLengthParameter));
-        double distance = earthRadius * centralAngle;
-
-        return distance;
+        return earthRadius * centralAngle;
     }
 
     /**

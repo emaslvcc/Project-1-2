@@ -3,15 +3,12 @@ package UserInterface;
 import Calculators.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
 import javafx.stage.Stage;
-import DataManagers.PostCode;
-import java.util.Scanner;
 
 public class Launcher extends Application {
     private double walkingTime;
     private double cyclingTime;
-    private GenericCalculator timeCalc;
+    private TimeCalculator timeCalc;
     public static void main(String[] args) {
 
         //call a method to start a program

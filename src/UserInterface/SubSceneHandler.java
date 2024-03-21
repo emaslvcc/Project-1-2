@@ -1,8 +1,6 @@
 package UserInterface;
 
-import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.layout.BorderPane;
 
 
 public class SubSceneHandler {
@@ -17,8 +15,7 @@ public class SubSceneHandler {
 
     public SubScene createMapSubscene() {
         MapViewer mapViewer = new MapViewer();
-        SubScene mapSubscene = mapViewer.createMapSubScene(innerFrameWidth, innerFrameHeight);
-        return mapSubscene;
+        return mapViewer.createMapSubScene(innerFrameWidth, innerFrameHeight);
     }
 
 }

@@ -49,6 +49,9 @@ public class MapViewer {
             if (deltaY < 0) {
                 zoomFactor = 1 / zoomFactor;
             }
+            if(deltaY == 0){
+                return;
+            }
             if ((mapPane.getScaleX() * zoomFactor) >= minZoom && (mapPane.getScaleX() * zoomFactor) <=maxZoom) {
                 mapPane.setScaleX(mapPane.getScaleX() * zoomFactor);
                 mapPane.setScaleY(mapPane.getScaleY() * zoomFactor);

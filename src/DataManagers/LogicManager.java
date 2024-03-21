@@ -12,13 +12,19 @@ public class LogicManager extends GetUserData {
     protected int time;
     protected double distance;
 
+    /**
+     * This method takes care of the main logic regarding the post codes.
+     * @param startCodeField Start Post Code.
+     * @param endCodeField End Post Code.
+     * @param modeBox Option of walking or cycling.
+     */
     protected void calculateLogic(TextField startCodeField, TextField endCodeField, ChoiceBox<String> modeBox){
 
         System.out.println("Calculating");
         createHashMap();
         try {
             startPostCode = getStartZip(startCodeField);
-            Thread.sleep(6000);
+            Thread.sleep(5000);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -39,6 +45,5 @@ public class LogicManager extends GetUserData {
         else if ((modeBox.getValue()).equals("Bike")){
             time = (int) (Math.round(timeCalc.getCyclingTime()));
         }
-
     }
 }

@@ -10,6 +10,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
+/**
+ * This class is responsible for displaying the map, drawing points, drawing lines, panning and zooming.
+ */
 public class MapViewer {
     private double dragStartX;
     private double dragStartY;
@@ -21,6 +24,14 @@ public class MapViewer {
 
     private static double startX, startY, endX, endY;
 
+    /**
+     * This method creates a map subscene.
+     *
+     * @param width This sets the width size for the size of the map.
+     *  @param height This sets the height size for the size of the map.
+     *
+     * @return This returns the map subscene that will be placed in the frame.
+     */
     public SubScene createMapSubScene(int width, int height) {
         // Load the image
         Image mapImage = new Image("/Images/mapBig.png");
@@ -80,6 +91,9 @@ public class MapViewer {
         return new SubScene(mapPane, width, height);
     }
 
+    /**
+     * Draws the points of two postcodes and a line connecting them on the map.
+     */
     public static void drawLine(){
 
         // Generate coordinates from postal codes is called
@@ -95,6 +109,12 @@ public class MapViewer {
         linesPane.getChildren().add(line);
     }
 
+    /**
+     * Get the coordinates from input postcodes.
+     *
+     * @param startPostCode Starting postcode.
+     * @param endPostCode Destination postcode.
+     */
     public static void updateCord(PostCode startPostCode,PostCode endPostCode){
         startX = startPostCode.getLatitude();
         startY = startPostCode.getLongitude();

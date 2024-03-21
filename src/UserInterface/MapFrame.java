@@ -31,7 +31,7 @@ public class MapFrame extends Application {
         //creates the scene
         Scene scene = new Scene(root, outerFrameWidth, outerFrameHeight, true, SceneAntialiasing.BALANCED);
 
-        //creates the borde panes for the top, center and bottom of the frame
+        //creates the border panes for the top, center and bottom of the frame
         BorderPane bottomPane = paneCreators.createBottomPane();
         BorderPane centerPane = paneCreators.createCenterPane();
         BorderPane topPane = paneCreators.createTopPane();

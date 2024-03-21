@@ -11,6 +11,7 @@ import java.util.Map;
 public class GetUserData extends DataBaseReader{
 
     protected PostCode startPostCode, endPostCode;
+    private int callCounter = 0;
 
     /**
      * Takes user's input and creates a PostCode object.
@@ -33,8 +34,25 @@ public class GetUserData extends DataBaseReader{
         if (dataMap.containsKey(zipCode)) {
             return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
         } else {
-            saveNewPostCode(zipCode);
-            return createPostCode(dataMap, zipCode);
+
+            if (callCounter == 0){
+
+                callCounter++;
+                saveNewPostCode(zipCode);
+                return createPostCode(dataMap, zipCode);
+            } else {
+
+                try {
+
+                    Thread.sleep(6000);
+                    callCounter++;
+                    saveNewPostCode(zipCode);
+                    return createPostCode(dataMap, zipCode);
+
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         }
     }
 

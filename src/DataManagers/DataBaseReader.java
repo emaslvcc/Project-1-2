@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class DataBaseReader extends APICaller {
 
-    protected Map<String, double[]> dataMap = new HashMap<>();
+    public Map<String, double[]> dataMap = new HashMap<>();
     private final String PATH = "src/DataManagers/MassZipLatLon.csv";
 
     /**

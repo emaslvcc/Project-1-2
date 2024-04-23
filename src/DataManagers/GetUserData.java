@@ -8,10 +8,12 @@ import java.util.Map;
  * The GetUserData class extends DataBaseReader and provides functionality to get user input
  * for postal codes and create corresponding PostCode objects.
  */
-public class GetUserData extends DataBaseReader{
+public class GetUserData{
 
     protected PostCode startPostCode, endPostCode;
-    private int callCounter = 0;
+    private int apiCallsCounter = 0;
+
+    DataBaseReader dataBaseReader = new DataBaseReader();
 
     /**
      * Takes user's input and creates a PostCode object.
@@ -30,29 +32,27 @@ public class GetUserData extends DataBaseReader{
      * @param zipCode The zip code to create a PostCode object for.
      * @return The PostCode object created based on the provided zip code.
      */
-    private PostCode createPostCode(Map<String, double[]> dataMap, String zipCode){
-        if (dataMap.containsKey(zipCode)) {
-            return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
-        } else {
-
-            if (callCounter == 0){
-
-                callCounter++;
-                saveNewPostCode(zipCode);
-                return createPostCode(dataMap, zipCode);
+    private PostCode createPostCode(Map<String, double[]> dataMap, String zipCode) {
+        try {
+            if (dataMap.containsKey(zipCode)) {
+                return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
             } else {
-
-                try {
-
-                    Thread.sleep(6000);
-                    callCounter++;
-                    saveNewPostCode(zipCode);
+                if (apiCallsCounter == 0) {
+                    apiCallsCounter++;
+                    dataBaseReader.saveNewPostCode(zipCode);
                     return createPostCode(dataMap, zipCode);
-
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                } else {
+                    Thread.sleep(6000); // Wait for 6 seconds
+                    apiCallsCounter++;
+                    dataBaseReader.saveNewPostCode(zipCode);
+                    return createPostCode(dataMap, zipCode);
                 }
             }
+        } catch (InterruptedException e) {
+            // Handle the InterruptedException
+            e.printStackTrace();
+
+            return null;
         }
     }
 
@@ -65,14 +65,14 @@ public class GetUserData extends DataBaseReader{
     protected PostCode getStartZip(TextField startCodeField) throws Exception {
         String startCode = startCodeField.getText().toUpperCase();
         validatePostcode(startCode);
-        startPostCode = getZipCode(dataMap, startCode );
+        startPostCode = getZipCode(dataBaseReader.dataMap, startCode );
         return startPostCode;
     }
     protected PostCode getEndZip(TextField endCodeField) throws Exception{
 
         String endCode = endCodeField.getText().toUpperCase();
         validatePostcode(endCode);
-        endPostCode = getZipCode(dataMap, endCode);
+        endPostCode = getZipCode(dataBaseReader.dataMap, endCode);
         return endPostCode;
     }
 

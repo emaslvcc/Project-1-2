@@ -3,6 +3,7 @@ package DataManagers;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
 import UserInterface.MapViewer;
+import UserInterface.PaneCreators;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
@@ -14,9 +15,10 @@ public class LogicManager extends GetUserData {
     protected void calculateLogic(TextField startCodeField, TextField endCodeField, ChoiceBox<String> modeBox){
 
         System.out.println("Calculating");
-        createHashMap();
+        dataBaseReader.createHashMap();
         try {
             startPostCode = getStartZip(startCodeField);
+//            Thread.sleep(6000);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

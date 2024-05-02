@@ -16,6 +16,9 @@ public abstract class TimeCalculator {
      * @return The time required to cover the distance at the given speed.
      */
     protected double calculateTime(double distance, double speed) {
+        if(distance <0 ){
+            distance = distance*(-1);
+        }
         return distance / speed;
     }
 

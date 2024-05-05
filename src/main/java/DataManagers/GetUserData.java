@@ -59,7 +59,7 @@ public class GetUserData extends DataBaseReader{
         return endPostCode;
     }
 
-    private void validatePostcode(String postcode) throws Exception {
+    public void validatePostcode(String postcode) throws Exception {
         if (postcode.length() != 6) {
             JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect length.");
             throw new Exception("Postcode " + postcode + " is invalid: incorrect length.");

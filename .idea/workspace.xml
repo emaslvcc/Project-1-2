@@ -4,57 +4,34 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="897b9f79-d022-4efd-b120-da514b493948" name="Changes" comment="" />
+    <list default="true" id="b793c1b6-6e07-45f9-8176-b437155ab0c6" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
-  </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 6
+  &quot;associatedIndex&quot;: 8
 }</component>
-  <component name="ProjectId" id="2fUsnsf11bUMv7HzbhhsMGclm1i" />
+  <component name="ProjectId" id="2gS2AmHMWfW37Bp8LwBuQFqqP55" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Start.executor&quot;: &quot;Run&quot;,
-    &quot;Application.mapFrame.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/joeld/Downloads/SwingMaps&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Start.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/joeld/Downloads/project_1-2_18-Joel/project_1-2_18-Joel",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\joeld\Downloads\SwingMaps" />
-      <recent name="C:\Users\joeld\Downloads\SwingMaps\src\main\resources\Map" />
-      <recent name="C:\Users\joeld\Downloads\SwingMaps\src\main\java" />
-      <recent name="C:\Users\joeld\Downloads\SwingMaps\src\main\resources" />
-    </key>
-  </component>
+}]]></component>
   <component name="RunManager">
     <configuration name="Start" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="GUI.mapFrame" />
@@ -63,9 +40,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Start" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="GUI.mapFrame" />
-      <module name="SwingMaps" />
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="project_1-2_18-Joel" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="project_1-2_18-Joel" />
+      <option name="filePath" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -82,21 +65,13 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="897b9f79-d022-4efd-b120-da514b493948" name="Changes" comment="" />
-      <created>1713867162365</created>
+      <changelist id="b793c1b6-6e07-45f9-8176-b437155ab0c6" name="Changes" comment="" />
+      <created>1715676518411</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1713867162365</updated>
-      <workItem from="1713867163382" duration="2873000" />
-      <workItem from="1713896058054" duration="5777000" />
-      <workItem from="1713904883306" duration="2141000" />
-      <workItem from="1713907233642" duration="133000" />
-      <workItem from="1714312362068" duration="81000" />
-      <workItem from="1714322892757" duration="3390000" />
-      <workItem from="1714326469488" duration="2010000" />
-      <workItem from="1714484372100" duration="12671000" />
-      <workItem from="1714505793872" duration="889000" />
-      <workItem from="1714512540572" duration="2528000" />
+      <updated>1715676518411</updated>
+      <workItem from="1715676518942" duration="61000" />
+      <workItem from="1715676590869" duration="1680000" />
     </task>
     <servers />
   </component>

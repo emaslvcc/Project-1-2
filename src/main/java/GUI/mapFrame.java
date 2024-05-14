@@ -1,5 +1,7 @@
 package GUI;
 
+import DataManagers.LogicManager;
+
 import javax.swing.*;
 
 public class mapFrame extends javax.swing.JFrame {
@@ -7,7 +9,7 @@ public class mapFrame extends javax.swing.JFrame {
     private javax.swing.JButton calculateButton;
     private javax.swing.JTextField destinationCodeField;
     private javax.swing.JLabel destinationCodeLabel;
-    private javax.swing.JLabel distanceNumberLabel;
+    private static javax.swing.JLabel distanceNumberLabel;
     private javax.swing.JLabel distanceTextLabel;
     private javax.swing.JLabel exitButton;
     private javax.swing.JPanel mapPanel;
@@ -15,7 +17,7 @@ public class mapFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> modeBox;
     private javax.swing.JTextField startCodeField;
     private javax.swing.JLabel startCodeLabel;
-    private javax.swing.JLabel timeNumberLabel;
+    private static javax.swing.JLabel timeNumberLabel;
     private javax.swing.JLabel timeTextLabel;
 
 
@@ -250,6 +252,14 @@ public class mapFrame extends javax.swing.JFrame {
 
     }
 
+    public static void updateTimeField(int time) {
+        timeNumberLabel.setText(time + " min");
+    }
+
+    public static void updateDistanceField(double distance) {
+        distanceNumberLabel.setText(distance + " km");
+    }
+
     private void exitButtonMouseClicked(java.awt.event.MouseEvent evt) {
         System.exit(0);
     }
@@ -260,7 +270,7 @@ public class mapFrame extends javax.swing.JFrame {
 
 
     public static void main(String args[]) {
-
+        LogicManager.createGraph();
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {

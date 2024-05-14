@@ -22,6 +22,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+
+import DataManagers.Node;
 
 public class createMap {
     private static org.jxmapviewer.JXMapViewer jXMapViewer;
@@ -55,10 +58,10 @@ public class createMap {
         jXMapViewer.setZoom(6);
 
         // The boundaries of Maastricht on the map
-        double minLatitude = 50.81;
-        double maxLatitude = 50.89;
-        double minLongitude = 5.65;
-        double maxLongitude = 5.72;
+        double minLatitude = 50.80;
+        double maxLatitude = 50.90;
+        double minLongitude = 5.62;
+        double maxLongitude = 5.76;
 
         // Define the maximum zoom level
         int maxZoom = 7;
@@ -118,14 +121,7 @@ public class createMap {
         endLongitude = endPostCode.getLongitude();
     }
 
-    public static void drawPath(ResponsePath path) {
-        // Get the points on the path
-        PointList pointList = path.getPoints();
-
-        // Ensure pointList is not null and contains at least two points
-        if (pointList == null || pointList.size() < 2) {
-            return;
-        }
+    public static void drawPath(List<Node> path) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
@@ -136,10 +132,14 @@ public class createMap {
                     g.setColor(Color.BLUE);
                     g.setStroke(new BasicStroke(3));
 
+
+
                     // Draw a line between each pair of points on the path
-                    for (int i = 0; i < pointList.size() - 1; i++) {
-                        GeoPosition point1 = new GeoPosition(pointList.getLat(i), pointList.getLon(i));
-                        GeoPosition point2 = new GeoPosition(pointList.getLat(i + 1), pointList.getLon(i + 1));
+                    for (int i = 0; i < path.size() - 1; i++) {
+                        Node startNode = path.get(i);
+                        Node endNode = path.get(i + 1);
+                        GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
+                        GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
                         Point2D startP = map.convertGeoPositionToPoint(point1);
                         Point2D endP = map.convertGeoPositionToPoint(point2);
                         g.draw(new Line2D.Double(startP, endP));

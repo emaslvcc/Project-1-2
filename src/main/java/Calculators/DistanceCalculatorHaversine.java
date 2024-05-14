@@ -52,6 +52,24 @@ public class DistanceCalculatorHaversine implements DistanceCalculator {
         return earthRadius * centralAngle;
     }
 
+    public static double calculate(double longitude1, double latitude1, double longitude2, double latitude2) {
+
+        // Radius of the earth in kilometers
+        final int earthRadius = 6371;
+
+        // Conversion of degrees to radians
+        double latDistance = Math.toRadians(latitude2 - latitude1);
+        double lonDistance = Math.toRadians(longitude2 - longitude1);
+
+        // Formula application
+        double chordLengthParameter = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(latitude1)) * Math.cos(Math.toRadians(latitude2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+        double centralAngle = 2 * Math.atan2(Math.sqrt(chordLengthParameter), Math.sqrt(1 - chordLengthParameter));
+        return earthRadius * centralAngle;
+    }
+
     /**
      * Retrieves the calculated distance.
      * @return The aerial distance between postal code addresses in kilometres.

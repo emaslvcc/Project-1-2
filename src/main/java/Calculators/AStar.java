@@ -47,7 +47,7 @@ public class AStar {
     }
 
     //euclidean distance
-    public static double heuristic(Node a, Node b) {
+    private static double heuristic(Node a, Node b) {
         return Math.sqrt(Math.pow(a.getLat() - b.getLat(), 2) + Math.pow(a.getLon() - b.getLon(), 2));
     }
     

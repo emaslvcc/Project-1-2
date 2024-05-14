@@ -6,11 +6,8 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.config.Profile;
 import com.graphhopper.util.*;
-
 import java.util.List;
 import javax.swing.*;
-
-import Calculators.AStar;
 
 public class LogicManager extends GetUserData {
     private static DataManagers.Graph graph = new DataManagers.Graph();
@@ -124,11 +121,10 @@ public class LogicManager extends GetUserData {
         for (int i = 0; i < path.size() - 1; i++) {
             Node startNode = path.get(i);
             Node endNode = path.get(i + 1);
-            distance += AStar.heuristic(startNode, endNode);
+            distance += Calculators.DistanceCalculatorHaversine.calculate(startNode.getLon(), startNode.getLat(), endNode.getLon(), endNode.getLat());
         }
 
-        // Convert the distance from degrees to meters
-        return Double.parseDouble(String.format("%.2f", (distance * 111139) / 1000));
+        return Double.parseDouble(String.format("%.2f", distance));
     }
 
 

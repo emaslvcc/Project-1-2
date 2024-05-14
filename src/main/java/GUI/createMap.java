@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.List;
 
 import DataManagers.Node;
+import Bus.DirectConnection;
 
 public class createMap {
     private static org.jxmapviewer.JXMapViewer jXMapViewer;
@@ -112,6 +113,8 @@ public class createMap {
                 }
             }
         });
+        Database.DatabaseUploader.init();
+        System.out.println(Bus.DirectConnection.checkConnection(2578403, 2578131));
     }
 
     public static void updateCoord(PostCode startPostCode, PostCode endPostCode) {

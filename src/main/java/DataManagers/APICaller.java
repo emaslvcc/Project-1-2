@@ -18,10 +18,20 @@ public class APICaller {
      * @param postcode The postal code in Maastricht for which coordinates are requested.
      * @return The response from the API containing the coordinates.
      */
-    protected static String sendPostRequest(String postcode) {
+
+    static long latestUseTime = 0;
+
+    protected static String sendPostRequest(String postcode) throws InterruptedException {
 
         String finalResponse = "";
-
+        if (latestUseTime == 0) {
+            latestUseTime = System.currentTimeMillis();
+            System.out.println("Calling API.");
+        } else if (System.currentTimeMillis() - latestUseTime < 5100) {
+            System.out.println("Pausing for " + (System.currentTimeMillis() - latestUseTime) + " ms.");
+            Thread.sleep(System.currentTimeMillis() - latestUseTime);
+            latestUseTime = System.currentTimeMillis();
+        }
         try {
             String urlString = "https://computerscience.dacs.unimaas.nl/get_coordinates?postcode=" + postcode;
             URL url = new URL(urlString);

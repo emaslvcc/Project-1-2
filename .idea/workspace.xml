@@ -4,11 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b793c1b6-6e07-45f9-8176-b437155ab0c6" name="Changes" comment="" />
+    <list default="true" id="b793c1b6-6e07-45f9-8176-b437155ab0c6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DataManagers/APICaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DataManagers/APICaller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DataManagers/DataBaseReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DataManagers/DataBaseReader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DataManagers/LogicManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DataManagers/LogicManager.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
@@ -22,13 +30,17 @@
   "keyToString": {
     "Application.Start.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "joel",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/joeld/Downloads/project_1-2_18-Joel/project_1-2_18-Joel",
+    "last_opened_file_path": "C:/Users/mrnon/Obelisk/Coding/Nonsense/project_1-2_18",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "SDKs",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -57,8 +69,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.15989.150" />
+        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-IU-241.15989.150" />
       </set>
     </attachedChunks>
   </component>
@@ -72,6 +84,7 @@
       <updated>1715676518411</updated>
       <workItem from="1715676518942" duration="61000" />
       <workItem from="1715676590869" duration="1680000" />
+      <workItem from="1715682261532" duration="2056000" />
     </task>
     <servers />
   </component>

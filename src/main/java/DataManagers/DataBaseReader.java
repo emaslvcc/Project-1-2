@@ -47,7 +47,6 @@ public class DataBaseReader extends APICaller {
      * @param zipCode The postal code to be saved.
      */
     public void saveNewPostCode(String zipCode) {
-
         try {
             // Call the API to get coordinates for the given postal code
             String apiResponse = sendPostRequest(zipCode);
@@ -64,6 +63,8 @@ public class DataBaseReader extends APICaller {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 

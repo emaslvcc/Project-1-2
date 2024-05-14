@@ -25,7 +25,6 @@ public class LogicManager extends GetUserData {
         createHashMap();
         try {
             startPostCode = getStartZip(startCodeField);
-            Thread.sleep(5000);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

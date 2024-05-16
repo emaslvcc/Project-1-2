@@ -1,5 +1,6 @@
 package DataManagers;
 
+import Bus.DirectConnection;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
 import com.graphhopper.GraphHopper;
@@ -13,6 +14,10 @@ public class LogicManager extends GetUserData {
     private static DataManagers.Graph graph = new DataManagers.Graph();
     protected int time;
     protected double distance;
+    DirectConnection directConnection = new DirectConnection();
+    protected int [] finalStops;
+
+    private int range = 500;
 
     /**
      * This method takes care of the main logic regarding the post codes.
@@ -22,7 +27,7 @@ public class LogicManager extends GetUserData {
      * @param modeBox        Option of walking or cycling.
      */
     public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox) {
-        createHashMap();
+        dataBaseReader.createHashMap();
         try {
             startPostCode = getStartZip(startCodeField);
         } catch (Exception ex) {
@@ -36,19 +41,23 @@ public class LogicManager extends GetUserData {
         }
         String mode = modeBox.getSelectedItem().toString();
 
-        GUI.createMap.updateCoord(startPostCode, endPostCode);
-        calculateRoute(startPostCode, endPostCode, mode);
-
-        //distance = Math.round(calculateAfterPressedButton(startPostCode, endPostCode) * 100d) / 100d;
+        if ((mode).equals("Bus")){
+            finalStops = directConnection.bestWay(startPostCode, endPostCode, range);
+            //TODO HERE SHOULD BE LINE FOR DRAWING LINE BASED ON BUS STOPS
+        } else {
+            GUI.createMap.updateCoord(startPostCode, endPostCode);
+            calculateRoute(startPostCode, endPostCode, mode);
+        }
 
         TimeCalculator timeCalc = new AverageTimeCalculator(distance);
-
         GUI.mapFrame.updateDistanceField(distance);
 
         if ((mode).equals("Walk")) {
             time = (int) (Math.round(timeCalc.getWalkingTime()));
         } else if ((mode).equals("Bike")) {
             time = (int) (Math.round(timeCalc.getCyclingTime()));
+        } else if ((mode).equals("Bus")) {
+            time = finalStops[2];
         }
         GUI.mapFrame.updateTimeField(time);
     }

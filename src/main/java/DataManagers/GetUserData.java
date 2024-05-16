@@ -9,20 +9,12 @@ import java.util.Map;
  * The GetUserData class extends DataBaseReader and provides functionality to get user input
  * for postal codes and create corresponding PostCode objects.
  */
-public class GetUserData extends DataBaseReader{
+public class GetUserData {
+
+    DataBaseReader dataBaseReader = new DataBaseReader();
+
 
     protected PostCode startPostCode, endPostCode;
-
-    /**
-     * Takes user's input and creates a PostCode object.
-     * 
-     * @param dataMap The map containing postal code data.
-     * @return The PostCode object created based on user input.
-     */
-    private PostCode getZipCode(Map<String, double[]> dataMap, String zipCode) {
-        return createPostCode(dataMap, zipCode);
-    }
-
     /**
      * Checks if the called zip code is in the hashMap, if not calls an API, then recursively checks again.
      * 
@@ -34,7 +26,7 @@ public class GetUserData extends DataBaseReader{
         if (dataMap.containsKey(zipCode)) {
             return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
         } else {
-            saveNewPostCode(zipCode);
+            dataBaseReader.saveNewPostCode(zipCode);
             return createPostCode(dataMap, zipCode);
         }
     }
@@ -48,14 +40,14 @@ public class GetUserData extends DataBaseReader{
     protected PostCode getStartZip(JTextField startCodeField) throws Exception {
         String startCode = startCodeField.getText().toUpperCase();
         validatePostcode(startCode);
-        startPostCode = getZipCode(dataMap, startCode );
+        startPostCode = createPostCode(dataBaseReader.dataMap, startCode );
         return startPostCode;
     }
     protected PostCode getEndZip(JTextField endCodeField) throws Exception{
 
         String endCode = endCodeField.getText().toUpperCase();
         validatePostcode(endCode);
-        endPostCode = getZipCode(dataMap, endCode);
+        endPostCode = createPostCode(dataBaseReader.dataMap, endCode);
         return endPostCode;
     }
 
@@ -66,6 +58,10 @@ public class GetUserData extends DataBaseReader{
         } else if (Character.isDigit(postcode.charAt(4)) || Character.isDigit(postcode.charAt(5))) {
             JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect format.");
             throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+        }
+        else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2' ||  (postcode.charAt(3) != '1' || postcode.charAt(3) != '2') || postcode.charAt(3) == '0'){
+            JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: not in Maastricht.");
+            throw new Exception("Postcode " + postcode + " is invalid: not in Maastricht.");
         }
 
         for (int i = 0; i < 4; i++) {

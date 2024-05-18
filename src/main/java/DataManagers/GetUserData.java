@@ -59,7 +59,7 @@ public class GetUserData {
             JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect format.");
             throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
         }
-        else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2' ||  (postcode.charAt(3) != '1' || postcode.charAt(3) != '2') || postcode.charAt(3) == '0'){
+        else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2' ||  (postcode.charAt(2) != '1' && postcode.charAt(2) != '2') || postcode.charAt(3) == '0'){
             JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: not in Maastricht.");
             throw new Exception("Postcode " + postcode + " is invalid: not in Maastricht.");
         }

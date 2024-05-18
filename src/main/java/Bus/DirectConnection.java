@@ -12,20 +12,27 @@ public class DirectConnection {
 
     private static int tripId;
     
-    private static boolean checkConnection(int start_bus_stop_id, int end_bus_stop_id) {
+    public static boolean checkConnection(int start_bus_stop_id, int end_bus_stop_id) {
 
         if(start_bus_stop_id == end_bus_stop_id){
             System.out.println("The SAME STOPS");
             return false;
         }
+        System.out.println("checking if direct connection between "+ start_bus_stop_id+ " "+ end_bus_stop_id + " exists");
 
-        String query = "SELECT DISTINCT routes.route_id, routes.route_short_name, routes.route_long_name, trips.trip_id " +
-                       "FROM routes " +
-                       "JOIN trips ON routes.route_id = trips.route_id " +
-                       "JOIN stop_times ON trips.trip_id = stop_times.trip_id " +
-                       "WHERE stop_times.stop_id = ? " +
-                       "AND trips.trip_id IN (SELECT trip_id FROM stop_times WHERE stop_id = ?)";
-        
+        String query = "SELECT DISTINCT r.route_id, r.route_short_name, r.route_long_name, t.trip_id, t.direction_id " +
+                "FROM routes r " +
+                "JOIN trips t ON r.route_id = t.route_id " +
+                "JOIN stop_times st ON t.trip_id = st.trip_id " +
+                "WHERE st.stop_id = ? " +
+                "AND r.route_id IN ( " +
+                "    SELECT DISTINCT r2.route_id " +
+                "    FROM routes r2 " +
+                "    JOIN trips t2 ON r2.route_id = t2.route_id " +
+                "    JOIN stop_times st2 ON t2.trip_id = st2.trip_id " +
+                "    WHERE st2.stop_id = ? AND t.direction_id = t2.direction_id " +
+                ");";
+
         try (PreparedStatement statement = DatabaseUploader.myCon.prepareStatement(query)) {
             // Set the parameters
             statement.setInt(1, start_bus_stop_id);
@@ -33,8 +40,11 @@ public class DirectConnection {
             
             try (ResultSet resultSet = statement.executeQuery()) {
                 // Check if there are any results
-                tripId = resultSet.getInt("trip_id");
-                return resultSet.next();
+                if(resultSet.next()){
+                    tripId = resultSet.getInt("trip_id");
+                    System.out.println("At least one direct connection has been found");
+                    return true;
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("SQL query went wrong.");
@@ -43,10 +53,12 @@ public class DirectConnection {
             e.printStackTrace();
             System.out.println("SQL query went wrong.");
         }
+        System.out.println("There is no direct connection");
         return false;
     }
 
     private int[] getClosestStops(int range, double latitude, double longitude) {
+        System.out.println("Getting nearby bus stops");
         // Corrected and formatted SQL query
         String query = "SELECT stop_id, stop_name, stop_lat, stop_lon, distance " +
                 "FROM (SELECT stop_id, stop_name, stop_lat, stop_lon, " +
@@ -87,7 +99,6 @@ public class DirectConnection {
     }
 
     public int[] bestWay(PostCode startCode, PostCode endCode, int range){
-
         int[] startBusStops = getClosestStops(range, startCode.latitude, startCode.longitude);
         int[] endBusStops = getClosestStops(range, endCode.latitude, endCode.longitude);
 
@@ -121,6 +132,7 @@ public class DirectConnection {
         if(!checkConnection(start_bus_stop_id, end_bus_stop_id)){
             return Integer.MAX_VALUE;
         } else {
+            System.out.println("querying time");
             String query = "SELECT A.stop_id AS start_stop_id, B.stop_id AS end_stop_id,A.departure_time AS departure_time_start,"+
                     " B.arrival_time AS arrival_time_end, " +
                     "TIME_TO_SEC(TIMEDIFF(B.arrival_time, A.departure_time)) / 60 AS time_difference_minutes" +

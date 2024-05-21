@@ -1,8 +1,10 @@
 package DataManagers;
 
+import Bus.BusConnection;
 import Bus.DirectConnection;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
+import GUI.createMap;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.config.Profile;
@@ -27,6 +29,7 @@ public class LogicManager extends GetUserData {
      * @param modeBox        Option of walking or cycling.
      */
     public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox) {
+        BusConnection con;
         dataBaseReader.createHashMap();
         try {
             startPostCode = getStartZip(startCodeField);
@@ -42,8 +45,10 @@ public class LogicManager extends GetUserData {
         String mode = modeBox.getSelectedItem().toString();
 
         if ((mode).equals("Bus")){
-            finalStops = directConnection.bestWay(startPostCode, endPostCode, range);
+            con = directConnection.bestWay(startPostCode, endPostCode, range);
+            time = con.getTravelTime()/60;
             //TODO HERE SHOULD BE LINE FOR DRAWING LINE BASED ON BUS STOPS
+            //createMap.drawPath(con.getRouteNodes());
         } else {
             GUI.createMap.updateCoord(startPostCode, endPostCode);
             calculateRoute(startPostCode, endPostCode, mode);
@@ -56,8 +61,6 @@ public class LogicManager extends GetUserData {
             time = (int) (Math.round(timeCalc.getWalkingTime()));
         } else if ((mode).equals("Bike")) {
             time = (int) (Math.round(timeCalc.getCyclingTime()));
-        } else if ((mode).equals("Bus")) {
-            time = finalStops[2];
         }
         GUI.mapFrame.updateTimeField(time);
     }

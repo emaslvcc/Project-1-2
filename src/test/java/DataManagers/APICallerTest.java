@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class APICallerTest {
 
     @Test
-    void sendPostRequest() {
+    void sendPostRequest() throws InterruptedException {
         assertAll(APICaller.sendPostRequest("6224GW"));
         assertTrue(APICaller.sendPostRequest("1096AC").isEmpty());                   // response should be empty since this is a postal code from amsterdam
 

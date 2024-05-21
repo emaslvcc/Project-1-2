@@ -8,9 +8,8 @@ public class DatabaseUploader {
 
     public static void init() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            myCon = DriverManager.getConnection("jdbc:mysql://localhost:3306/gtfs", "BCS1510", "BCS1510");
-        } catch (ClassNotFoundException | SQLException e) {
+            myCon = DriverManager.getConnection("jdbc:mysql://localhost:3306/gtfs", "joris", "joris");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

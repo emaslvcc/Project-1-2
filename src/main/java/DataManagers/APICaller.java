@@ -33,7 +33,7 @@ public class APICaller {
             latestUseTime = System.currentTimeMillis();
         }
         try {
-            String urlString = "https://computerscience.dacs.unimaas.nl/get_coordinates?postcode=" + postcode;
+            String urlString = "https://project12.ashish.nl/get_coordinates?postcode=" + postcode;
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 

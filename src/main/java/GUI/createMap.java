@@ -18,6 +18,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -146,6 +147,12 @@ public class createMap {
                         Point2D startP = map.convertGeoPositionToPoint(point1);
                         Point2D endP = map.convertGeoPositionToPoint(point2);
                         g.draw(new Line2D.Double(startP, endP));
+//                        g.setColor(Color.RED);
+//                        Ellipse2D.Double circle = new Ellipse2D.Double(startP.getX(), startP.getY(), 10, 10);
+//                        Ellipse2D.Double circle2 = new Ellipse2D.Double(endP.getX(), endP.getY(), 10, 10);
+//                        g.fill(circle);
+//                        g.fill(circle2);
+//                        g.setColor(Color.BLUE);
                     }
 
                     // Create the icons for the start and end points

@@ -28,9 +28,8 @@ public class AStar {
                 return constructPath(cameFrom, goal);
             }
 
-            for (Edge edge : graph.getEdges()) {
-                if (edge.getSource().equals(current) || edge.getDestination().equals(current)) {
-                    Node next = edge.getDestination().equals(current) ? edge.getSource() : edge.getDestination();
+            for (Edge edge : graph.getEdges(current)) {
+                    Node next = edge.getDestination();
                     double newCost = costSoFar.get(current) + edge.getWeight();
 
                     if (!costSoFar.containsKey(next) || newCost < costSoFar.get(next)) {
@@ -38,7 +37,6 @@ public class AStar {
                         frontier.add(next);
                         cameFrom.put(next, current);
                     }
-                }
             }
         }
 

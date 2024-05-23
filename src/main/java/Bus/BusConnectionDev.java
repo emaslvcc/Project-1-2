@@ -7,6 +7,7 @@ import DataManagers.PostCode;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
+import GUI.mapFrame;
 
 class RouteStopInfo {
     String routeId;
@@ -94,6 +95,10 @@ public class BusConnectionDev {
     static List<Node> tripNodes = new ArrayList<>();
     static int id2 = 0;
 
+    static String bestTripString;
+    static TripInfo bestTrip;
+    static int time;
+
     public static void busLogic(double x1, double y1, double x2, double y2) {
 
         try {
@@ -101,7 +106,7 @@ public class BusConnectionDev {
             setupNearestStops(conn, x1, y1, x2, y2); // Start and end coordinates
             findPotentialRoutes(conn);
             List<RouteStopInfo> routes = findRouteBusStops(conn);
-            TripInfo bestTrip = null; // Start with no best trip found
+            bestTrip = null; // Start with no best trip found
 
             for (RouteStopInfo route : routes) {
                 List<TripInfo> tripsForRoute = printNextDepartureAndArrival(conn,
@@ -118,13 +123,12 @@ public class BusConnectionDev {
             }
 
             if (bestTrip != null) {
+                bestTripString = "" + bestTrip;
                 System.out.println("Best Trip: " + bestTrip);
                 createAndQueryShapes(conn, bestTrip);
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-                //createMap.drawPath(stopNodes);
                 createMap.drawPath(tripNodes, stopNodes);
-
             } else {
                 System.out.println("No upcoming trips found.");
             }

@@ -15,7 +15,7 @@ import com.graphhopper.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.*;
+import javax.swing.*;   
 
 public class LogicManager extends GetUserData {
     private static DataManagers.Graph graph = new DataManagers.Graph();
@@ -50,10 +50,7 @@ public class LogicManager extends GetUserData {
         String mode = modeBox.getSelectedItem().toString();
 
         if ((mode).equals("Bus")){
-            //con = directConnection.bestWay(startPostCode, endPostCode, range);
-            //time = con.getTravelTime()/60;
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(), endPostCode.getLatitude(), endPostCode.getLongitude());
-            //createMap.drawPath(con.getRouteNodes());
         } else {
             GUI.createMap.updateCoord(startPostCode, endPostCode);
             calculateRoute(startPostCode, endPostCode, mode);

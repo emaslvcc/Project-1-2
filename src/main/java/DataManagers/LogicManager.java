@@ -6,10 +6,14 @@ import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
 import GUI.createMap;
 import com.graphhopper.GraphHopper;
+import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.config.Profile;
 import com.graphhopper.util.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 
 public class LogicManager extends GetUserData {
@@ -19,7 +23,7 @@ public class LogicManager extends GetUserData {
     DirectConnection directConnection = new DirectConnection();
     protected int [] finalStops;
 
-    private int range = 500;
+    private int range = 1000;
 
     /**
      * This method takes care of the main logic regarding the post codes.
@@ -87,12 +91,15 @@ public class LogicManager extends GetUserData {
 
         com.graphhopper.storage.Graph graphHopper = hopper.getBaseGraph();
         NodeAccess nodeAccess = graphHopper.getNodeAccess();
+        Map<Integer, Node> nodes = new HashMap<>();
 
         // iterate over every node and add it to the graph
         for (int i = 0; i < graphHopper.getNodes(); i++) {
             double lat = nodeAccess.getLat(i);
             double lon = nodeAccess.getLon(i);
-            graph.addNode(new Node(i, lat, lon));
+            Node node = new Node(i, lat, lon);
+            graph.addNode(node);
+            nodes.put(i,node);
         }
 
         // iterate over every edge and add it to the graph
@@ -103,7 +110,9 @@ public class LogicManager extends GetUserData {
             int baseNode = edgeIterator.getBaseNode();
             int adjNode = edgeIterator.getAdjNode();
             double distance = edgeIterator.getDistance();
-            graph.addEdge(new Edge(edgeId, graph.nodes.get(baseNode), graph.nodes.get(adjNode), distance));
+            //System.out.println("trying to add edge for base node "+ edgeId);
+            graph.addEdge(new Edge(edgeId, nodes.get(baseNode), nodes.get(adjNode), distance));
+            graph.addEdge(new Edge(edgeId, nodes.get(adjNode), nodes.get(baseNode), distance));
         }
         System.out.println("Graph created");
     }

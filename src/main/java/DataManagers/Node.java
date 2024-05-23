@@ -23,5 +23,25 @@ public class Node {
         return lon;
     }
 
+    @Override
+    public boolean equals(Object obj){
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Node other = (Node) obj;
+
+        return this.id == other.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 
 }

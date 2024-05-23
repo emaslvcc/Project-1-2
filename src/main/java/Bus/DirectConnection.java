@@ -134,7 +134,7 @@ public class DirectConnection {
         // }
         System.out.println(
                 currMin.getStartingTime() + currMin.getEndTime() + currMin.getLongName() + currMin.getShortName());
-        GUI.createMap.drawPath(currMin.getRouteNodes());
+        //GUI.createMap.drawPath(currMin.getRouteNodes());
         return currMin;
     }
 

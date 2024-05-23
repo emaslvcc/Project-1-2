@@ -125,20 +125,14 @@ public class createMap {
         endLongitude = endPostCode.getLongitude();
     }
 
-    public static void drawPath(List<Node> path) {
-
+    public static void drawPath(List<Node> path, List<Node> stops) {
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
-
                 try {
-                    // Set the color and stroke of the path
                     g.setColor(Color.BLUE);
                     g.setStroke(new BasicStroke(3));
 
-
-
-                    // Draw a line between each pair of points on the path
                     for (int i = 0; i < path.size() - 1; i++) {
                         Node startNode = path.get(i);
                         Node endNode = path.get(i + 1);
@@ -147,16 +141,17 @@ public class createMap {
                         Point2D startP = map.convertGeoPositionToPoint(point1);
                         Point2D endP = map.convertGeoPositionToPoint(point2);
                         g.draw(new Line2D.Double(startP, endP));
-//                        g.setColor(Color.RED);
-//                        Ellipse2D.Double circle = new Ellipse2D.Double(startP.getX(), startP.getY(), 10, 10);
-//                        Ellipse2D.Double circle2 = new Ellipse2D.Double(endP.getX(), endP.getY(), 10, 10);
-//                        g.fill(circle);
-//                        g.fill(circle2);
-//                        g.setColor(Color.BLUE);
                     }
-
-                    // Create the icons for the start and end points
                     createStartAndEndPoints(g, map);
+
+                    g.setColor(Color.RED);
+                    for (int i = 0; i < stops.size(); i++) {
+                        Node node = stops.get(i);
+                        GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                        Point2D pointMap = map.convertGeoPositionToPoint(point);
+                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(), pointMap.getY(), 10, 10);
+                        g.fill(circle);
+                    }
 
                 } catch (Exception e) {
                     System.out.println("Error in drawing path" + e);

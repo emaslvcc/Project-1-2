@@ -192,12 +192,18 @@ public class BusConnectionDev {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(setGroupConcatMaxLen); // Extend group_concat_max_len for large datasets
             stmt.execute("CREATE TEMPORARY TABLE route_bus_stops AS " +
-                    "SELECT route_id, MIN(start_distance + end_distance) AS total_distance, " +
-                    "SUBSTRING_INDEX(GROUP_CONCAT(start_stop_id ORDER BY (start_distance + end_distance)), ',', 1) AS start_stop_id, "
+                    "SELECT route_id, MIN(st2.arrival_time) AS earliest_arrival_time, " +
+                    "SUBSTRING_INDEX(GROUP_CONCAT(st2.stop_id ORDER BY st2.arrival_time ASC, nes.distance ASC), ',', 1) AS end_stop_id, "
                     +
-                    "SUBSTRING_INDEX(GROUP_CONCAT(end_stop_id ORDER BY (start_distance + end_distance)), ',', 1) AS end_stop_id "
+                    "SUBSTRING_INDEX(GROUP_CONCAT(st1.stop_id ORDER BY st2.arrival_time ASC, nes.distance ASC), ',', 1) AS start_stop_id, "
                     +
-                    "FROM potential_routes GROUP BY route_id ORDER BY total_distance;");
+                    "MIN(nes.distance) AS min_end_distance " +
+                    "FROM potential_routes pr " +
+                    "JOIN stop_times st1 ON pr.start_stop_id = st1.stop_id AND pr.trip_id = st1.trip_id " +
+                    "JOIN stop_times st2 ON pr.end_stop_id = st2.stop_id AND pr.trip_id = st2.trip_id " +
+                    "JOIN nearest_end_stops nes ON st2.stop_id = nes.stop_id " +
+                    "GROUP BY route_id " +
+                    "ORDER BY earliest_arrival_time ASC, min_end_distance ASC;");
 
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {

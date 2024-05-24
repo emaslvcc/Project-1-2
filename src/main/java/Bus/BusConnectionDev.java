@@ -153,11 +153,11 @@ public class BusConnectionDev {
         String createNearestStartStops = "CREATE TEMPORARY TABLE nearest_start_stops AS " +
                 "SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance "
                 +
-                "FROM stops ORDER BY distance LIMIT 10;";
+                "FROM stops ORDER BY distance LIMIT 20;";
         String createNearestEndStops = "CREATE TEMPORARY TABLE nearest_end_stops AS " +
                 "SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance "
                 +
-                "FROM stops ORDER BY distance LIMIT 10;";
+                "FROM stops ORDER BY distance LIMIT 20;";
 
         try (PreparedStatement pstmt1 = conn.prepareStatement(createNearestStartStops);
                 PreparedStatement pstmt2 = conn.prepareStatement(createNearestEndStops)) {

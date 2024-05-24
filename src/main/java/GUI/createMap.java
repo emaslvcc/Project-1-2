@@ -115,7 +115,7 @@ public class createMap {
             }
         });
         Database.DatabaseUploader.init();
-        //System.out.println(Bus.DirectConnection.checkConnection(2578403, 2578131));
+        // System.out.println(Bus.DirectConnection.checkConnection(2578403, 2578131));
     }
 
     public static void updateCoord(PostCode startPostCode, PostCode endPostCode) {

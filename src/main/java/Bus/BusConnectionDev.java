@@ -3,6 +3,7 @@ package Bus;
 import java.sql.*;
 import java.util.*;
 
+import Calculators.DistanceCalculatorHaversine;
 import DataManagers.PostCode;
 import DataManagers.Node;
 import Database.DatabaseConnection;
@@ -81,13 +82,6 @@ class TripInfo {
 }
 
 public class BusConnectionDev {
-    PostCode startPostCode;
-    PostCode endPostCode;
-
-    double startLat = startPostCode.getLatitude();
-    double startLon = startPostCode.getLongitude();
-    double endLat = endPostCode.getLatitude();
-    double endLon = endPostCode.getLongitude();
 
     static List<Node> stopNodes = new ArrayList<>();
     static int id = 0;
@@ -98,6 +92,16 @@ public class BusConnectionDev {
     static String bestTripString;
     static TripInfo bestTrip;
     static int time;
+    static double totalDistance = 0.0;
+
+    // calculate distance
+    public static double calculateTotalDistance(List<Node> nodes) {
+
+        for (int i = 0; i < nodes.size() - 1; i++) {
+            totalDistance += DistanceCalculatorHaversine.haversineDistance(nodes.get(i), nodes.get(i + 1));
+        }
+        return totalDistance; // Total distance in kilometers
+    }
 
     public static void busLogic(double x1, double y1, double x2, double y2) {
 
@@ -130,6 +134,8 @@ public class BusConnectionDev {
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 createMap.drawPath(tripNodes, stopNodes);
+                double totalDistance = calculateTotalDistance(tripNodes);
+                System.out.println("Total Distance: " + totalDistance + " km");
             } else {
                 System.out.println("No upcoming trips found.");
             }
@@ -206,10 +212,8 @@ public class BusConnectionDev {
     private static List<TripInfo> printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
             String endStopId) throws SQLException {
         String sql = "SELECT t.route_id, st1.trip_id, st1.departure_time AS start_departure_time, st2.arrival_time AS end_arrival_time, "
-                + "TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time "
-                // Calculating trip time
-                // // in minutes for
-                // clarity
+                + "TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time " // Calculating trip time
+                                                                                              // in minutes for
                 + "FROM stop_times st1 "
                 + "JOIN stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence "
                 + "JOIN trips t ON t.trip_id = st1.trip_id " // Joining with trips to include route_id in the query

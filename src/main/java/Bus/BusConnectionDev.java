@@ -111,6 +111,7 @@ public class BusConnectionDev {
 
             if (bestTrip != null) {
                 System.out.println("Best Trip: " + bestTrip);
+                System.out.println("========================================");
                 createAndQueryShapes(conn, bestTrip);
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());

@@ -4,7 +4,10 @@ import java.sql.*;
 import java.util.*;
 
 import DataManagers.PostCode;
+import DataManagers.Node;
 import Database.DatabaseConnection;
+import GUI.createMap;
+import GUI.mapFrame;
 
 class RouteStopInfo {
     String routeId;
@@ -86,14 +89,24 @@ public class BusConnectionDev {
     double endLat = endPostCode.getLatitude();
     double endLon = endPostCode.getLongitude();
 
-    public static void main(String[] args) {
+    static List<Node> stopNodes = new ArrayList<>();
+    static int id = 0;
+
+    static List<Node> tripNodes = new ArrayList<>();
+    static int id2 = 0;
+
+    static String bestTripString;
+    static TripInfo bestTrip;
+    static int time;
+
+    public static void busLogic(double x1, double y1, double x2, double y2) {
 
         try {
             Connection conn = DatabaseConnection.getConnection();
-            setupNearestStops(conn, 50.849782, 5.705090, 50.855008, 5.666684); // Start and end coordinates
+            setupNearestStops(conn, x1, y1, x2, y2); // Start and end coordinates
             findPotentialRoutes(conn);
             List<RouteStopInfo> routes = findRouteBusStops(conn);
-            TripInfo bestTrip = null; // Start with no best trip found
+            bestTrip = null; // Start with no best trip found
 
             for (RouteStopInfo route : routes) {
                 List<TripInfo> tripsForRoute = printNextDepartureAndArrival(conn,
@@ -110,12 +123,13 @@ public class BusConnectionDev {
             }
 
             if (bestTrip != null) {
+                bestTripString = "" + bestTrip;
                 System.out.println("Best Trip: " + bestTrip);
                 System.out.println("========================================");
                 createAndQueryShapes(conn, bestTrip);
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-
+                createMap.drawPath(tripNodes, stopNodes);
             } else {
                 System.out.println("No upcoming trips found.");
             }
@@ -309,6 +323,9 @@ public class BusConnectionDev {
                         ", Shape Pt Sequence: " + shapePtSequence +
                         ", Latitude: " + shapePtLat +
                         ", Longitude: " + shapePtLon);
+                
+                tripNodes.add(new Node(id2, shapePtLat, shapePtLon));
+                id2++;
             }
             System.out.println("Query completed.");
 
@@ -320,8 +337,8 @@ public class BusConnectionDev {
                 "FROM stop_times st " +
                 "JOIN stops s ON st.stop_id = s.stop_id " +
                 "WHERE st.trip_id = ? AND " +
-                "st.stop_sequence > (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?) AND " +
-                "st.stop_sequence < (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?) " +
+                "st.stop_sequence >= (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?) AND " +
+                "st.stop_sequence <= (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?) " +
                 "ORDER BY st.stop_sequence;";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -341,6 +358,9 @@ public class BusConnectionDev {
 
                 System.out.println("Trip ID: " + tripId + ", Stop ID: " + stopId + ", Stop Name: " + stopName +
                         ", Stop Sequence: " + stopSequence + ", Latitude: " + stopLat + ", Longitude: " + stopLon);
+
+                stopNodes.add(new Node(id, stopLat, stopLon));
+                id++;
             }
         } catch (SQLException e) {
             e.printStackTrace();

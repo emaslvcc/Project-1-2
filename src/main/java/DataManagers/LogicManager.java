@@ -1,6 +1,7 @@
 package DataManagers;
 
 import Bus.BusConnection;
+import Bus.BusConnectionDev;
 import Bus.DirectConnection;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
@@ -14,7 +15,7 @@ import com.graphhopper.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.*;
+import javax.swing.*;   
 
 public class LogicManager extends GetUserData {
     private static DataManagers.Graph graph = new DataManagers.Graph();
@@ -49,10 +50,7 @@ public class LogicManager extends GetUserData {
         String mode = modeBox.getSelectedItem().toString();
 
         if ((mode).equals("Bus")){
-            con = directConnection.bestWay(startPostCode, endPostCode, range);
-            time = con.getTravelTime()/60;
-            //TODO HERE SHOULD BE LINE FOR DRAWING LINE BASED ON BUS STOPS
-            //createMap.drawPath(con.getRouteNodes());
+            BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(), endPostCode.getLatitude(), endPostCode.getLongitude());
         } else {
             GUI.createMap.updateCoord(startPostCode, endPostCode);
             calculateRoute(startPostCode, endPostCode, mode);
@@ -129,7 +127,7 @@ public class LogicManager extends GetUserData {
             List<Node> shortestPath = aStar.findShortestPath(startNode, endNode);
             distance = calculateDistance(shortestPath);
             // Display the shortest path on the map
-            GUI.createMap.drawPath(shortestPath);
+            GUI.createMap.drawPath(shortestPath, null);
 
         } catch (Exception e) {
             System.out.println(e);

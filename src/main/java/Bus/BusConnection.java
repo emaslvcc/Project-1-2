@@ -11,7 +11,7 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BusConnection{
+public class BusConnection {
     public String getShortName() {
         return shortName;
     }
@@ -50,7 +50,8 @@ public class BusConnection{
     String shortName;
     String longName;
 
-    public BusConnection(int fromBusStop, int toBusstop, String startingTime, String endTime, int tripID, int travelTime, String shortName, String longName){
+    public BusConnection(int fromBusStop, int toBusstop, String startingTime, String endTime, int tripID,
+            int travelTime, String shortName, String longName) {
         this.fromBusStop = fromBusStop;
         this.toBusstop = toBusstop;
         this.startingTime = startingTime;
@@ -61,14 +62,14 @@ public class BusConnection{
         this.longName = longName;
     }
 
-
-    public List<Node> getRouteNodes(){
+    public List<Node> getRouteNodes() {
         System.out.println("Getting Nodes for the bus stops");
         String query = "SELECT s.stop_lat, s.stop_lon " +
                 "FROM stop_times st " +
                 "JOIN stops s ON st.stop_id = s.stop_id " +
                 "WHERE st.trip_id = ? " +
-                "AND st.stop_sequence <= (SELECT st2.stop_sequence FROM stop_times st2 WHERE st2.trip_id = ? AND stop_id = ?) " +
+                "AND st.stop_sequence <= (SELECT st2.stop_sequence FROM stop_times st2 WHERE st2.trip_id = ? AND stop_id = ?) "
+                +
                 "AND st.stop_sequence >= (SELECT st2.stop_sequence FROM stop_times st2 WHERE st2.trip_id = ? AND stop_id = ?);";
 
         List<Node> nodeList = new ArrayList<>();
@@ -83,7 +84,7 @@ public class BusConnection{
             // Execute the query and process the ResultSet
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    nodeList.add(new Node(resultSet.getInt(1), resultSet.getDouble(1),resultSet.getDouble(2)));
+                    nodeList.add(new Node(resultSet.getInt(1), resultSet.getDouble(1), resultSet.getDouble(2)));
                 }
             }
         } catch (SQLException e) {
@@ -93,14 +94,8 @@ public class BusConnection{
         return nodeList;
     }
 
-    public int getTravelTime(){
+    public int getTravelTime() {
         return travelTime;
     }
-
-
-
-
-
-
 
 }

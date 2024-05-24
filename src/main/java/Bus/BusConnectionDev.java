@@ -92,11 +92,10 @@ public class BusConnectionDev {
     static String bestTripString;
     static TripInfo bestTrip;
     static int time;
-    static double totalDistance = 0.0;
 
     // calculate distance
     public static double calculateTotalDistance(List<Node> nodes) {
-
+        double totalDistance = 0.0;
         for (int i = 0; i < nodes.size() - 1; i++) {
             totalDistance += DistanceCalculatorHaversine.haversineDistance(nodes.get(i), nodes.get(i + 1));
         }
@@ -127,12 +126,14 @@ public class BusConnectionDev {
             }
 
             if (bestTrip != null) {
+
                 bestTripString = "" + bestTrip;
                 System.out.println("Best Trip: " + bestTrip);
                 System.out.println("========================================");
                 createAndQueryShapes(conn, bestTrip);
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+
                 createMap.drawPath(tripNodes, stopNodes);
                 double totalDistance = calculateTotalDistance(tripNodes);
                 System.out.println("Total Distance: " + totalDistance + " km");

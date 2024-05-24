@@ -15,14 +15,14 @@ import com.graphhopper.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.*;   
+import javax.swing.*;
 
 public class LogicManager extends GetUserData {
     private static DataManagers.Graph graph = new DataManagers.Graph();
     protected int time;
     protected double distance;
     DirectConnection directConnection = new DirectConnection();
-    protected int [] finalStops;
+    protected int[] finalStops;
 
     private int range = 1000;
 
@@ -34,7 +34,7 @@ public class LogicManager extends GetUserData {
      * @param modeBox        Option of walking or cycling.
      */
     public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox) {
-        BusConnection con;
+
         dataBaseReader.createHashMap();
         try {
             startPostCode = getStartZip(startCodeField);
@@ -49,8 +49,9 @@ public class LogicManager extends GetUserData {
         }
         String mode = modeBox.getSelectedItem().toString();
 
-        if ((mode).equals("Bus")){
-            BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(), endPostCode.getLatitude(), endPostCode.getLongitude());
+        if ((mode).equals("Bus")) {
+            BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
+                    endPostCode.getLatitude(), endPostCode.getLongitude());
         } else {
             GUI.createMap.updateCoord(startPostCode, endPostCode);
             calculateRoute(startPostCode, endPostCode, mode);
@@ -76,13 +77,13 @@ public class LogicManager extends GetUserData {
         hopper.setOSMFile("src/main/resources/Map/Maastricht.osm.pbf");
         hopper.setGraphHopperLocation("graph-cache");
 
-        hopper.setEncodedValuesString("foot_access, foot_average_speed, bike_access, bike_average_speed, hike_rating, foot_priority, bike_priority, roundabout");
+        hopper.setEncodedValuesString(
+                "foot_access, foot_average_speed, bike_access, bike_average_speed, hike_rating, foot_priority, bike_priority, roundabout");
 
         // Define the walking and biking profiles with custom models
         hopper.setProfiles(
                 new Profile("walk").setCustomModel(GHUtility.loadCustomModelFromJar("foot.json")),
-                new Profile("bike").setCustomModel(GHUtility.loadCustomModelFromJar("bike.json"))
-        );
+                new Profile("bike").setCustomModel(GHUtility.loadCustomModelFromJar("bike.json")));
 
         // Import the OSM file and load the graph
         hopper.importOrLoad();
@@ -97,18 +98,19 @@ public class LogicManager extends GetUserData {
             double lon = nodeAccess.getLon(i);
             Node node = new Node(i, lat, lon);
             graph.addNode(node);
-            nodes.put(i,node);
+            nodes.put(i, node);
         }
 
         // iterate over every edge and add it to the graph
-        //edgeiterator is a built-in class that allows us to iterate over all the edges in the graph
+        // edgeiterator is a built-in class that allows us to iterate over all the edges
+        // in the graph
         EdgeIterator edgeIterator = graphHopper.getAllEdges();
         while (edgeIterator.next()) {
             int edgeId = edgeIterator.getEdge();
             int baseNode = edgeIterator.getBaseNode();
             int adjNode = edgeIterator.getAdjNode();
             double distance = edgeIterator.getDistance();
-            //System.out.println("trying to add edge for base node "+ edgeId);
+            // System.out.println("trying to add edge for base node "+ edgeId);
             graph.addEdge(new Edge(edgeId, nodes.get(baseNode), nodes.get(adjNode), distance));
             graph.addEdge(new Edge(edgeId, nodes.get(adjNode), nodes.get(baseNode), distance));
         }
@@ -139,11 +141,11 @@ public class LogicManager extends GetUserData {
         for (int i = 0; i < path.size() - 1; i++) {
             Node startNode = path.get(i);
             Node endNode = path.get(i + 1);
-            distance += Calculators.DistanceCalculatorHaversine.calculate(startNode.getLon(), startNode.getLat(), endNode.getLon(), endNode.getLat());
+            distance += Calculators.DistanceCalculatorHaversine.calculate(startNode.getLon(), startNode.getLat(),
+                    endNode.getLon(), endNode.getLat());
         }
 
         return Double.parseDouble(String.format("%.2f", distance));
     }
-
 
 }

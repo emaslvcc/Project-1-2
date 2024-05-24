@@ -35,7 +35,6 @@ public class mapFrame extends javax.swing.JFrame {
         initComponents();
     }
 
-
     private void initComponents() {
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/Images/mapLogo.png")).getImage());
         backPanel = new javax.swing.JPanel();
@@ -101,19 +100,17 @@ public class mapFrame extends javax.swing.JFrame {
         mapPanel.setLayout(mapPanelLayout);
         mapPanelLayout.setHorizontalGroup(
                 mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
-        );
+                        .addGap(0, 0, Short.MAX_VALUE));
         mapPanelLayout.setVerticalGroup(
                 mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 454, Short.MAX_VALUE)
-        );
+                        .addGap(0, 454, Short.MAX_VALUE));
         mapPanel = createMap.createMapPanel();
 
         modeBox.setOpaque(false);
         modeBox.setBackground(new java.awt.Color(170, 211, 223));
         modeBox.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         modeBox.setForeground(new java.awt.Color(255, 255, 255));
-        modeBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Walk", "Bike", "Bus"}));
+        modeBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Walk", "Bike", "Bus" }));
         modeBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         startCodeLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -156,97 +153,147 @@ public class mapFrame extends javax.swing.JFrame {
                 backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(backPanelLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addContainerGap())
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
                                 .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(backPanelLayout.createSequentialGroup()
                                                 .addGap(135, 135, 135)
-                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                        .addComponent(distanceTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(distanceNumberLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addGroup(backPanelLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(distanceTextLabel,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 78,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(distanceNumberLabel,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 72,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                         .addGroup(backPanelLayout.createSequentialGroup()
-                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(backPanelLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(backPanelLayout.createSequentialGroup()
                                                                 .addGap(41, 41, 41)
-                                                                .addComponent(startCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addComponent(startCodeField,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 201,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
                                                         .addGroup(backPanelLayout.createSequentialGroup()
                                                                 .addGap(93, 93, 93)
                                                                 .addComponent(startCodeLabel)))
-                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(backPanelLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(backPanelLayout.createSequentialGroup()
                                                                 .addGap(169, 169, 169)
-                                                                .addComponent(modeBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 116, Short.MAX_VALUE)
-                                                                .addComponent(calculateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addGap(121, 121, 121)))))
+                                                                .addComponent(modeBox,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                                                backPanelLayout.createSequentialGroup()
+                                                                        .addPreferredGap(
+                                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                                                116, Short.MAX_VALUE)
+                                                                        .addComponent(calculateButton,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                173,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addGap(121, 121, 121)))))
                                 .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
-                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(timeTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(timeNumberLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout
+                                                .createSequentialGroup()
+                                                .addGroup(backPanelLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(timeTextLabel,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 78,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(timeNumberLabel,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 72,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(154, 154, 154))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
-                                                .addComponent(destinationCodeLabel)
-                                                .addGap(42, 42, 42)
-                                                .addComponent(minimizeButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(exitButton)
-                                                .addGap(15, 15, 15))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
-                                                .addComponent(destinationCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(49, 49, 49))))
-        );
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                                backPanelLayout.createSequentialGroup()
+                                                        .addComponent(destinationCodeLabel)
+                                                        .addGap(42, 42, 42)
+                                                        .addComponent(minimizeButton)
+                                                        .addPreferredGap(
+                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(exitButton)
+                                                        .addGap(15, 15, 15))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                                backPanelLayout.createSequentialGroup()
+                                                        .addComponent(destinationCodeField,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 197,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(49, 49, 49)))));
         backPanelLayout.setVerticalGroup(
                 backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(backPanelLayout.createSequentialGroup()
-                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(backPanelLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addGroup(backPanelLayout.createSequentialGroup()
-                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
-                                                                        .addGap(17, 17, 17)
-                                                                        .addComponent(startCodeLabel))
+                                                .addGroup(backPanelLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(backPanelLayout
+                                                                .createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                                                        backPanelLayout.createSequentialGroup()
+                                                                                .addGap(17, 17, 17)
+                                                                                .addComponent(startCodeLabel))
                                                                 .addGroup(backPanelLayout.createSequentialGroup()
                                                                         .addContainerGap()
-                                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addGroup(backPanelLayout.createParallelGroup(
+                                                                                javax.swing.GroupLayout.Alignment.BASELINE)
                                                                                 .addComponent(exitButton)
                                                                                 .addComponent(minimizeButton))))
-                                                        .addComponent(destinationCodeLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                                                        .addComponent(destinationCodeLabel,
+                                                                javax.swing.GroupLayout.Alignment.TRAILING))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(destinationCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(startCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(backPanelLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(destinationCodeField,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(startCodeField,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(18, 18, 18))
                                         .addGroup(backPanelLayout.createSequentialGroup()
                                                 .addComponent(calculateButton)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(modeBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(modeBox, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(8, 8, 8)))
-                                .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(timeTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(distanceTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(
+                                        backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(timeTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(distanceTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        14, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(timeNumberLabel)
-                                        .addComponent(distanceNumberLabel))
-                                .addGap(15, 15, 15))
-        );
+                                .addGroup(
+                                        backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(timeNumberLabel)
+                                                .addComponent(distanceNumberLabel))
+                                .addGap(15, 15, 15)));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(backPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                        .addComponent(backPanel, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(backPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                        .addComponent(backPanel, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
         setSize(new java.awt.Dimension(900, 598));
         setLocationRelativeTo(null);
@@ -270,9 +317,7 @@ public class mapFrame extends javax.swing.JFrame {
         DataManagers.LogicManager logicManager = new DataManagers.LogicManager();
         logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox);
 
-
     }
-
 
     public static void updateTimeField(int time) {
         timeNumberLabel.setText(time + " min");
@@ -353,7 +398,8 @@ public class mapFrame extends javax.swing.JFrame {
         recenterWindow();
     }
 
-    public void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop, String arrivalTime, String departureTime) {
+    public void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop, String arrivalTime,
+            String departureTime) {
         this.busName.setText("Bus Name: " + busName);
         this.busNum.setText("Bus Number: " + busNum);
         this.startBusStop.setText("Start Bus Stop: " + startBusStop);
@@ -374,7 +420,6 @@ public class mapFrame extends javax.swing.JFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
     }
-
 
     public static void main(String args[]) {
         LogicManager.createGraph();
@@ -401,6 +446,5 @@ public class mapFrame extends javax.swing.JFrame {
             }
         });
     }
-
 
 }

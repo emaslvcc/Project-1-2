@@ -126,6 +126,7 @@ public class createMap {
     }
 
     public static void drawPath(List<Node> path, List<Node> stops) {
+
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
@@ -142,6 +143,7 @@ public class createMap {
                         Point2D endP = map.convertGeoPositionToPoint(point2);
                         g.draw(new Line2D.Double(startP, endP));
                     }
+                    // Draw start and end markers
                     createStartAndEndPoints(g, map);
 
                     g.setColor(Color.RED);
@@ -162,8 +164,9 @@ public class createMap {
 
             }
         };
-
+        // Set the new painter
         jXMapViewer.setOverlayPainter(pathOverlay);
+
     }
 
     private static void createStartAndEndPoints(Graphics2D g, JXMapViewer map) {
@@ -198,4 +201,5 @@ public class createMap {
         }
         return pointerImage;
     }
+
 }

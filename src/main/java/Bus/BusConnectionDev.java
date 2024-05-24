@@ -206,14 +206,19 @@ public class BusConnectionDev {
     private static List<TripInfo> printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
             String endStopId) throws SQLException {
         String sql = "SELECT t.route_id, st1.trip_id, st1.departure_time AS start_departure_time, st2.arrival_time AS end_arrival_time, "
-                + "TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time " // Calculating trip time
-                                                                                              // in minutes for clarity
+                + "TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time "
+                // Calculating trip time
+                // // in minutes for
+                // clarity
                 + "FROM stop_times st1 "
                 + "JOIN stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence "
                 + "JOIN trips t ON t.trip_id = st1.trip_id " // Joining with trips to include route_id in the query
-                + "WHERE st1.stop_id = ? AND st2.stop_id = ? AND t.route_id = ? AND st1.departure_time >= CURRENT_TIME() "
-                + "ORDER BY st1.departure_time "
+                + "WHERE st1.stop_id = ? AND st2.stop_id = ? AND t.route_id = ? AND (st1.departure_time >= CURRENT_TIME() OR "
+                + "st1.departure_time < CURRENT_TIME())"
+                + "ORDER BY CASE WHEN st1.departure_time >= CURRENT_TIME() THEN 0 ELSE 1 END, st1.departure_time ASC"
+                + " "
                 + "LIMIT 1;";
+
         List<TripInfo> trips = new ArrayList<>();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -323,7 +328,7 @@ public class BusConnectionDev {
                         ", Shape Pt Sequence: " + shapePtSequence +
                         ", Latitude: " + shapePtLat +
                         ", Longitude: " + shapePtLon);
-                
+
                 tripNodes.add(new Node(id2, shapePtLat, shapePtLon));
                 id2++;
             }

@@ -201,5 +201,8 @@ public class createMap {
         }
         return pointerImage;
     }
-
+    
+    public static void clearMap() {
+        jXMapViewer.setOverlayPainter(null);
+    }
 }

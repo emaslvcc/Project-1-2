@@ -350,8 +350,8 @@ public class mapFrame extends javax.swing.JFrame {
 
         private void calculateButtonActionPerformed(ActionEvent evt, ActionListener frame) {
                 if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
-                        addPanelForBusInfo(frame);
                         createMap.clearMap();
+                        addPanelForBusInfo(frame);
                         busMode = true;
                 } else if (busMode) {
                         removePanelForBusInfo(frame);

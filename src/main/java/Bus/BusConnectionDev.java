@@ -134,8 +134,13 @@ public class BusConnectionDev {
                 createAndQueryShapes(conn, bestTrip);
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+                if (id2 == 0) {
+                    System.out.println("trip null");
+                    createMap.drawPath(stopNodes);
+                } else {
+                    createMap.drawPath(tripNodes, stopNodes);
+                }
 
-                createMap.drawPath(tripNodes, stopNodes);
                 double totalDistance = calculateTotalDistance(tripNodes);
                 System.out.println("Total Distance: " + totalDistance + " km");
             } else {

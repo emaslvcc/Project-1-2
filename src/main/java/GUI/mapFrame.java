@@ -353,7 +353,7 @@ public class mapFrame extends javax.swing.JFrame {
                         createMap.clearMap();
                         addPanelForBusInfo(frame);
                         busMode = true;
-                } else if (busMode) {
+                } else if (!Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && busMode) {
                         removePanelForBusInfo(frame);
                         busMode = false;
                 }

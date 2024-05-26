@@ -252,5 +252,9 @@ public class createMap {
     
     public static void clearMap() {
         jXMapViewer.setOverlayPainter(null);
+        startLatitude = Double.NaN;
+        startLongitude = Double.NaN;
+        endLatitude = Double.NaN;
+        endLongitude = Double.NaN;
     }
 }

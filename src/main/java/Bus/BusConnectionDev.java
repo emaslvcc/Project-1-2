@@ -115,6 +115,14 @@ public class BusConnectionDev {
     static String departureTime = "";
     static String arrivalTime = "";
 
+    public static void resetLists() {
+        stopNodes = new ArrayList<>();
+        id = 0;
+        tripNodes = new ArrayList<>();
+        id2 = 0;
+    }
+
+
     // calculate distance
     public static double calculateTotalDistance(List<Node> nodes) {
         double totalDistance = 0.0;

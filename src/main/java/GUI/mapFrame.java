@@ -357,6 +357,7 @@ public class mapFrame extends javax.swing.JFrame {
                         removePanelForBusInfo(frame);
                         busMode = false;
                 }
+                Bus.BusConnectionDev.resetLists();
 
                 if (startCodeField.getText().isEmpty() || destinationCodeField.getText().isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Please fill in both fields.");

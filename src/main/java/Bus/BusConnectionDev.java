@@ -47,6 +47,14 @@ class TripInfo {
         this.tripTime = tripTime;
     }
 
+    public String getBusNumber() {
+        return busNumber;
+    }
+
+    public String getBusName() {
+        return busName;
+    }
+
     // Getter for tripTime
     public int getTripTime() {
         return tripTime;
@@ -54,14 +62,6 @@ class TripInfo {
 
     public String getRouteId() {
         return routeId;
-    }
-
-    public String getBusNumber() {
-        return busNumber;
-    }
-
-    public String getBusName() {
-        return busName;
     }
 
     public String getTripId() {
@@ -107,6 +107,13 @@ public class BusConnectionDev {
     static String bestTripString;
     static TripInfo bestTrip;
     static int time;
+
+    static String busName = ""; 
+    static String busNumber = ""; 
+    static String startBusStop = "";
+    static String endBusStop = "";
+    static String departureTime = "";
+    static String arrivalTime = "";
 
     // calculate distance
     public static double calculateTotalDistance(List<Node> nodes) {
@@ -156,7 +163,19 @@ public class BusConnectionDev {
                 }
 
                 double totalDistance = calculateTotalDistance(tripNodes);
+                if (totalDistance == 0) totalDistance = calculateTotalDistance(stopNodes);
                 System.out.println("Total Distance: " + totalDistance + " km");
+
+                DataManagers.LogicManager.time = bestTrip.getTripTime();
+                DataManagers.LogicManager.distance = totalDistance;
+
+                DataManagers.LogicManager.busInfo = new String[]{
+                                                        bestTrip.getBusName(),
+                                                        bestTrip.getBusNumber(),
+                                                        startBusStop,
+                                                        endBusStop,
+                                                        bestTrip.endArrivalTime,
+                                                        bestTrip.startDepartureTime};
             } else {
                 JOptionPane.showMessageDialog(null, "No direct bus connection");
                 System.out.println("No upcoming trips found.");
@@ -389,6 +408,9 @@ public class BusConnectionDev {
             while (rs.next()) {
                 String stopId = rs.getString("stop_id");
                 String stopName = rs.getString("stop_name");
+                if (id == 0) startBusStop = stopName;
+                endBusStop = stopName;
+
                 int stopSequence = rs.getInt("stop_sequence");
                 double stopLat = rs.getDouble("stop_lat");
                 double stopLon = rs.getDouble("stop_lon");

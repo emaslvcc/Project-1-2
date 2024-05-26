@@ -25,6 +25,8 @@ class RouteStopInfo {
 
 class TripInfo {
     String routeId;
+    String busNumber;
+    String busName;
     String tripId;
     String startStopId;
     String endStopId;
@@ -32,9 +34,11 @@ class TripInfo {
     String endArrivalTime;
     int tripTime;
 
-    public TripInfo(String routeId, String tripId, String startStopId,
+    public TripInfo(String routeId, String busNumber, String busName, String tripId, String startStopId,
             String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
         this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.busName = busName;
         this.tripId = tripId;
         this.startStopId = startStopId;
         this.endStopId = endStopId;
@@ -50,6 +54,14 @@ class TripInfo {
 
     public String getRouteId() {
         return routeId;
+    }
+
+    public String getBusNumber() {
+        return busNumber;
+    }
+
+    public String getBusName() {
+        return busName;
     }
 
     public String getTripId() {
@@ -72,6 +84,8 @@ class TripInfo {
     @Override
     public String toString() {
         return "Route ID: " + routeId +
+                ", Bus Number: " + busNumber +
+                ", Bus Name: " + busName +
                 ", Trip ID: " + tripId +
                 ", Start stop ID: " + startStopId +
                 ", End stop ID: " + endStopId +
@@ -225,16 +239,14 @@ public class BusConnectionDev {
 
     private static List<TripInfo> printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
             String endStopId) throws SQLException {
-        String sql = "SELECT t.route_id, st1.trip_id, st1.departure_time AS start_departure_time, st2.arrival_time AS end_arrival_time, "
-                + "TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time " // Calculating trip time
-                                                                                              // in minutes for
+        String sql = "SELECT t.route_id, r.route_short_name, r.route_long_name, st1.trip_id, st1.departure_time AS start_departure_time, st2.arrival_time AS end_arrival_time, "
+                + "TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time "
                 + "FROM stop_times st1 "
                 + "JOIN stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence "
-                + "JOIN trips t ON t.trip_id = st1.trip_id " // Joining with trips to include route_id in the query
-                + "WHERE st1.stop_id = ? AND st2.stop_id = ? AND t.route_id = ? AND (st1.departure_time >= CURRENT_TIME() OR "
-                + "st1.departure_time < CURRENT_TIME())"
-                + "ORDER BY CASE WHEN st1.departure_time >= CURRENT_TIME() THEN 0 ELSE 1 END, st1.departure_time ASC"
-                + " "
+                + "JOIN trips t ON t.trip_id = st1.trip_id "
+                + "JOIN routes r ON t.route_id = r.route_id "
+                + "WHERE st1.stop_id = ? AND st2.stop_id = ? AND t.route_id = ? AND st1.departure_time >= CURRENT_TIME() "
+                + "ORDER BY CASE WHEN st1.departure_time >= CURRENT_TIME() THEN 0 ELSE 1 END, st1.departure_time ASC "
                 + "LIMIT 1;";
 
         List<TripInfo> trips = new ArrayList<>();
@@ -247,6 +259,8 @@ public class BusConnectionDev {
             while (rs.next()) {
                 trips.add(new TripInfo(
                         rs.getString("route_id"),
+                        rs.getString("route_short_name"),
+                        rs.getString("route_long_name"),
                         rs.getString("trip_id"),
                         startStopId,
                         endStopId,

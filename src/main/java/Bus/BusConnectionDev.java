@@ -9,6 +9,7 @@ import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
 import GUI.mapFrame;
+import javax.swing.*;
 
 class RouteStopInfo {
     String routeId;
@@ -138,6 +139,7 @@ public class BusConnectionDev {
                 double totalDistance = calculateTotalDistance(tripNodes);
                 System.out.println("Total Distance: " + totalDistance + " km");
             } else {
+                JOptionPane.showMessageDialog(null, "No direct bus connection");
                 System.out.println("No upcoming trips found.");
             }
 

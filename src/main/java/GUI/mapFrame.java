@@ -24,12 +24,12 @@ public class mapFrame extends javax.swing.JFrame {
         private static javax.swing.JLabel timeNumberLabel;
         private javax.swing.JLabel timeTextLabel;
         private JPanel busInfoPanel;
-        private JLabel busName;
-        private JLabel busNum;
-        private JLabel departureTime;
-        private JLabel arrivalTime;
-        private JLabel startBusStop;
-        private JLabel endBusStop;
+        private static JLabel busName;
+        private static JLabel busNum;
+        private static JLabel departureTime;
+        private static JLabel arrivalTime;
+        private static JLabel startBusStop;
+        private static JLabel endBusStop;
 
         public mapFrame() {
                 initComponents();
@@ -362,6 +362,7 @@ public class mapFrame extends javax.swing.JFrame {
                         removePanelForBusInfo(frame);
                         busMode = false;
                 }
+                Bus.BusConnectionDev.resetLists();
 
                 if (startCodeField.getText().isEmpty() || destinationCodeField.getText().isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Please fill in both fields.");
@@ -377,7 +378,8 @@ public class mapFrame extends javax.swing.JFrame {
         }
 
         public static void updateDistanceField(double distance) {
-                distanceNumberLabel.setText(distance + " km");
+                String displayed = String.format("%.2f", distance);
+                distanceNumberLabel.setText(displayed + " km");
         }
 
         private void exitButtonMouseClicked(java.awt.event.MouseEvent evt) {
@@ -453,15 +455,13 @@ public class mapFrame extends javax.swing.JFrame {
                 recenterWindow();
         }
 
-        public void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop,
-                        String arrivalTime,
-                        String departureTime) {
-                this.busName.setText("Bus Name: " + busName);
-                this.busNum.setText("Bus Number: " + busNum);
-                this.startBusStop.setText("Start Bus Stop: " + startBusStop);
-                this.endBusStop.setText("End Bus Stop: " + endBusStop);
-                this.arrivalTime.setText("Arrival Time: " + arrivalTime);
-                this.departureTime.setText("Departure Time: " + departureTime);
+        public static void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop, String arrivalTime, String departureTime) {
+                mapFrame.busName.setText("<html>Bus Name:<br>" + busName + "</html>");
+                mapFrame.busNum.setText("<html>Bus Number:<br>" + busNum + "</html>");
+                mapFrame.startBusStop.setText("<html>Start Bus Stop:<br>" + startBusStop + "</html>");
+                mapFrame.endBusStop.setText("<html>End Bus Stop:<br>" + endBusStop + "</html>");
+                mapFrame.arrivalTime.setText("<html>Arrival Time:<br>" + arrivalTime + "</html>");
+                mapFrame.departureTime.setText("<html>Departure Time:<br>" + departureTime + "</html>");
         }
 
         private void removePanelForBusInfo(ActionListener frame) {

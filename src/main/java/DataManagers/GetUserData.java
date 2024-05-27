@@ -39,36 +39,42 @@ public class GetUserData {
     }
     protected PostCode getStartZip(JTextField startCodeField) throws Exception {
         String startCode = startCodeField.getText().toUpperCase();
-        validatePostcode(startCode);
+        String returnValue = validatePostcode(startCode);
+        if(!returnValue.isEmpty()){      // if this returns a string then there was an error
+            JOptionPane.showMessageDialog(null, returnValue);
+            throw new Exception(returnValue);
+        }
         startPostCode = createPostCode(dataBaseReader.dataMap, startCode );
         return startPostCode;
     }
     protected PostCode getEndZip(JTextField endCodeField) throws Exception{
-
         String endCode = endCodeField.getText().toUpperCase();
-        validatePostcode(endCode);
+        String returnValue = validatePostcode(endCode);
+        if(!returnValue.isEmpty()){      // if this returns a string then there was an error
+            JOptionPane.showMessageDialog(null, returnValue);
+            throw new Exception(returnValue);
+        }
         endPostCode = createPostCode(dataBaseReader.dataMap, endCode);
         return endPostCode;
     }
 
-    public void validatePostcode(String postcode) throws Exception {
-        if (postcode.length() != 6) {
-            JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect length.");
-            throw new Exception("Postcode " + postcode + " is invalid: incorrect length.");
-        } else if (Character.isDigit(postcode.charAt(4)) || Character.isDigit(postcode.charAt(5))) {
-            JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect format.");
-            throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+    public String validatePostcode(String postcode){
+        if(postcode == null){
+            return "Postcode is null";
         }
-        else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2' ||  (postcode.charAt(2) != '1' && postcode.charAt(2) != '2') || postcode.charAt(3) == '0'){
-            JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: not in Maastricht.");
-            throw new Exception("Postcode " + postcode + " is invalid: not in Maastricht.");
+        if (postcode.length() != 6) {
+            return "Postcode " + postcode + " is invalid: incorrect length.";
+        } else if (Character.isDigit(postcode.charAt(4)) || Character.isDigit(postcode.charAt(5))) {
+            return "Postcode " + postcode + " is invalid: incorrect format.";
+        } else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2' ||  (postcode.charAt(2) != '1' && postcode.charAt(2) != '2') || postcode.charAt(3) == '0'){
+            return "Postcode " + postcode + " is invalid: not in Maastricht.";
         }
 
         for (int i = 0; i < 4; i++) {
             if(!Character.isDigit(postcode.charAt(i))) {
-                JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect format.");
-                throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+                return "Postcode " + postcode + " is invalid: incorrect format.";
             }
         }
+        return "";
     }
 }

@@ -26,7 +26,7 @@ import java.net.URL;
 import java.util.List;
 
 import DataManagers.Node;
-import Bus.DirectConnection;
+//import Bus.DirectConnection;
 
 public class createMap {
     private static org.jxmapviewer.JXMapViewer jXMapViewer;
@@ -114,8 +114,6 @@ public class createMap {
                 }
             }
         });
-        Database.DatabaseUploader.init();
-        // System.out.println(Bus.DirectConnection.checkConnection(2578403, 2578131));
     }
 
     public static void updateCoord(PostCode startPostCode, PostCode endPostCode) {
@@ -194,13 +192,15 @@ public class createMap {
                     // Draw start and end markers
                     createStartAndEndPoints(g, map);
 
-                    g.setColor(Color.RED);
-                    for (int i = 0; i < stops.size(); i++) {
-                        Node node = stops.get(i);
-                        GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
-                        Point2D pointMap = map.convertGeoPositionToPoint(point);
-                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(), pointMap.getY(), 10, 10);
-                        g.fill(circle);
+                    if (stops != null) {
+                        g.setColor(Color.RED);
+                        for (int i = 0; i < stops.size(); i++) {
+                            Node node = stops.get(i);
+                            GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                            Point2D pointMap = map.convertGeoPositionToPoint(point);
+                            Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(), pointMap.getY(), 10, 10);
+                            g.fill(circle);
+                        }
                     }
 
                 } catch (Exception e) {

@@ -1,13 +1,9 @@
 package DataManagers;
 
-import Bus.BusConnection;
 import Bus.BusConnectionDev;
-import Bus.DirectConnection;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
-import GUI.createMap;
 import com.graphhopper.GraphHopper;
-import com.graphhopper.storage.BaseGraph;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.config.Profile;
 import com.graphhopper.util.*;
@@ -19,12 +15,10 @@ import javax.swing.*;
 
 public class LogicManager extends GetUserData {
     private static DataManagers.Graph graph = new DataManagers.Graph();
-    protected int time;
-    protected double distance;
-    DirectConnection directConnection = new DirectConnection();
+    public static int time;
+    public static double distance;
+    public static String[] busInfo;
     protected int[] finalStops;
-
-    private int range = 1000;
 
     /**
      * This method takes care of the main logic regarding the post codes.
@@ -54,6 +48,7 @@ public class LogicManager extends GetUserData {
         if ((mode).equals("Bus")) {
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude());
+            GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3], busInfo[4], busInfo[5]);
         } else {
             GUI.createMap.updateCoord(startPostCode, endPostCode);
             calculateRoute(startPostCode, endPostCode, mode);
@@ -147,7 +142,7 @@ public class LogicManager extends GetUserData {
                     endNode.getLon(), endNode.getLat());
         }
 
-        return Double.parseDouble(String.format("%.2f", distance));
+        return distance;
     }
 
 }

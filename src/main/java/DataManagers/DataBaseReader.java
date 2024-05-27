@@ -76,7 +76,7 @@ public class DataBaseReader extends APICaller {
      * @param longitude The longitude of the postal code.
      * @throws IOException If an I/O error occurs.
      */
-    private void updateCSVFile(String zipCode, double latitude, double longitude) throws IOException {
+    public void updateCSVFile(String zipCode, double latitude, double longitude) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PATH, true))) {
             // Append the new postal code and coordinates to the CSV file
             writer.write( zipCode + "," + latitude + "," + longitude + "\n");
@@ -89,7 +89,7 @@ public class DataBaseReader extends APICaller {
      * @param apiResponse The response from the API.
      * @return The latitude extracted from the response.
      */
-    private double extractLatitude(String apiResponse) {
+    public double extractLatitude(String apiResponse) {
 
         String latitude;
         double finalLatitude;
@@ -109,7 +109,7 @@ public class DataBaseReader extends APICaller {
      * @param apiResponse The response from the API.
      * @return The longitude extracted from the response.
      */
-    private double extractLongitude(String apiResponse) {
+    public double extractLongitude(String apiResponse) {
 
         String longitude;
         double finalLongitude;

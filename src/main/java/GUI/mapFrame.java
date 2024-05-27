@@ -455,7 +455,8 @@ public class mapFrame extends javax.swing.JFrame {
                 recenterWindow();
         }
 
-        public static void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop, String arrivalTime, String departureTime) {
+        public static void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop,
+                        String arrivalTime, String departureTime) {
                 mapFrame.busName.setText("<html>Bus Name:<br>" + busName + "</html>");
                 mapFrame.busNum.setText("<html>Bus Number:<br>" + busNum + "</html>");
                 mapFrame.startBusStop.setText("<html>Start Bus Stop:<br>" + startBusStop + "</html>");

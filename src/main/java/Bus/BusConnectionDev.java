@@ -108,6 +108,10 @@ public class BusConnectionDev {
     static TripInfo bestTrip;
     static int time;
 
+    public static int getId2() {
+        return id2;
+    }
+
     // calculate distance
     public static double calculateTotalDistance(List<Node> nodes) {
         double totalDistance = 0.0;
@@ -117,28 +121,11 @@ public class BusConnectionDev {
         return totalDistance; // Total distance in kilometers
     }
 
-    public static void busLogic(double x1, double y1, double x2, double y2) {
+    public static void busLogic(double x1, double y1, double x2, double y2) throws Exception {
 
         try {
             Connection conn = DatabaseConnection.getConnection();
-            setupNearestStops(conn, x1, y1, x2, y2); // Start and end coordinates
-            findPotentialRoutes(conn);
-            List<RouteStopInfo> routes = findRouteBusStops(conn);
-            bestTrip = null; // Start with no best trip found
-
-            for (RouteStopInfo route : routes) {
-                List<TripInfo> tripsForRoute = printNextDepartureAndArrival(conn,
-                        route.routeId, route.startStopId,
-                        route.endStopId);
-                for (TripInfo trip : tripsForRoute) {
-                    // Update the best trip based on trip time and arrival time.
-                    if (bestTrip == null || trip.getTripTime() < bestTrip.getTripTime() ||
-                            (trip.getTripTime() == bestTrip.getTripTime()
-                                    && trip.getArrivalTime().compareTo(bestTrip.getArrivalTime()) < 0)) {
-                        bestTrip = trip; // Found a new best trip.
-                    }
-                }
-            }
+            bestTrip = processRoutes(conn, x1, y1, x2, y2);
 
             if (bestTrip != null) {
 
@@ -149,8 +136,8 @@ public class BusConnectionDev {
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 if (id2 == 0) {
-                    System.out.println("trip null");
                     createMap.drawPath(stopNodes);
+                    System.out.println("no shape");
                 } else {
                     createMap.drawPath(tripNodes, stopNodes);
                 }
@@ -159,7 +146,7 @@ public class BusConnectionDev {
                 System.out.println("Total Distance: " + totalDistance + " km");
             } else {
                 JOptionPane.showMessageDialog(null, "No direct bus connection");
-                System.out.println("No upcoming trips found.");
+                throw new Exception("No direct bus connection");
             }
 
         } catch (
@@ -167,6 +154,28 @@ public class BusConnectionDev {
         SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static TripInfo processRoutes(Connection conn, double x1, double y1, double x2, double y2)
+            throws SQLException {
+        setupNearestStops(conn, x1, y1, x2, y2); // Start and end coordinates
+        findPotentialRoutes(conn);
+        List<RouteStopInfo> routes = findRouteBusStops(conn);
+        TripInfo bestTrip = null; // Initialize with no best trip found
+
+        for (RouteStopInfo route : routes) {
+            List<TripInfo> tripsForRoute = printNextDepartureAndArrival(conn,
+                    route.routeId, route.startStopId, route.endStopId);
+            for (TripInfo trip : tripsForRoute) {
+                // Update the best trip based on trip time and arrival time.
+                if (bestTrip == null || trip.getTripTime() < bestTrip.getTripTime() ||
+                        (trip.getTripTime() == bestTrip.getTripTime()
+                                && trip.getArrivalTime().compareTo(bestTrip.getArrivalTime()) < 0)) {
+                    bestTrip = trip; // Found a new best trip.
+                }
+            }
+        }
+        return bestTrip;
     }
 
     public static void setupNearestStops(Connection conn, double startLat, double startLon, double endLat,

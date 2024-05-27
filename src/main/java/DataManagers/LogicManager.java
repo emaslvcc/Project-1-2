@@ -32,8 +32,10 @@ public class LogicManager extends GetUserData {
      * @param startCodeField Start Post Code.
      * @param endCodeField   End Post Code.
      * @param modeBox        Option of walking or cycling.
+     * @throws Exception
      */
-    public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox) {
+    public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox)
+            throws Exception {
 
         dataBaseReader.createHashMap();
         try {

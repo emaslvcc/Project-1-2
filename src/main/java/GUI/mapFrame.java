@@ -68,7 +68,12 @@ public class mapFrame extends javax.swing.JFrame {
                 calculateButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
                 calculateButton.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                calculateButtonActionPerformed(evt, this);
+                                try {
+                                        calculateButtonActionPerformed(evt, this);
+                                } catch (Exception e) {
+
+                                        e.printStackTrace();
+                                }
                         }
                 });
 
@@ -348,7 +353,7 @@ public class mapFrame extends javax.swing.JFrame {
 
         private boolean busMode = false;
 
-        private void calculateButtonActionPerformed(ActionEvent evt, ActionListener frame) {
+        private void calculateButtonActionPerformed(ActionEvent evt, ActionListener frame) throws Exception {
                 if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
                         createMap.clearMap();
                         addPanelForBusInfo(frame);
@@ -450,7 +455,8 @@ public class mapFrame extends javax.swing.JFrame {
                 recenterWindow();
         }
 
-        public static void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop, String arrivalTime, String departureTime) {
+        public static void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop,
+                        String arrivalTime, String departureTime) {
                 mapFrame.busName.setText("<html>Bus Name:<br>" + busName + "</html>");
                 mapFrame.busNum.setText("<html>Bus Number:<br>" + busNum + "</html>");
                 mapFrame.startBusStop.setText("<html>Start Bus Stop:<br>" + startBusStop + "</html>");

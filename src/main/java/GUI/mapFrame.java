@@ -23,7 +23,7 @@ public class mapFrame extends javax.swing.JFrame {
         private javax.swing.JLabel startCodeLabel;
         private static javax.swing.JLabel timeNumberLabel;
         private javax.swing.JLabel timeTextLabel;
-        private JPanel busInfoPanel;
+        private static JPanel busInfoPanel;
         private static JLabel busName;
         private static JLabel busNum;
         private static JLabel departureTime;
@@ -520,6 +520,7 @@ public class mapFrame extends javax.swing.JFrame {
          */
         private void removePanelForBusInfo(ActionListener frame) {
                 this.setSize(new java.awt.Dimension(900, 598));
+                busInfoPanel.removeAll();
                 this.remove(busInfoPanel);
                 this.revalidate();
                 this.repaint();

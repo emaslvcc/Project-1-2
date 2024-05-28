@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 
+/**
+ * Manages the logic for calculating routes and handling user inputs.
+ */
 public class LogicManager extends GetUserData {
     private static DataManagers.Graph graph = new DataManagers.Graph();
     public static int time;
@@ -65,8 +68,10 @@ public class LogicManager extends GetUserData {
         GUI.mapFrame.updateTimeField(time);
     }
 
+    /**
+     * Creates the graph for routing purposes.
+     */
     public static void createGraph() {
-
         System.out.println("Creating graph...");
         GraphHopper hopper = new GraphHopper();
 
@@ -89,7 +94,7 @@ public class LogicManager extends GetUserData {
         NodeAccess nodeAccess = graphHopper.getNodeAccess();
         Map<Integer, Node> nodes = new HashMap<>();
 
-        // iterate over every node and add it to the graph
+        // Iterate over every node and add it to the graph
         for (int i = 0; i < graphHopper.getNodes(); i++) {
             double lat = nodeAccess.getLat(i);
             double lon = nodeAccess.getLon(i);
@@ -98,7 +103,7 @@ public class LogicManager extends GetUserData {
             nodes.put(i, node);
         }
 
-        // iterate over every edge and add it to the graph
+        // Iterate over every edge and add it to the graph
         // edgeiterator is a built-in class that allows us to iterate over all the edges
         // in the graph
         EdgeIterator edgeIterator = graphHopper.getAllEdges();
@@ -107,24 +112,30 @@ public class LogicManager extends GetUserData {
             int baseNode = edgeIterator.getBaseNode();
             int adjNode = edgeIterator.getAdjNode();
             double distance = edgeIterator.getDistance();
-            // System.out.println("trying to add edge for base node "+ edgeId);
             graph.addEdge(new Edge(edgeId, nodes.get(baseNode), nodes.get(adjNode), distance));
             graph.addEdge(new Edge(edgeId, nodes.get(adjNode), nodes.get(baseNode), distance));
         }
         System.out.println("Graph created");
     }
 
+    /**
+     * Calculates the route based on the start and end post codes.
+     *
+     * @param startPostCode The starting post code.
+     * @param endPostCode   The ending post code.
+     * @param mode          The mode of transportation.
+     */
     public void calculateRoute(PostCode startPostCode, PostCode endPostCode, String mode) {
-        try {// Find the start and end nodes
+        try {
+            // Find the start and end nodes
             Node startNode = graph.getNodeByLatLon(startPostCode.getLatitude(), startPostCode.getLongitude());
             Node endNode = graph.getNodeByLatLon(endPostCode.getLatitude(), endPostCode.getLongitude());
 
-            // Create an AStar object
-            Calculators.AStar aStar = new Calculators.AStar(graph);
-
             // Find the shortest path
+            Calculators.AStar aStar = new Calculators.AStar(graph);
             List<Node> shortestPath = aStar.findShortestPath(startNode, endNode);
             distance = calculateDistance(shortestPath);
+
             // Display the shortest path on the map
             GUI.createMap.drawPath(shortestPath, null);
 
@@ -133,6 +144,12 @@ public class LogicManager extends GetUserData {
         }
     }
 
+    /**
+     * Calculates the distance of a given path.
+     *
+     * @param path The path for which the distance is to be calculated.
+     * @return The total distance of the path.
+     */
     public double calculateDistance(List<Node> path) {
         double distance = 0;
         for (int i = 0; i < path.size() - 1; i++) {
@@ -141,8 +158,6 @@ public class LogicManager extends GetUserData {
             distance += Calculators.DistanceCalculatorHaversine.calculate(startNode.getLon(), startNode.getLat(),
                     endNode.getLon(), endNode.getLat());
         }
-
         return distance;
     }
-
 }

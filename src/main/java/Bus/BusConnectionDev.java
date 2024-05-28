@@ -4,18 +4,27 @@ import java.sql.*;
 import java.util.*;
 
 import Calculators.DistanceCalculatorHaversine;
-import DataManagers.PostCode;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
-import GUI.mapFrame;
 import javax.swing.*;
 
+/**
+ * Represents information about a bus route stop.
+ */
 class RouteStopInfo {
     String routeId;
     String startStopId;
     String endStopId;
 
+    /**
+     * Constructs a new route with the specified route ID, start stop ID, and end
+     * stop ID.
+     * 
+     * @param routeId     the ID of the route
+     * @param startStopId the ID of the start stop
+     * @param endStopId   the ID of the end stop
+     */
     RouteStopInfo(String routeId, String startStopId, String endStopId) {
         this.routeId = routeId;
         this.startStopId = startStopId;
@@ -23,6 +32,9 @@ class RouteStopInfo {
     }
 }
 
+/**
+ * Represents information about a specific bus trip.
+ */
 class TripInfo {
     String routeId;
     String busNumber;
@@ -34,6 +46,19 @@ class TripInfo {
     String endArrivalTime;
     int tripTime;
 
+    /**
+     * Constructs a new trip with the specified details.
+     * 
+     * @param routeId            the ID of the route
+     * @param busNumber          the number of the bus
+     * @param busName            the name of the bus
+     * @param tripId             the ID of the trip
+     * @param startStopId        the ID of the start stop
+     * @param endStopId          the ID of the end stop
+     * @param startDepartureTime the departure time at the start stop
+     * @param endArrivalTime     the arrival time at the end stop
+     * @param tripTime           the duration of the trip in minutes
+     */
     public TripInfo(String routeId, String busNumber, String busName, String tripId, String startStopId,
             String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
         this.routeId = routeId;
@@ -55,7 +80,6 @@ class TripInfo {
         return busName;
     }
 
-    // Getter for tripTime
     public int getTripTime() {
         return tripTime;
     }
@@ -68,7 +92,6 @@ class TripInfo {
         return tripId;
     }
 
-    // Getter for endArrivalTime
     public String getArrivalTime() {
         return endArrivalTime;
     }
@@ -96,6 +119,9 @@ class TripInfo {
 
 }
 
+/**
+ * Manages the logic behind bus trips.
+ */
 public class BusConnectionDev {
 
     public static boolean testClass = false;
@@ -117,6 +143,9 @@ public class BusConnectionDev {
     static String departureTime = "";
     static String arrivalTime = "";
 
+    /**
+     * Resets the lists and IDs used for tracking stops and trips.
+     */
     public static void resetLists() {
         stopNodes = new ArrayList<>();
         id = 0;
@@ -128,28 +157,45 @@ public class BusConnectionDev {
         return id2;
     }
 
-    // calculate distance
+    /**
+     * Calculates the total distance between a list of nodes using the Haversine
+     * formula.
+     * 
+     * @param nodes the list of nodes
+     * @return the total distance in kilometers
+     */
     public static double calculateTotalDistance(List<Node> nodes) {
         double totalDistance = 0.0;
         for (int i = 0; i < nodes.size() - 1; i++) {
             totalDistance += DistanceCalculatorHaversine.haversineDistance(nodes.get(i), nodes.get(i + 1));
         }
-        return totalDistance; // Total distance in kilometers
+        return totalDistance;
     }
 
+    /**
+     * Finds and processes the best bus route between two coordinates.
+     * 
+     * @param x1 the latitude of the start location
+     * @param y1 the longitude of the start location
+     * @param x2 the latitude of the end location
+     * @param y2 the longitude of the end location
+     * @throws Exception if no direct bus connection is found or if a database error
+     *                   occurs
+     */
     public static void busLogic(double x1, double y1, double x2, double y2) throws Exception {
-
         try {
             Connection conn = DatabaseConnection.getConnection();
             bestTrip = processRoutes(conn, x1, y1, x2, y2);
 
             if (bestTrip != null) {
-
                 bestTripString = "" + bestTrip;
+
+                // Debugging print statements
                 System.out.println("Best Trip: " + bestTrip);
                 System.out.println("========================================");
                 queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 System.out.println("========================================");
+
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 if (id2 == 0) {
                     createMap.drawPath(stopNodes);
@@ -174,7 +220,8 @@ public class BusConnectionDev {
                         bestTrip.endArrivalTime,
                         bestTrip.startDepartureTime };
             } else {
-                if(!testClass)JOptionPane.showMessageDialog(null, "No direct bus connection");
+                if (!testClass)
+                    JOptionPane.showMessageDialog(null, "No direct bus connection");
                 testClass = false;
                 throw new Exception("No direct bus connection");
             }
@@ -186,9 +233,20 @@ public class BusConnectionDev {
         }
     }
 
+    /**
+     * Processes the potential bus routes between two geographic coordinates.
+     * 
+     * @param conn the database connection
+     * @param x1   the latitude of the start location
+     * @param y1   the longitude of the start location
+     * @param x2   the latitude of the end location
+     * @param y2   the longitude of the end location
+     * @return the best TripInfo object found
+     * @throws SQLException if a database error occurs
+     */
     public static TripInfo processRoutes(Connection conn, double x1, double y1, double x2, double y2)
             throws SQLException {
-        setupNearestStops(conn, x1, y1, x2, y2); // Start and end coordinates
+        setupNearestStops(conn, x1, y1, x2, y2);
         findPotentialRoutes(conn);
         List<RouteStopInfo> routes = findRouteBusStops(conn);
         TripInfo bestTrip = null; // Initialize with no best trip found
@@ -197,17 +255,27 @@ public class BusConnectionDev {
             List<TripInfo> tripsForRoute = printNextDepartureAndArrival(conn,
                     route.routeId, route.startStopId, route.endStopId);
             for (TripInfo trip : tripsForRoute) {
-                // Update the best trip based on trip time and arrival time.
+                // Update the best trip based on trip time and arrival time
                 if (bestTrip == null || trip.getTripTime() < bestTrip.getTripTime() ||
                         (trip.getTripTime() == bestTrip.getTripTime()
                                 && trip.getArrivalTime().compareTo(bestTrip.getArrivalTime()) < 0)) {
-                    bestTrip = trip; // Found a new best trip.
+                    bestTrip = trip; // Found a new best trip
                 }
             }
         }
         return bestTrip;
     }
 
+    /**
+     * Sets up the nearest start and end stops based on the provided coordinates.
+     * 
+     * @param conn     the database connection
+     * @param startLat the latitude of the start location
+     * @param startLon the longitude of the start location
+     * @param endLat   the latitude of the end location
+     * @param endLon   the longitude of the end location
+     * @throws SQLException if a database error occurs
+     */
     public static void setupNearestStops(Connection conn, double startLat, double startLon, double endLat,
             double endLon) throws SQLException {
         String createNearestStartStops = "CREATE TEMPORARY TABLE nearest_start_stops AS " +
@@ -230,6 +298,12 @@ public class BusConnectionDev {
         }
     }
 
+    /**
+     * Finds potential routes by creating a temporary table with route information.
+     * 
+     * @param conn the database connection
+     * @throws SQLException if a database error occurs
+     */
     public static void findPotentialRoutes(Connection conn) throws SQLException {
         String sql = """
                     CREATE TEMPORARY TABLE IF NOT EXISTS potential_routes AS
@@ -274,6 +348,14 @@ public class BusConnectionDev {
         }
     }
 
+    /**
+     * Finds the route bus stops from the potential routes and returns a list of
+     * RouteStopInfo objects.
+     * 
+     * @param conn the database connection
+     * @return a list of RouteStopInfo objects
+     * @throws SQLException if a database error occurs
+     */
     private static List<RouteStopInfo> findRouteBusStops(Connection conn) throws SQLException {
         List<RouteStopInfo> routes = new ArrayList<>();
         String setGroupConcatMaxLen = "SET SESSION group_concat_max_len = 1000000;";
@@ -314,6 +396,17 @@ public class BusConnectionDev {
         return routes;
     }
 
+    /**
+     * Retrieves the next departure and arrival times for the given route, start
+     * stop, and end stop.
+     * 
+     * @param conn        the database connection
+     * @param routeId     the route ID
+     * @param startStopId the start stop ID
+     * @param endStopId   the end stop ID
+     * @return a list of TripInfo objects with departure and arrival information
+     * @throws SQLException if a database error occurs
+     */
     private static List<TripInfo> printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
             String endStopId) throws SQLException {
         String sql = "SELECT t.route_id, r.route_short_name, r.route_long_name, st1.trip_id, st1.departure_time AS start_departure_time, st2.arrival_time AS end_arrival_time, "
@@ -349,6 +442,15 @@ public class BusConnectionDev {
         return trips;
     }
 
+    /**
+     * Queries and prints shape details for a given trip, start stop, and end stop.
+     * 
+     * @param conn    the database connection
+     * @param tripId  the trip ID
+     * @param startId the start stop ID
+     * @param endId   the end stop ID
+     * @throws SQLException if a database error occurs
+     */
     private static void queryShapeDetails(Connection conn, String tripId, String startId, String endId)
             throws SQLException {
         // First, determine the latitude and longitude of the start and end stops
@@ -432,6 +534,15 @@ public class BusConnectionDev {
         }
     }
 
+    /**
+     * Queries and prints the stops between the start and end stops for a given
+     * trip.
+     * 
+     * @param conn        the database connection
+     * @param tripId      the trip ID
+     * @param startStopId the start stop ID
+     * @param endStopId   the end stop ID
+     */
     private static void queryStopsBetween(Connection conn, String tripId, String startStopId, String endStopId) {
         String sql = "SELECT st.trip_id, st.stop_id, s.stop_name, st.stop_sequence, s.stop_lat, s.stop_lon " +
                 "FROM stop_times st " +
@@ -470,5 +581,4 @@ public class BusConnectionDev {
             e.printStackTrace();
         }
     }
-
 }

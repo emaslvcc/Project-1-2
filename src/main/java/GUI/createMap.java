@@ -26,8 +26,10 @@ import java.net.URL;
 import java.util.List;
 
 import DataManagers.Node;
-//import Bus.DirectConnection;
 
+/**
+ * Manages the creation and display of the map.
+ */
 public class createMap {
     private static org.jxmapviewer.JXMapViewer jXMapViewer;
     private static double startLatitude = 0;
@@ -35,6 +37,11 @@ public class createMap {
     private static double endLatitude = 0;
     private static double endLongitude = 0;
 
+    /**
+     * Creates a JPanel containing the map.
+     *
+     * @return The JPanel containing the map.
+     */
     public static JPanel createMapPanel() {
         jXMapViewer = new org.jxmapviewer.JXMapViewer();
         jXMapViewer.setPreferredSize(new Dimension(200, 440));
@@ -50,6 +57,9 @@ public class createMap {
         return Center;
     }
 
+    /**
+     * Initializes the map creation.
+     */
     private static void init() {
         TileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
@@ -116,6 +126,12 @@ public class createMap {
         });
     }
 
+    /**
+     * Updates the start and end coordinates for drawing on the map.
+     *
+     * @param startPostCode The starting post code.
+     * @param endPostCode   The ending post code.
+     */
     public static void updateCoord(PostCode startPostCode, PostCode endPostCode) {
         startLatitude = startPostCode.getLatitude();
         startLongitude = startPostCode.getLongitude();
@@ -123,6 +139,11 @@ public class createMap {
         endLongitude = endPostCode.getLongitude();
     }
 
+    /**
+     * Draws the path on the map.
+     *
+     * @param stops The list of stops along the path.
+     */
     public static void drawPath(List<Node> stops) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
@@ -171,6 +192,12 @@ public class createMap {
 
     }
 
+    /**
+     * Draws the path on the map.
+     *
+     * @param stops The list of stops along the path.
+     * @param path The list of paths.
+     */
     public static void drawPath(List<Node> path, List<Node> stops) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
@@ -217,6 +244,12 @@ public class createMap {
 
     }
 
+    /**
+     * Creates and draws start and end points on the map.
+     *
+     * @param g   The graphics context used for drawing.
+     * @param map The map on which the points will be drawn.
+     */
     private static void createStartAndEndPoints(Graphics2D g, JXMapViewer map) {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
@@ -236,6 +269,11 @@ public class createMap {
 
     }
 
+    /**
+     * Creates and returns an image for the start and end points.
+     *
+     * @return The image for the start and end points.
+     */
     public static Image returnImage() {
         Image pointerImage;
         try {
@@ -250,6 +288,9 @@ public class createMap {
         return pointerImage;
     }
     
+    /**
+     * Clear the map.
+     */
     public static void clearMap() {
         jXMapViewer.setOverlayPainter(null);
         startLatitude = Double.NaN;

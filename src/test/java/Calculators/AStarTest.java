@@ -37,7 +37,7 @@ class AStarTest {
 
         AStar star = new AStar(graph);
         List<Node> nodeList = star.findShortestPath(node1,node4);
-        assertEquals(node1, nodeList.getFirst());
+        assertEquals(node1, nodeList.get(0));
         assertEquals(node3, nodeList.get(1));
         assertEquals(node4, nodeList.get(2));
 

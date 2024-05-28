@@ -173,18 +173,7 @@ LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/ph
 
 DROP TABLE IF EXISTS transfers;
 
-CREATE TABLE transfers (
-  from_stop_id VARCHAR(40),
-  to_stop_id VARCHAR(40),
-  from_route_id  VARCHAR(255),
-  to_route_id VARCHAR(255) ,
-  from_trip_id INT,
-  to_trip_id INT,
-  transfer_type INT,
-  PRIMARY KEY(from_stop_id,from_trip_id, to_trip_id)
- 
 
-);
 CREATE TABLE transfers (
   from_stop_id VARCHAR(40),
   to_stop_id VARCHAR(40),

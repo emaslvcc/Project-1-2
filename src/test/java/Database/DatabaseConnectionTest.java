@@ -12,6 +12,6 @@ class DatabaseConnectionTest {
     @Test
     @DisplayName("Test Database connection")
     void getConnection() throws SQLException {
-        assert(DatabaseConnection.getConnection() != null);
+        assert (DatabaseConnection.getConnection() != null);
     }
 }

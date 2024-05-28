@@ -98,6 +98,8 @@ class TripInfo {
 
 public class BusConnectionDev {
 
+    public static boolean testClass = false;
+
     static List<Node> stopNodes = new ArrayList<>();
     static int id = 0;
 
@@ -172,7 +174,8 @@ public class BusConnectionDev {
                         bestTrip.endArrivalTime,
                         bestTrip.startDepartureTime };
             } else {
-                JOptionPane.showMessageDialog(null, "No direct bus connection");
+                if(!testClass)JOptionPane.showMessageDialog(null, "No direct bus connection");
+                testClass = false;
                 throw new Exception("No direct bus connection");
             }
 

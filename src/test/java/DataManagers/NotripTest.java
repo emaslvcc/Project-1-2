@@ -21,6 +21,7 @@ class NotripTest {
         double endLon = 5.687570;
 
         Exception exception = assertThrows(Exception.class, () -> {
+            BusConnectionDev.testClass = true;
             BusConnectionDev.busLogic(startLat, startLon, endLat, endLon);
         });
 

@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.swing.JOptionPane;
+
 /**
  * The APICaller class provides functionality to send a POST request to an API
  * in order to retrieve the coordinates of a given postal code.
@@ -15,9 +17,11 @@ public class APICaller {
     static long latestUseTime = 0;
 
     /**
-     * Sends a POST request to the API to retrieve the coordinates of a given postal code.
+     * Sends a POST request to the API to retrieve the coordinates of a given postal
+     * code.
      * 
-     * @param postcode The postal code in Maastricht for which coordinates are requested.
+     * @param postcode The postal code in Maastricht for which coordinates are
+     *                 requested.
      * @return The response from the API containing the coordinates.
      */
     protected static String sendPostRequest(String postcode) throws InterruptedException {
@@ -64,7 +68,7 @@ public class APICaller {
                 finalResponse = response.toString();
 
             } else {
-                System.out.println("POST request didn't work.");
+                JOptionPane.showMessageDialog(null, "POST request didn't work.");
             }
 
         } catch (Exception e) {

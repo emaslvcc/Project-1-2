@@ -12,9 +12,8 @@ import java.util.Map;
 public class GetUserData {
 
     DataBaseReader dataBaseReader = new DataBaseReader();
-
-
     protected PostCode startPostCode, endPostCode;
+
     /**
      * Checks if the called zip code is in the hashMap, if not calls an API, then recursively checks again.
      * 
@@ -31,12 +30,25 @@ public class GetUserData {
         }
     }
 
+    /**
+     * Calculates the distance between the start and end postal codes using the Haversine formula.
+     *
+     * @param startPostCode The starting postal code.
+     * @param endPostCode   The ending postal code.
+     * @return The distance between the start and end postal codes.
+     */
     public double calculateAfterPressedButton(PostCode startPostCode, PostCode endPostCode) {
-        //calculate the distance (two different methods)
         DistanceCalculatorHaversine calc1 = new DistanceCalculatorHaversine(startPostCode, endPostCode);
-
         return calc1.getDistance();
     }
+
+    /**
+     * Gets the starting postal code from the user input.
+     *
+     * @param startCodeField The text field containing the starting postal code.
+     * @return The PostCode object for the starting postal code.
+     * @throws Exception If the postal code is invalid.
+     */
     protected PostCode getStartZip(JTextField startCodeField) throws Exception {
         String startCode = startCodeField.getText().toUpperCase();
         String returnValue = validatePostcode(startCode);
@@ -47,6 +59,14 @@ public class GetUserData {
         startPostCode = createPostCode(dataBaseReader.dataMap, startCode );
         return startPostCode;
     }
+
+    /**
+     * Gets the ending postal code from the user input.
+     *
+     * @param endCodeField The text field containing the ending postal code.
+     * @return The PostCode object for the ending postal code.
+     * @throws Exception If the postal code is invalid.
+     */
     protected PostCode getEndZip(JTextField endCodeField) throws Exception{
         String endCode = endCodeField.getText().toUpperCase();
         String returnValue = validatePostcode(endCode);
@@ -58,6 +78,12 @@ public class GetUserData {
         return endPostCode;
     }
 
+    /**
+     * Validates the format and correctness of a postal code.
+     *
+     * @param postcode The postal code to validate.
+     * @return An error message if the postal code is invalid, otherwise an empty string.
+     */
     public String validatePostcode(String postcode){
         if(postcode == null){
             return "Postcode is null";

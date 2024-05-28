@@ -4,13 +4,29 @@ import java.util.*;
 
 import DataManagers.*;
 
+/**
+ * The AStar class implements the A* algorithm for finding the shortest path
+ * between two nodes in a graph.
+ */
 public class AStar {
     private Graph graph;
 
+    /**
+     * Constructs an AStar instance with the given graph.
+     *
+     * @param graph the graph on which to perform the A* search
+     */
     public AStar(Graph graph) {
         this.graph = graph;
     }
 
+    /**
+     * Finds the shortest path between the start and goal nodes using the A* algorithm.
+     *
+     * @param start the starting node
+     * @param goal the goal node
+     * @return a list of nodes representing the shortest path from start to goal, or null if no path is found
+     */
     public List<Node> findShortestPath(Node start, Node goal) {
         Map<Node, Node> cameFrom = new HashMap<>();
         Map<Node, Double> costSoFar = new HashMap<>();
@@ -44,7 +60,13 @@ public class AStar {
         return null;
     }
 
-    //euclidean distance
+    /**
+     * Calculates the estimate of the distance between two nodes using the Euclidean formula.
+     *
+     * @param a the first node
+     * @param b the second node
+     * @return the heuristic estimate of the distance between node a and node b
+     */
     private static double heuristic(Node a, Node b) {
         return Math.sqrt(Math.pow(a.getLat() - b.getLat(), 2) + Math.pow(a.getLon() - b.getLon(), 2));
     }

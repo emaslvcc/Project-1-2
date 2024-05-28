@@ -2,6 +2,10 @@ package DataManagers;
 
 import java.util.*;
 
+/**
+ * The Graph class represents a graph data structure using an adjacency list.
+ * It stores nodes and their adjacent edges.
+ */
 public class Graph {
     Map<Node, List<Edge>> adjacencyList = new HashMap<>();
 
@@ -13,10 +17,18 @@ public class Graph {
         adjacencyList.get(edge.getSource()).add(edge);
     }
 
-    public List<Edge> getEdges(Node nodeID){
+    public List<Edge> getEdges(Node nodeID) {
         return adjacencyList.get(nodeID);
     }
 
+    /**
+     * Finds the node in the graph that is closest to the specified latitude and
+     * longitude coordinates.
+     *
+     * @param lat The latitude coordinate.
+     * @param lon The longitude coordinate.
+     * @return The node in the graph closest to the specified coordinates.
+     */
     public Node getNodeByLatLon(double lat, double lon) {
         Node closestNode = null;
         double closestDistance = Double.MAX_VALUE;
@@ -29,8 +41,6 @@ public class Graph {
                 closestNode = node;
             }
         }
-
-        return closestNode; // Return the closest node
+        return closestNode;
     }
-
 }

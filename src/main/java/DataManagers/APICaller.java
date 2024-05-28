@@ -12,15 +12,14 @@ import java.net.URL;
  */
 public class APICaller {
 
+    static long latestUseTime = 0;
+
     /**
      * Sends a POST request to the API to retrieve the coordinates of a given postal code.
      * 
      * @param postcode The postal code in Maastricht for which coordinates are requested.
      * @return The response from the API containing the coordinates.
      */
-
-    static long latestUseTime = 0;
-
     protected static String sendPostRequest(String postcode) throws InterruptedException {
 
         String finalResponse = "";

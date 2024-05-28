@@ -31,10 +31,16 @@ public class mapFrame extends javax.swing.JFrame {
         private static JLabel startBusStop;
         private static JLabel endBusStop;
 
+        /**
+         * Calls the component initializer.
+         */
         public mapFrame() {
                 initComponents();
         }
 
+        /**
+         * Initializes all the GUI components.
+         */
         private void initComponents() {
                 setIconImage(new javax.swing.ImageIcon(getClass().getResource("/Images/mapLogo.png")).getImage());
                 backPanel = new javax.swing.JPanel();
@@ -353,6 +359,13 @@ public class mapFrame extends javax.swing.JFrame {
 
         private boolean busMode = false;
 
+        /**
+         * Handles the action when the calculate button is pressed.
+         *
+         * @param evt   The action event.
+         * @param frame The action listener for the frame.
+         * @throws Exception Exception if an error occurs during calculation.
+         */
         private void calculateButtonActionPerformed(ActionEvent evt, ActionListener frame) throws Exception {
                 if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
                         createMap.clearMap();
@@ -373,23 +386,48 @@ public class mapFrame extends javax.swing.JFrame {
 
         }
 
+        /**
+         * Updates the time field on the map frame.
+         *
+         * @param time The time value to be displayed.
+         */
         public static void updateTimeField(int time) {
                 timeNumberLabel.setText(time + " min");
         }
 
+        /**
+         * Updates the distance field on the map frame.
+         *
+         * @param distance The distance value to be displayed.
+         */
         public static void updateDistanceField(double distance) {
                 String displayed = String.format("%.2f", distance);
                 distanceNumberLabel.setText(displayed + " km");
         }
 
+        /**
+         * Handles the action when the exit button is clicked.
+         *
+         * @param evt The mouse event.
+         */
         private void exitButtonMouseClicked(java.awt.event.MouseEvent evt) {
                 System.exit(0);
         }
 
+        /**
+         * Handles the action when the minimize button is clicked.
+         *
+         * @param evt The mouse event.
+         */
         private void minimizeButtonMouseClicked(java.awt.event.MouseEvent evt) {
                 this.setExtendedState(mapFrame.ICONIFIED);
         }
 
+        /**
+         * Adds a panel for displaying bus information to the map frame.
+         *
+         * @param frame The action listener for the frame.
+         */
         private void addPanelForBusInfo(ActionListener frame) {
                 this.setSize(new java.awt.Dimension(1100, 598));
                 this.setLayout(new BorderLayout());
@@ -455,6 +493,16 @@ public class mapFrame extends javax.swing.JFrame {
                 recenterWindow();
         }
 
+        /**
+         * Sets the bus information on the map frame.
+         *
+         * @param busName       The name of the bus.
+         * @param busNum        The number of the bus.
+         * @param startBusStop  The starting bus stop.
+         * @param endBusStop    The ending bus stop.
+         * @param arrivalTime   The arrival time of the bus.
+         * @param departureTime The departure time of the bus.
+         */
         public static void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop,
                         String arrivalTime, String departureTime) {
                 mapFrame.busName.setText("<html>Bus Name:<br>" + busName + "</html>");
@@ -465,6 +513,11 @@ public class mapFrame extends javax.swing.JFrame {
                 mapFrame.departureTime.setText("<html>Departure Time:<br>" + departureTime + "</html>");
         }
 
+        /**
+         * Removes the panel for displaying bus information from the map frame.
+         *
+         * @param frame The action listener for the frame.
+         */
         private void removePanelForBusInfo(ActionListener frame) {
                 this.setSize(new java.awt.Dimension(900, 598));
                 this.remove(busInfoPanel);
@@ -473,11 +526,19 @@ public class mapFrame extends javax.swing.JFrame {
                 recenterWindow();
         }
 
+        /**
+         * Recenter the window on the screen.
+         */
         public void recenterWindow() {
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
                 this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
         }
 
+        /**
+         * Main method that starts the application.
+         * 
+         * @param args the command line arguments.
+         */
         public static void main(String args[]) {
                 LogicManager.createGraph();
                 try {
@@ -508,5 +569,4 @@ public class mapFrame extends javax.swing.JFrame {
                         }
                 });
         }
-
 }

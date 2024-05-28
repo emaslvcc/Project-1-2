@@ -174,7 +174,8 @@ public class BusConnectionDev {
                         bestTrip.endArrivalTime,
                         bestTrip.startDepartureTime };
             } else {
-                if(!testClass)JOptionPane.showMessageDialog(null, "No direct bus connection");
+                if (!testClass)
+                    JOptionPane.showMessageDialog(null, "No direct bus connection");
                 testClass = false;
                 throw new Exception("No direct bus connection");
             }

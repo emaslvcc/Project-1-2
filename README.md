@@ -4,7 +4,7 @@
 
 ## Public Transport Routing Application for Maastricht
 
-This application utilizes the General Transit Feed Specification (GTFS) dataset for The Netherlands to provide efficient public transport routing options in Maastricht, focusing solely on bus services. It calculates the distance and time between two postal codes using direct bus connections.
+This application utilizes the General Transit Feed Specification (GTFS) dataset for The Netherlands to provide efficient public transport routing options in Maastricht, focusing solely on bus services. It shows the bus info and calculates the distance and time between two postal codes using direct bus connections.
 
 ### Installation
 

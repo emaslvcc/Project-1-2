@@ -148,7 +148,7 @@ public class BusConnectionDev {
                 bestTripString = "" + bestTrip;
                 System.out.println("Best Trip: " + bestTrip);
                 System.out.println("========================================");
-                createAndQueryShapes(conn, bestTrip);
+                queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 System.out.println("========================================");
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 if (id2 == 0) {
@@ -349,91 +349,78 @@ public class BusConnectionDev {
         return trips;
     }
 
-    private static void createAndQueryShapes(Connection conn, TripInfo bestTrip) throws SQLException {
-        createTemporaryTableNearestStartShape(conn, bestTrip.getRouteId(), bestTrip.getStartStopId());
-        createTemporaryTableNearestEndShape(conn, bestTrip.getRouteId(), bestTrip.getEndStopId());
-        createTemporaryTableCommonShapeId(conn);
-        queryShapeDetails(conn);
-    }
-
-    private static void createTemporaryTableNearestStartShape(Connection conn, String routeId, String startStopId)
+    private static void queryShapeDetails(Connection conn, String tripId, String startId, String endId)
             throws SQLException {
-        String sql = "CREATE TEMPORARY TABLE NearestStartShape AS " +
-                "SELECT t.route_id, stp.stop_id, s.shape_id, s.shape_pt_lat, s.shape_pt_lon, s.shape_pt_sequence AS start_shape_sequence,"
-                +
-                "MIN(ST_Distance_Sphere(point(stp.stop_lon, stp.stop_lat), point(s.shape_pt_lon, s.shape_pt_lat))) AS min_distance "
-                +
-                "FROM stops stp " +
-                "JOIN trips t ON t.route_id = ? " +
-                "JOIN shapes s ON t.shape_id = s.shape_id " +
-                "WHERE stp.stop_id = ? " +
-                "GROUP BY s.shape_id, s.shape_pt_sequence " +
-                "ORDER BY min_distance ASC " +
-                "LIMIT 3;";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, routeId);
-            pstmt.setString(2, startStopId);
-            pstmt.executeUpdate();
+        // First, determine the latitude and longitude of the start and end stops
+        String stopInfoQuery = "SELECT stop_lat, stop_lon FROM stops WHERE stop_id = ?";
+        double startLat = 0, startLon = 0, endLat = 0, endLon = 0;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(stopInfoQuery)) {
+            pstmt.setString(1, startId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                startLat = rs.getDouble("stop_lat");
+                startLon = rs.getDouble("stop_lon");
+            }
+
+            pstmt.setString(1, endId);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                endLat = rs.getDouble("stop_lat");
+                endLon = rs.getDouble("stop_lon");
+            }
         }
-    }
 
-    private static void createTemporaryTableNearestEndShape(Connection conn, String routeId, String endStopId)
-            throws SQLException {
-        String sql = "CREATE TEMPORARY TABLE NearestEndShape AS " +
-                "SELECT t.route_id, stp.stop_id, s.shape_id, s.shape_pt_lat, s.shape_pt_lon, s.shape_pt_sequence AS end_shape_sequence, "
-                +
-                "MIN(ST_Distance_Sphere(point(stp.stop_lon, stp.stop_lat), point(s.shape_pt_lon, s.shape_pt_lat))) AS min_distance "
-                +
-                "FROM stops stp " +
-                "JOIN trips t ON t.route_id = ? " +
-                "JOIN shapes s ON t.shape_id = s.shape_id " +
-                "WHERE stp.stop_id = ? " +
-                "GROUP BY s.shape_id, s.shape_pt_sequence " +
-                "ORDER BY min_distance ASC " +
-                "LIMIT 3;";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, routeId);
-            pstmt.setString(2, endStopId);
-            pstmt.executeUpdate();
+        // Then, find the nearest shape points to these coordinates and the sequences
+        String shapeSeqQuery = """
+                SELECT s.shape_pt_sequence
+                FROM shapes s
+                JOIN trips t ON s.shape_id = t.shape_id
+                WHERE t.trip_id = ?
+                ORDER BY ST_Distance_Sphere(point(s.shape_pt_lon, s.shape_pt_lat), point(?, ?))
+                LIMIT 1;
+                """;
+
+        int startShapeSeq = 0, endShapeSeq = 0;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(shapeSeqQuery)) {
+            pstmt.setString(1, tripId);
+            pstmt.setDouble(2, startLon);
+            pstmt.setDouble(3, startLat);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                startShapeSeq = rs.getInt("shape_pt_sequence");
+            }
+
+            pstmt.setDouble(2, endLon);
+            pstmt.setDouble(3, endLat);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                endShapeSeq = rs.getInt("shape_pt_sequence");
+            }
         }
-    }
 
-    private static void createTemporaryTableCommonShapeId(Connection conn) throws SQLException {
-        String sql = "CREATE TEMPORARY TABLE CommonShapeId AS " +
-                "SELECT DISTINCT ns.shape_id " +
-                "FROM NearestStartShape ns " +
-                "JOIN NearestEndShape ne ON ns.shape_id = ne.shape_id " +
-                "LIMIT 1;";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.executeUpdate();
-        }
-    }
+        // Retrieve all shape points between the determined sequences
+        String finalQuery = """
+                SELECT s.shape_id, s.shape_pt_sequence, s.shape_pt_lat, s.shape_pt_lon
+                FROM shapes s
+                JOIN trips t ON s.shape_id = t.shape_id
+                WHERE t.trip_id = ? AND s.shape_pt_sequence BETWEEN ? AND ?
+                ORDER BY s.shape_pt_sequence;
+                """;
 
-    private static void queryShapeDetails(Connection conn) throws SQLException {
-        String sql = "SELECT DISTINCT " +
-                "ns.route_id, " +
-                "ns.shape_id, " +
-                "sh.shape_pt_sequence, " +
-                "sh.shape_pt_lat, " +
-                "sh.shape_pt_lon " +
-                "FROM NearestStartShape ns " +
-                "JOIN NearestEndShape ne ON ns.route_id = ne.route_id AND ns.shape_id = ne.shape_id " +
-                "JOIN shapes sh ON ns.shape_id = sh.shape_id " +
-                "JOIN CommonShapeId csi ON csi.shape_id = ns.shape_id " + // Filter by the common shape_id
-                "WHERE (sh.shape_pt_sequence BETWEEN ns.start_shape_sequence AND ne.end_shape_sequence " +
-                "OR sh.shape_pt_sequence BETWEEN ne.end_shape_sequence AND ns.start_shape_sequence) " +
-                "ORDER BY sh.shape_pt_sequence;";
-
-        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(finalQuery)) {
+            pstmt.setString(1, tripId);
+            pstmt.setInt(2, Math.min(startShapeSeq, endShapeSeq)); // Ensure correct order
+            pstmt.setInt(3, Math.max(startShapeSeq, endShapeSeq));
+            ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                String routeId = rs.getString("route_id");
                 String shapeId = rs.getString("shape_id");
                 int shapePtSequence = rs.getInt("shape_pt_sequence");
                 double shapePtLat = rs.getDouble("shape_pt_lat");
                 double shapePtLon = rs.getDouble("shape_pt_lon");
 
-                System.out.println("Route ID: " + routeId +
-                        ", Shape ID: " + shapeId +
+                System.out.println("Shape ID: " + shapeId +
                         ", Shape Pt Sequence: " + shapePtSequence +
                         ", Latitude: " + shapePtLat +
                         ", Longitude: " + shapePtLon);
@@ -442,7 +429,6 @@ public class BusConnectionDev {
                 id2++;
             }
             System.out.println("Query completed.");
-
         }
     }
 

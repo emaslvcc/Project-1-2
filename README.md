@@ -1,36 +1,52 @@
-3.2 Phase 2: Public Transport Routing
+### README.md
 
-For this phase, you have been provided with a GTFS (General Transit Feed Specification4)
-dataset for The Netherlands. Calculate the distance and time between two postal codes, now
-considering public transport options.
-Assume that the only mode of public transport in Maastricht is by bus (ignore the Arriva train
-connections between Randwyck, Centraal, and Nord stations).
-3.2.1 Tasks:
+---
 
-1. Develop an efficient algorithm to find the closest bus stops, bus routes, and times for
-   trips for a given postal code.
+## Public Transport Routing Application for Maastricht
 
-2. Store the GTFS data5 in a well-structured relational database and write efficient SQL
-   queries.
-   Hint: Use indexes where appropriate.
+This application utilizes the General Transit Feed Specification (GTFS) dataset for The Netherlands to provide efficient public transport routing options in Maastricht, focusing solely on bus services. It calculates the distance and time between two postal codes using direct bus connections.
 
-3. Enhance your visualization to accurately depict bus routes.
-   You may use the city bus map as inspiration.
-4. Write JUnit test cases and report code coverage statistics (aim for very high coverage).
+### Installation
 
-3.2.2 Requirements:
+1. Ensure you have Java installed (Java 17+ recommended).
+2. Compile the application using your favorite IDE or the Java command line compiler.
 
-1. Store GTFS data in a relational database. Optimize all SQL queries for performance
-   (minimal query wait time).
-2. Calculate time by bus. Only direct connections count. If no direct connection exists
-   between two postal codes the GUI must indicate this.
+### Database Setup
 
-3.2.3 To Pass:
+1. Import the GTFS data into a relational database using the provided SQL scripts found in `sql/load_gtfs.sql`.
+2. Configure your database with appropriate indexes to optimize the performance of query operations.
 
-1. Have a correctly implemented routing algorithm for finding the shortest direct route.
-2. Include a GUI with all bus routes. Upon user input the GUI must indicate in some
-   manner which bus route the user should take.
+### Usage
 
-3.2.4 How to run the application?
+1. Start the application by navigating to the `src` directory and running:
+   ```bash
+   java GUI/mapFrame.java
+   ```
+2. Enter the start and destination postal codes into the GUI.
+3. Select the mode of transportation: `walk`, `bike`, or `bus`.
+4. Click 'Calculate' to get the route information.
 
-Enter the start zip code and destination zip code, choose 'walk', 'bike' or 'bus', then press 'Calculate'.
+### Features
+
+- **Efficient Route Calculation**: Calculates the shortest direct route using bus connections. If no direct bus route exists, the application will inform the user accordingly.
+- **Interactive Map Visualization**: Displays bus routes on a map, highlighting the recommended route based on the user's input.
+- **Optimized Database**: Features a well-structured relational database optimized with indexes for quick query responses.
+
+### Running Tests
+
+- Run JUnit test cases located in the `test` directory to ensure application functionality:
+
+### Requirements
+
+- GTFS data must be stored in a relational database.
+- SQL queries should be optimized for fast performance.
+- The GUI must display all bus routes and indicate which bus route the user should take based on their input.
+
+### Troubleshooting
+
+- If the GTFS data fails to load correctly, verify the SQL scripts and the database integrity.
+- For GUI issues, ensure all Java Swing components are properly initialized in `GUI/mapFrame.java`.
+
+### Support
+
+For additional help or to report issues, please contact support at [carreyhzz@gmail.com].

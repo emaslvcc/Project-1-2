@@ -22,6 +22,7 @@ public class LogicManager extends GetUserData {
     public static double distance;
     public static String[] busInfo;
     protected int[] finalStops;
+    private List<Node> shortestPath;
 
     /**
      * This method takes care of the main logic regarding the post codes.
@@ -34,7 +35,6 @@ public class LogicManager extends GetUserData {
     public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox)
             throws Exception {
 
-        dataBaseReader.createHashMap();
         try {
             startPostCode = getStartZip(startCodeField);
         } catch (Exception ex) {
@@ -47,14 +47,16 @@ public class LogicManager extends GetUserData {
             throw new RuntimeException(ex);
         }
         String mode = modeBox.getSelectedItem().toString();
+        GUI.createMap.updateCoord(startPostCode, endPostCode);
 
         if ((mode).equals("Bus")) {
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude());
             GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3], busInfo[4], busInfo[5]);
         } else {
-            GUI.createMap.updateCoord(startPostCode, endPostCode);
             calculateRoute(startPostCode, endPostCode, mode);
+            // Display the shortest path on the map
+            GUI.createMap.drawPath(shortestPath, null);
         }
 
         TimeCalculator timeCalc = new AverageTimeCalculator(distance);
@@ -133,11 +135,8 @@ public class LogicManager extends GetUserData {
 
             // Find the shortest path
             Calculators.AStar aStar = new Calculators.AStar(graph);
-            List<Node> shortestPath = aStar.findShortestPath(startNode, endNode);
+            shortestPath = aStar.findShortestPath(startNode, endNode);
             distance = calculateDistance(shortestPath);
-
-            // Display the shortest path on the map
-            GUI.createMap.drawPath(shortestPath, null);
 
         } catch (Exception e) {
             System.out.println(e);
@@ -159,5 +158,10 @@ public class LogicManager extends GetUserData {
                     endNode.getLon(), endNode.getLat());
         }
         return distance;
+    }
+
+
+    public List<Node> getShortestPath() {
+        return shortestPath;
     }
 }

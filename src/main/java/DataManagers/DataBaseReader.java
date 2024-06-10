@@ -1,7 +1,12 @@
 
 package DataManagers;
 
+import Database.DatabaseConnection;
+
 import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,36 +15,6 @@ import java.util.Map;
  * file and interact with a data map containing postal code coordinates.
  */
 public class DataBaseReader extends APICaller {
-
-    protected Map<String, double[]> dataMap = new HashMap<>();
-    private final String PATH = "src/main/java/DataManagers/MassZipLatLon.csv";
-
-    /**
-     * Translates the CSV file to a HashMap containing postal codes and their coordinates.
-     */
-    private void csvToHashMap (){
-
-        try (BufferedReader br = new BufferedReader(new FileReader(PATH))) {
-            br.readLine(); // Skips header line
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(","); // Use a comma to separate entries
-                double lat = Double.parseDouble(data[1]);
-                double lon = Double.parseDouble(data[2]);
-                dataMap.put(data[0], new double[] { lat, lon });
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Creates a HashMap from the CSV file.
-     */
-    public void createHashMap(){
-        csvToHashMap();
-    }
 
     /**
      * Saves a new postal code and its coordinates to the CSV file and updates the data map.
@@ -56,10 +31,7 @@ public class DataBaseReader extends APICaller {
             double longitude = extractLongitude(apiResponse);
 
             // Update the CSV file with the new postal code and coordinates
-            updateCSVFile(zipCode, latitude, longitude);
-
-            // Update the dataMap HashMap
-            csvToHashMap();
+            updateDatabase(zipCode, latitude, longitude);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,10 +48,32 @@ public class DataBaseReader extends APICaller {
      * @param longitude The longitude of the postal code.
      * @throws IOException If an I/O error occurs.
      */
-    public void updateCSVFile(String zipCode, double latitude, double longitude) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PATH, true))) {
-            // Append the new postal code and coordinates to the CSV file
-            writer.write( zipCode + "," + latitude + "," + longitude + "\n");
+    public void updateDatabase(String zipCode, double latitude, double longitude) throws IOException {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Corrected SQL query
+        String query = "INSERT INTO post_codes (zipcode, latitude, longitude) VALUES (?, ?, ?)";
+
+        try (PreparedStatement pstmt1 = conn.prepareStatement(query)) {
+            pstmt1.setString(1, zipCode);
+            pstmt1.setDouble(2, latitude);
+            pstmt1.setDouble(3, longitude);
+            pstmt1.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

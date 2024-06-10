@@ -17,7 +17,7 @@ import javax.swing.*;
  * Manages the logic for calculating routes and handling user inputs.
  */
 public class LogicManager extends GetUserData {
-    private static DataManagers.Graph graph = new DataManagers.Graph();
+    private static Graph graph = new Graph();
     public static int time;
     public static double distance;
     public static String[] busInfo;

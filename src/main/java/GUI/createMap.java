@@ -31,7 +31,7 @@ import DataManagers.Node;
  * Manages the creation and display of the map.
  */
 public class createMap {
-    private static org.jxmapviewer.JXMapViewer jXMapViewer;
+    private static JXMapViewer jXMapViewer;
     private static double startLatitude = 0;
     private static double startLongitude = 0;
     private static double endLatitude = 0;
@@ -43,7 +43,7 @@ public class createMap {
      * @return The JPanel containing the map.
      */
     public static JPanel createMapPanel() {
-        jXMapViewer = new org.jxmapviewer.JXMapViewer();
+        jXMapViewer = new JXMapViewer();
         jXMapViewer.setPreferredSize(new Dimension(200, 440));
         init();
 

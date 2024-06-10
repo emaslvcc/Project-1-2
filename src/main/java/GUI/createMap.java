@@ -1,8 +1,9 @@
 package GUI;
 
+import Calculators.AverageTimeCalculator;
+import Calculators.TimeCalculator;
+import DataManagers.LogicManager;
 import DataManagers.PostCode;
-import com.graphhopper.ResponsePath;
-import com.graphhopper.util.PointList;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.PanMouseInputListener;
@@ -25,14 +26,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-import DataManagers.*;
-import Calculators.*;
+import DataManagers.Node;
 
 /**
  * Manages the creation and display of the map.
  */
 public class createMap {
-    private static org.jxmapviewer.JXMapViewer jXMapViewer;
+    private static JXMapViewer jXMapViewer;
     private static double startLatitude = 0;
     private static double startLongitude = 0;
     private static double endLatitude = 0;
@@ -44,7 +44,7 @@ public class createMap {
      * @return The JPanel containing the map.
      */
     public static JPanel createMapPanel() {
-        jXMapViewer = new org.jxmapviewer.JXMapViewer();
+        jXMapViewer = new JXMapViewer();
         jXMapViewer.setPreferredSize(new Dimension(200, 440));
         init();
 
@@ -139,6 +139,9 @@ public class createMap {
         startLongitude = startPostCode.getLongitude();
         endLatitude = endPostCode.getLatitude();
         endLongitude = endPostCode.getLongitude();
+
+        System.out.println("Start Coord: " + startLatitude + ", " + startLongitude);
+        System.out.println("End Coord: " + endLatitude + ", " + endLongitude);
     }
 
     /**
@@ -199,7 +202,7 @@ public class createMap {
      * Draws the path on the map.
      *
      * @param stops The list of stops along the path.
-     * @param path  The list of paths.
+     * @param path The list of paths.
      */
     public static void drawPath(List<Node> path, List<Node> stops) {
 
@@ -207,9 +210,8 @@ public class createMap {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
-                    g.setColor(Color.BLUE);
-                    // g.setColor(Color.decode("#FFFF00")); // Set the color for the lines to yellow
 
+                    g.setColor(Color.BLUE);
                     g.setStroke(new BasicStroke(3));
 
                     for (int i = 0; i < path.size() - 1; i++) {
@@ -222,8 +224,9 @@ public class createMap {
                         g.draw(new Line2D.Double(startP, endP));
                     }
 
+
                     if (stops != null) {
-                        createStartAndEndPointsForBus(g, map, stops);
+                        createStartAndEndPointsForBus(g, map,  stops);
 
                         g.setColor(Color.RED);
                         for (int i = 0; i < stops.size(); i++) {
@@ -233,14 +236,15 @@ public class createMap {
                             Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(), pointMap.getY(), 10, 10);
                             g.fill(circle);
                         }
+                    } else {
+                        // Draw start and end markers
+                        createStartAndEndPoints(g, map);
                     }
 
                 } catch (Exception e) {
                     System.out.println("Error in drawing path" + e);
                     e.printStackTrace();
-                } finally {
-                    g.dispose();
-                }
+     
 
             }
         };
@@ -334,7 +338,7 @@ public class createMap {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
 
-        Image PointerImage = returnImage();
+        Image PointerImage = returnPointerImage();
 
         g = (Graphics2D) g.create();
         Point2D start = map.convertGeoPositionToPoint(startPos);
@@ -354,7 +358,7 @@ public class createMap {
      *
      * @return The image for the start and end points.
      */
-    public static Image returnImage() {
+    public static Image returnPointerImage() {
         Image pointerImage;
         try {
             URL imageUrl = createMap.class.getResource("/Images/pointer.png");

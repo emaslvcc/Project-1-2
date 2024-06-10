@@ -328,12 +328,6 @@ public class createMap {
         }
     }
 
-    /**
-     * Creates and draws start and end points on the map.
-     *
-     * @param g   The graphics context used for drawing.
-     * @param map The map on which the points will be drawn.
-     */
     private static void createStartAndEndPoints(Graphics2D g, JXMapViewer map) {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
@@ -351,11 +345,10 @@ public class createMap {
         g.drawImage(PointerImage, (int) start.getX() - imgX / 2, (int) start.getY() - imgY, null);
         g.drawImage(PointerImage, (int) end.getX() - imgX / 2, (int) end.getY() - imgY, null);
 
-    }
-
     /**
-     * Creates and returns an image for the start and end points.
-     *
+     * 
+     * 
+     * 
      * @return The image for the start and end points.
      */
     public static Image returnPointerImage() {

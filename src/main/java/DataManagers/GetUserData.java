@@ -9,19 +9,10 @@ import java.util.Map;
  * The GetUserData class extends DataBaseReader and provides functionality to get user input
  * for postal codes and create corresponding PostCode objects.
  */
-public class GetUserData extends DataBaseReader{
+public class GetUserData {
 
+    DataBaseReader dataBaseReader = new DataBaseReader();
     protected PostCode startPostCode, endPostCode;
-
-    /**
-     * Takes user's input and creates a PostCode object.
-     * 
-     * @param dataMap The map containing postal code data.
-     * @return The PostCode object created based on user input.
-     */
-    private PostCode getZipCode(Map<String, double[]> dataMap, String zipCode) {
-        return createPostCode(dataMap, zipCode);
-    }
 
     /**
      * Checks if the called zip code is in the hashMap, if not calls an API, then recursively checks again.
@@ -34,45 +25,82 @@ public class GetUserData extends DataBaseReader{
         if (dataMap.containsKey(zipCode)) {
             return new PostCode(zipCode, dataMap.get(zipCode)[0], dataMap.get(zipCode)[1]);
         } else {
-            saveNewPostCode(zipCode);
+            dataBaseReader.saveNewPostCode(zipCode);
             return createPostCode(dataMap, zipCode);
         }
     }
 
+    /**
+     * Calculates the distance between the start and end postal codes using the Haversine formula.
+     *
+     * @param startPostCode The starting postal code.
+     * @param endPostCode   The ending postal code.
+     * @return The distance between the start and end postal codes.
+     */
     public double calculateAfterPressedButton(PostCode startPostCode, PostCode endPostCode) {
-        //calculate the distance (two different methods)
         DistanceCalculatorHaversine calc1 = new DistanceCalculatorHaversine(startPostCode, endPostCode);
-
         return calc1.getDistance();
     }
+
+    /**
+     * Gets the starting postal code from the user input.
+     *
+     * @param startCodeField The text field containing the starting postal code.
+     * @return The PostCode object for the starting postal code.
+     * @throws Exception If the postal code is invalid.
+     */
     protected PostCode getStartZip(JTextField startCodeField) throws Exception {
         String startCode = startCodeField.getText().toUpperCase();
-        validatePostcode(startCode);
-        startPostCode = getZipCode(dataMap, startCode );
+        String returnValue = validatePostcode(startCode);
+        if(!returnValue.isEmpty()){      // if this returns a string then there was an error
+            JOptionPane.showMessageDialog(null, returnValue);
+            throw new Exception(returnValue);
+        }
+        startPostCode = createPostCode(dataBaseReader.dataMap, startCode );
         return startPostCode;
     }
-    protected PostCode getEndZip(JTextField endCodeField) throws Exception{
 
+    /**
+     * Gets the ending postal code from the user input.
+     *
+     * @param endCodeField The text field containing the ending postal code.
+     * @return The PostCode object for the ending postal code.
+     * @throws Exception If the postal code is invalid.
+     */
+    protected PostCode getEndZip(JTextField endCodeField) throws Exception{
         String endCode = endCodeField.getText().toUpperCase();
-        validatePostcode(endCode);
-        endPostCode = getZipCode(dataMap, endCode);
+        String returnValue = validatePostcode(endCode);
+        if(!returnValue.isEmpty()){      // if this returns a string then there was an error
+            JOptionPane.showMessageDialog(null, returnValue);
+            throw new Exception(returnValue);
+        }
+        endPostCode = createPostCode(dataBaseReader.dataMap, endCode);
         return endPostCode;
     }
 
-    public void validatePostcode(String postcode) throws Exception {
+    /**
+     * Validates the format and correctness of a postal code.
+     *
+     * @param postcode The postal code to validate.
+     * @return An error message if the postal code is invalid, otherwise an empty string.
+     */
+    public String validatePostcode(String postcode){
+        if(postcode == null){
+            return "Postcode is null";
+        }
         if (postcode.length() != 6) {
-            JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect length.");
-            throw new Exception("Postcode " + postcode + " is invalid: incorrect length.");
+            return "Postcode " + postcode + " is invalid: incorrect length.";
         } else if (Character.isDigit(postcode.charAt(4)) || Character.isDigit(postcode.charAt(5))) {
-            JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect format.");
-            throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+            return "Postcode " + postcode + " is invalid: incorrect format.";
+        } else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2' ||  (postcode.charAt(2) != '1' && postcode.charAt(2) != '2') || postcode.charAt(3) == '0'){
+            return "Postcode " + postcode + " is invalid: not in Maastricht.";
         }
 
         for (int i = 0; i < 4; i++) {
             if(!Character.isDigit(postcode.charAt(i))) {
-                JOptionPane.showMessageDialog(null, "Postcode " + postcode + " is invalid: incorrect format.");
-                throw new Exception("Postcode " + postcode + " is invalid: incorrect format.");
+                return "Postcode " + postcode + " is invalid: incorrect format.";
             }
         }
+        return "";
     }
 }

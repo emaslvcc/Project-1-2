@@ -13,13 +13,14 @@ class GetUserDataTest {
     @DisplayName("Test if postal code format validation works")
     void sendPostRequest() {
         GetUserData user = new GetUserData();
-        assertThrows(Exception.class, () -> user.validatePostcode(";lkjaskldjf"));
-        assertThrows(Exception.class, () -> user.validatePostcode("GW6224"));
-        assertThrows(Exception.class, () -> user.validatePostcode("2"));
-        assertThrows(Exception.class, () -> user.validatePostcode("622GGW"));
-        assertThrows(Exception.class, () -> user.validatePostcode("_224GW"));
-        assertThrows(Exception.class, () -> user.validatePostcode(""));
-        assertThrows(Exception.class, () -> user.validatePostcode(null));
+        assert(!user.validatePostcode(";lkjaskldjf").isEmpty());
+        assert(!user.validatePostcode("GW6224").isEmpty());
+        assert(!user.validatePostcode("2").isEmpty());
+        assert(!user.validatePostcode("622GGW").isEmpty());
+        assert(!user.validatePostcode("_224GW").isEmpty());
+        assert(!user.validatePostcode("6882ER").isEmpty());
+        assert(!user.validatePostcode(null).isEmpty());
+        assert(user.validatePostcode("6224GW").isEmpty());
     }
 
 }

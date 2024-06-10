@@ -18,6 +18,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -25,8 +26,10 @@ import java.net.URL;
 import java.util.List;
 
 import DataManagers.Node;
-import Bus.DirectConnection;
 
+/**
+ * Manages the creation and display of the map.
+ */
 public class createMap {
     private static org.jxmapviewer.JXMapViewer jXMapViewer;
     private static double startLatitude = 0;
@@ -34,6 +37,11 @@ public class createMap {
     private static double endLatitude = 0;
     private static double endLongitude = 0;
 
+    /**
+     * Creates a JPanel containing the map.
+     *
+     * @return The JPanel containing the map.
+     */
     public static JPanel createMapPanel() {
         jXMapViewer = new org.jxmapviewer.JXMapViewer();
         jXMapViewer.setPreferredSize(new Dimension(200, 440));
@@ -49,6 +57,9 @@ public class createMap {
         return Center;
     }
 
+    /**
+     * Initializes the map creation.
+     */
     private static void init() {
         TileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
@@ -113,10 +124,14 @@ public class createMap {
                 }
             }
         });
-        Database.DatabaseUploader.init();
-        System.out.println(Bus.DirectConnection.checkConnection(2578403, 2578131));
     }
 
+    /**
+     * Updates the start and end coordinates for drawing on the map.
+     *
+     * @param startPostCode The starting post code.
+     * @param endPostCode   The ending post code.
+     */
     public static void updateCoord(PostCode startPostCode, PostCode endPostCode) {
         startLatitude = startPostCode.getLatitude();
         startLongitude = startPostCode.getLongitude();
@@ -124,32 +139,44 @@ public class createMap {
         endLongitude = endPostCode.getLongitude();
     }
 
-    public static void drawPath(List<Node> path) {
+    /**
+     * Draws the path on the map.
+     *
+     * @param stops The list of stops along the path.
+     */
+    public static void drawPath(List<Node> stops) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
-
                 try {
-                    // Set the color and stroke of the path
-                    g.setColor(Color.BLUE);
-                    g.setStroke(new BasicStroke(3));
-
-
-
-                    // Draw a line between each pair of points on the path
-                    for (int i = 0; i < path.size() - 1; i++) {
-                        Node startNode = path.get(i);
-                        Node endNode = path.get(i + 1);
-                        GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
-                        GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
-                        Point2D startP = map.convertGeoPositionToPoint(point1);
-                        Point2D endP = map.convertGeoPositionToPoint(point2);
-                        g.draw(new Line2D.Double(startP, endP));
-                    }
-
-                    // Create the icons for the start and end points
+                    // Draw start and end markers
                     createStartAndEndPoints(g, map);
+                    Point2D pointMapPrev = null; // Initialize a variable to hold the previous point
+
+                    for (int i = 0; i < stops.size(); i++) {
+                        Node node = stops.get(i);
+                        GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                        Point2D pointMap = map.convertGeoPositionToPoint(point);
+
+                        // Draw a red circle at each bus stop
+                        g.setColor(Color.RED); // Set the color for the bus stops
+                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10,
+                                10);
+                        g.fill(circle);
+
+                        // If this is not the first stop, draw a blue line from the previous stop to the
+                        // current stop
+                        if (i > 0) {
+                            g.setColor(Color.BLUE); // Set the color for the lines
+                            g.setStroke(new BasicStroke(3));
+                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                    (int) pointMap.getY());
+                        }
+
+                        // Update pointMapPrev to the current stop for the next iteration
+                        pointMapPrev = pointMap;
+                    }
 
                 } catch (Exception e) {
                     System.out.println("Error in drawing path" + e);
@@ -160,10 +187,69 @@ public class createMap {
 
             }
         };
-
+        // Set the new painter
         jXMapViewer.setOverlayPainter(pathOverlay);
+
     }
 
+    /**
+     * Draws the path on the map.
+     *
+     * @param stops The list of stops along the path.
+     * @param path The list of paths.
+     */
+    public static void drawPath(List<Node> path, List<Node> stops) {
+
+        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
+                try {
+                    g.setColor(Color.BLUE);
+                    g.setStroke(new BasicStroke(3));
+
+                    for (int i = 0; i < path.size() - 1; i++) {
+                        Node startNode = path.get(i);
+                        Node endNode = path.get(i + 1);
+                        GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
+                        GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
+                        Point2D startP = map.convertGeoPositionToPoint(point1);
+                        Point2D endP = map.convertGeoPositionToPoint(point2);
+                        g.draw(new Line2D.Double(startP, endP));
+                    }
+                    // Draw start and end markers
+                    createStartAndEndPoints(g, map);
+
+                    if (stops != null) {
+                        g.setColor(Color.RED);
+                        for (int i = 0; i < stops.size(); i++) {
+                            Node node = stops.get(i);
+                            GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                            Point2D pointMap = map.convertGeoPositionToPoint(point);
+                            Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(), pointMap.getY(), 10, 10);
+                            g.fill(circle);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error in drawing path" + e);
+                    e.printStackTrace();
+                } finally {
+                    g.dispose();
+                }
+
+            }
+        };
+        // Set the new painter
+        jXMapViewer.setOverlayPainter(pathOverlay);
+
+    }
+
+    /**
+     * Creates and draws start and end points on the map.
+     *
+     * @param g   The graphics context used for drawing.
+     * @param map The map on which the points will be drawn.
+     */
     private static void createStartAndEndPoints(Graphics2D g, JXMapViewer map) {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
@@ -183,6 +269,11 @@ public class createMap {
 
     }
 
+    /**
+     * Creates and returns an image for the start and end points.
+     *
+     * @return The image for the start and end points.
+     */
     public static Image returnImage() {
         Image pointerImage;
         try {
@@ -195,5 +286,16 @@ public class createMap {
             return null;
         }
         return pointerImage;
+    }
+    
+    /**
+     * Clear the map.
+     */
+    public static void clearMap() {
+        jXMapViewer.setOverlayPainter(null);
+        startLatitude = Double.NaN;
+        startLongitude = Double.NaN;
+        endLatitude = Double.NaN;
+        endLongitude = Double.NaN;
     }
 }

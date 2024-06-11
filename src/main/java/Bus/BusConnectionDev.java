@@ -1,6 +1,7 @@
 package Bus;
 
 import java.sql.*;
+
 import java.util.*;
 
 import Calculators.DistanceCalculatorHaversine;
@@ -9,115 +10,7 @@ import Database.DatabaseConnection;
 import GUI.createMap;
 import javax.swing.*;
 
-/**
- * Represents information about a bus route stop.
- */
-class RouteStopInfo {
-    String routeId;
-    String startStopId;
-    String endStopId;
-
-    /**
-     * Constructs a new route with the specified route ID, start stop ID, and end
-     * stop ID.
-     * 
-     * @param routeId     the ID of the route
-     * @param startStopId the ID of the start stop
-     * @param endStopId   the ID of the end stop
-     */
-    RouteStopInfo(String routeId, String startStopId, String endStopId) {
-        this.routeId = routeId;
-        this.startStopId = startStopId;
-        this.endStopId = endStopId;
-    }
-}
-
-/**
- * Represents information about a specific bus trip.
- */
-class TripInfo {
-    String routeId;
-    String busNumber;
-    String busName;
-    String tripId;
-    String startStopId;
-    String endStopId;
-    String startDepartureTime;
-    String endArrivalTime;
-    int tripTime;
-
-    /**
-     * Constructs a new trip with the specified details.
-     * 
-     * @param routeId            the ID of the route
-     * @param busNumber          the number of the bus
-     * @param busName            the name of the bus
-     * @param tripId             the ID of the trip
-     * @param startStopId        the ID of the start stop
-     * @param endStopId          the ID of the end stop
-     * @param startDepartureTime the departure time at the start stop
-     * @param endArrivalTime     the arrival time at the end stop
-     * @param tripTime           the duration of the trip in minutes
-     */
-    public TripInfo(String routeId, String busNumber, String busName, String tripId, String startStopId,
-            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
-        this.routeId = routeId;
-        this.busNumber = busNumber;
-        this.busName = busName;
-        this.tripId = tripId;
-        this.startStopId = startStopId;
-        this.endStopId = endStopId;
-        this.startDepartureTime = startDepartureTime;
-        this.endArrivalTime = endArrivalTime;
-        this.tripTime = tripTime;
-    }
-
-    public String getBusNumber() {
-        return busNumber;
-    }
-
-    public String getBusName() {
-        return busName;
-    }
-
-    public int getTripTime() {
-        return tripTime;
-    }
-
-    public String getRouteId() {
-        return routeId;
-    }
-
-    public String getTripId() {
-        return tripId;
-    }
-
-    public String getArrivalTime() {
-        return endArrivalTime;
-    }
-
-    public String getStartStopId() {
-        return startStopId;
-    }
-
-    public String getEndStopId() {
-        return endStopId;
-    }
-
-    @Override
-    public String toString() {
-        return "Route ID: " + routeId +
-                ", Bus Number: " + busNumber +
-                ", Bus Name: " + busName +
-                ", Trip ID: " + tripId +
-                ", Start stop ID: " + startStopId +
-                ", End stop ID: " + endStopId +
-                ", Start Departure Time: " + startDepartureTime +
-                ", End Arrival Time: " + endArrivalTime +
-                ", Trip Time: " + tripTime + " minutes";
-    }
-
-}
+//import com.graphhopper.json.Statement;
 
 /**
  * Manages the logic behind bus trips.
@@ -132,7 +25,6 @@ public class BusConnectionDev {
     static List<Node> tripNodes = new ArrayList<>();
     static int id2 = 0;
 
-    static String bestTripString;
     static TripInfo bestTrip;
     static int time;
 
@@ -188,7 +80,6 @@ public class BusConnectionDev {
             bestTrip = processRoutes(conn, x1, y1, x2, y2);
 
             if (bestTrip != null) {
-                bestTripString = "" + bestTrip;
 
                 // Debugging print statements
                 System.out.println("Best Trip: " + bestTrip);
@@ -220,10 +111,59 @@ public class BusConnectionDev {
                         bestTrip.endArrivalTime,
                         bestTrip.startDepartureTime };
             } else {
-                if (!testClass)
-                    JOptionPane.showMessageDialog(null, "No direct bus connection");
-                testClass = false;
-                throw new Exception("No direct bus connection");
+                // if (!testClass)
+                // JOptionPane.showMessageDialog(null, "No direct bus connection");
+                // testClass = false;
+                // throw new Exception("No direct bus connection");
+                double stationLon = 50.849932;
+                double stationLan = 5.705160;
+                bestTrip = processRoutes(conn, x1, y1, stationLon, stationLan);
+                queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+
+                queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+                if (id2 == 0) {
+                    createMap.drawPath(stopNodes);
+                    System.out.println("no shape");
+                } else {
+                    createMap.drawPath(tripNodes, stopNodes);
+                }
+
+                double totalDistance = calculateTotalDistance(tripNodes);
+                if (totalDistance == 0)
+                    totalDistance = calculateTotalDistance(stopNodes);
+                System.out.println("Total Distance: " + totalDistance + " km");
+
+                DataManagers.LogicManager.time = bestTrip.getTripTime();
+                DataManagers.LogicManager.distance = totalDistance;
+
+                DataManagers.LogicManager.busInfo = new String[] {
+                        bestTrip.getBusName(),
+                        bestTrip.getBusNumber(),
+                        startBusStop,
+                        endBusStop,
+                        bestTrip.endArrivalTime,
+                        bestTrip.startDepartureTime };
+
+                id2 = 0;
+                bestTrip = processRoutes(conn, stationLon, stationLan, x2, y2);
+                queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+
+                queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+                if (id2 == 0) {
+                    createMap.drawPath(stopNodes);
+                    System.out.println("no shape");
+                } else {
+                    createMap.drawPath(tripNodes, stopNodes);
+                }
+
+                totalDistance += calculateTotalDistance(tripNodes);
+                if (totalDistance == 0)
+                    totalDistance = calculateTotalDistance(stopNodes);
+                System.out.println("Total Distance: " + totalDistance + " km");
+
+                DataManagers.LogicManager.time = bestTrip.getTripTime();
+                DataManagers.LogicManager.distance = totalDistance;
+
             }
 
         } catch (
@@ -278,17 +218,26 @@ public class BusConnectionDev {
      */
     public static void setupNearestStops(Connection conn, double startLat, double startLon, double endLat,
             double endLon) throws SQLException {
-        String createNearestStartStops = "CREATE TEMPORARY TABLE nearest_start_stops AS " +
-                "SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance "
-                +
-                "FROM stops ORDER BY distance LIMIT 20;";
-        String createNearestEndStops = "CREATE TEMPORARY TABLE nearest_end_stops AS " +
-                "SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance "
-                +
-                "FROM stops ORDER BY distance LIMIT 20;";
+        String sqlDropStartStops = "DROP TABLE IF EXISTS nearest_start_stops;";
+        String createNearestStartStops = """
+                CREATE TEMPORARY TABLE nearest_start_stops AS
+                SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
+                FROM stops ORDER BY distance LIMIT 20;""";
+        String sqlDropEndStops = "DROP TABLE IF EXISTS nearest_end_stops;";
+        String createNearestEndStops = """
+                CREATE TEMPORARY TABLE nearest_end_stops AS
+                SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
+                FROM stops ORDER BY distance LIMIT 20;"""
+
+        ;
 
         try (PreparedStatement pstmt1 = conn.prepareStatement(createNearestStartStops);
                 PreparedStatement pstmt2 = conn.prepareStatement(createNearestEndStops)) {
+            Statement stmt1 = conn.createStatement();
+            stmt1.execute(sqlDropStartStops);
+            Statement stmt2 = conn.createStatement();
+            stmt2.execute(sqlDropEndStops);
+
             pstmt1.setDouble(1, startLon);
             pstmt1.setDouble(2, startLat);
             pstmt2.setDouble(1, endLon);
@@ -305,6 +254,7 @@ public class BusConnectionDev {
      * @throws SQLException if a database error occurs
      */
     public static void findPotentialRoutes(Connection conn) throws SQLException {
+        String sqlDropPotentialToutes = "DROP TABLE IF EXISTS potential_routes;";
         String sql = """
                     CREATE TEMPORARY TABLE IF NOT EXISTS potential_routes AS
                     SELECT DISTINCT
@@ -343,7 +293,8 @@ public class BusConnectionDev {
                     ORDER BY
                         earliest_departure_time ASC;
                 """;
-        try (Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement();) {
+            stmt.execute(sqlDropPotentialToutes);
             stmt.execute(sql);
         }
     }
@@ -360,6 +311,7 @@ public class BusConnectionDev {
         List<RouteStopInfo> routes = new ArrayList<>();
         String setGroupConcatMaxLen = "SET SESSION group_concat_max_len = 1000000;";
         String sql = "SELECT route_id, start_stop_id, end_stop_id FROM route_bus_stops;";
+        String sqlDropRouteBusStops = "DROP TABLE IF EXISTS route_bus_stops;";
         String sqlRoute = """
                         CREATE TEMPORARY TABLE IF NOT EXISTS route_bus_stops AS
                     SELECT
@@ -383,6 +335,7 @@ public class BusConnectionDev {
                 """;
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(setGroupConcatMaxLen); // Extend group_concat_max_len for large datasets
+            stmt.execute(sqlDropRouteBusStops);
             stmt.execute(sqlRoute);
 
             ResultSet rs = stmt.executeQuery(sql);
@@ -530,7 +483,7 @@ public class BusConnectionDev {
                 tripNodes.add(new Node(id2, shapePtLat, shapePtLon));
                 id2++;
             }
-            System.out.println("Query completed.");
+
         }
     }
 
@@ -544,13 +497,14 @@ public class BusConnectionDev {
      * @param endStopId   the end stop ID
      */
     private static void queryStopsBetween(Connection conn, String tripId, String startStopId, String endStopId) {
-        String sql = "SELECT st.trip_id, st.stop_id, s.stop_name, st.stop_sequence, s.stop_lat, s.stop_lon " +
-                "FROM stop_times st " +
-                "JOIN stops s ON st.stop_id = s.stop_id " +
-                "WHERE st.trip_id = ? AND " +
-                "st.stop_sequence >= (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?) AND " +
-                "st.stop_sequence <= (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?) " +
-                "ORDER BY st.stop_sequence;";
+        String sql = """
+                SELECT st.trip_id, st.stop_id, s.stop_name, st.stop_sequence, s.stop_lat, s.stop_lon
+                    FROM stop_times st
+                    JOIN stops s ON st.stop_id = s.stop_id
+                    WHERE st.trip_id = ? AND
+                    st.stop_sequence >= (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?) AND
+                    st.stop_sequence <= (SELECT stop_sequence FROM stop_times WHERE trip_id = ? AND stop_id = ?)
+                    ORDER BY st.stop_sequence;""";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, tripId);

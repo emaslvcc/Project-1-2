@@ -10,8 +10,6 @@ import Database.DatabaseConnection;
 import GUI.createMap;
 import javax.swing.*;
 
-//import com.graphhopper.json.Statement;
-
 /**
  * Manages the logic behind bus trips.
  */

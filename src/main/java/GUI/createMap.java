@@ -202,7 +202,7 @@ public class createMap {
      * Draws the path on the map.
      *
      * @param stops The list of stops along the path.
-     * @param path The list of paths.
+     * @param path  The list of paths.
      */
     public static void drawPath(List<Node> path, List<Node> stops) {
 
@@ -224,9 +224,8 @@ public class createMap {
                         g.draw(new Line2D.Double(startP, endP));
                     }
 
-
                     if (stops != null) {
-                        createStartAndEndPointsForBus(g, map,  stops);
+                        createStartAndEndPointsForBus(g, map, stops);
 
                         g.setColor(Color.RED);
                         for (int i = 0; i < stops.size(); i++) {
@@ -244,7 +243,9 @@ public class createMap {
                 } catch (Exception e) {
                     System.out.println("Error in drawing path" + e);
                     e.printStackTrace();
-     
+                } finally {
+                    g.dispose();
+                }
 
             }
         };
@@ -328,6 +329,12 @@ public class createMap {
         }
     }
 
+    /**
+     * Creates and draws start and end points on the map.
+     *
+     * @param g   The graphics context used for drawing.
+     * @param map The map on which the points will be drawn.
+     */
     private static void createStartAndEndPoints(Graphics2D g, JXMapViewer map) {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
@@ -345,10 +352,11 @@ public class createMap {
         g.drawImage(PointerImage, (int) start.getX() - imgX / 2, (int) start.getY() - imgY, null);
         g.drawImage(PointerImage, (int) end.getX() - imgX / 2, (int) end.getY() - imgY, null);
 
+    }
+
     /**
-     * 
-     * 
-     * 
+     * Creates and returns an image for the start and end points.
+     *
      * @return The image for the start and end points.
      */
     public static Image returnPointerImage() {

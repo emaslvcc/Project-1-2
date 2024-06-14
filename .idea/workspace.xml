@@ -156,7 +156,7 @@
       <workItem from="1716047819504" duration="746000" />
       <workItem from="1716118344548" duration="22110000" />
       <workItem from="1716281556054" duration="7421000" />
-      <workItem from="1718017967699" duration="1176000" />
+      <workItem from="1718017967699" duration="1548000" />
     </task>
     <task id="LOCAL-00001" summary="makes the direct connection query more efficient">
       <option name="closed" value="true" />
@@ -182,7 +182,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718018100661</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="fixes postal code validation">
+      <option name="closed" value="true" />
+      <created>1718019493685</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1718019493685</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

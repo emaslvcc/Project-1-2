@@ -52,7 +52,7 @@ public class LogicManager extends GetUserData {
         if ((mode).equals("Bus")) {
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude());
-            GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3], busInfo[4], busInfo[5]);
+            //GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3], busInfo[4], busInfo[5]);
         } else {
             calculateRoute(startPostCode, endPostCode, mode);
             // Display the shortest path on the map

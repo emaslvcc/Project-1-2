@@ -89,15 +89,12 @@ public class createMap {
                 super.mousePressed(e);
             }
 
-
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
 
                 // Check if the new center position is within the boundaries of Maastricht
                 GeoPosition newPosition = jXMapViewer.getCenterPosition();
-
-
 
                 if (newPosition.getLatitude() < minLatitude || newPosition.getLatitude() > maxLatitude
                         || newPosition.getLongitude() < minLongitude || newPosition.getLongitude() > maxLongitude) {
@@ -159,8 +156,8 @@ public class createMap {
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
                     // Draw start and end markers
-                    //createStartAndEndPoints(g, map);
-                    createStartAndEndPointsForBus(g, map,  stops);
+                    // createStartAndEndPoints(g, map);
+                    createStartAndEndPointsForBus(g, map, stops);
                     Point2D pointMapPrev = null; // Initialize a variable to hold the previous point
 
                     for (int i = 0; i < stops.size(); i++) {
@@ -205,7 +202,7 @@ public class createMap {
      * Draws the path on the map.
      *
      * @param stops The list of stops along the path.
-     * @param path The list of paths.
+     * @param path  The list of paths.
      */
     public static void drawPath(List<Node> path, List<Node> stops) {
 
@@ -227,9 +224,8 @@ public class createMap {
                         g.draw(new Line2D.Double(startP, endP));
                     }
 
-
                     if (stops != null) {
-                        createStartAndEndPointsForBus(g, map,  stops);
+                        createStartAndEndPointsForBus(g, map, stops);
 
                         g.setColor(Color.RED);
                         for (int i = 0; i < stops.size(); i++) {
@@ -258,13 +254,15 @@ public class createMap {
 
     }
 
-    private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops){
+    private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
 
         GeoPosition startBusStop = new GeoPosition(stops.get(0).getLat(), stops.get(0).getLon());
-        GeoPosition endBusStop = new GeoPosition(stops.get(stops.size() - 1).getLat(), stops.get(stops.size() - 1).getLon());
-        drawWalkingPath(g,startBusStop.getLatitude(), startBusStop.getLongitude(), endBusStop.getLatitude(), endBusStop.getLongitude(), map);
+        GeoPosition endBusStop = new GeoPosition(stops.get(stops.size() - 1).getLat(),
+                stops.get(stops.size() - 1).getLon());
+        drawWalkingPath(g, startBusStop.getLatitude(), startBusStop.getLongitude(), endBusStop.getLatitude(),
+                endBusStop.getLongitude(), map);
         System.out.println("Start Bus Stop: " + startBusStop + " End Bus Stop: " + endBusStop);
 
         Image PointerImage = returnPointerImage();
@@ -282,7 +280,8 @@ public class createMap {
 
     }
 
-    private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat, double endBusLong , JXMapViewer map) {
+    private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat,
+            double endBusLong, JXMapViewer map) {
         PostCode startPostCode = new PostCode("Start", startLatitude, startLongitude);
         PostCode endPostCode = new PostCode("End", endLatitude, endLongitude);
 
@@ -330,7 +329,6 @@ public class createMap {
         }
     }
 
-
     /**
      * Creates and draws start and end points on the map.
      *
@@ -374,7 +372,7 @@ public class createMap {
         }
         return pointerImage;
     }
-    
+
     /**
      * Clear the map.
      */

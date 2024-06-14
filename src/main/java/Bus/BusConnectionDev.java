@@ -8,7 +8,6 @@ import Calculators.DistanceCalculatorHaversine;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
-import javax.swing.*;
 
 /**
  * Manages the logic behind bus trips.
@@ -109,14 +108,35 @@ public class BusConnectionDev {
                         bestTrip.endArrivalTime,
                         bestTrip.startDepartureTime };
             } else {
-                // if (!testClass)
-                // JOptionPane.showMessageDialog(null, "No direct bus connection");
-                // testClass = false;
-                // throw new Exception("No direct bus connection");
-                double stationLon = 50.849932;
-                double stationLan = 5.705160;
-                bestTrip = processRoutes(conn, x1, y1, stationLon, stationLan);
+                tempTransfer.processTransfers(x1, y1, x2, y2);
+                String sql = """
+                        SELECT
+                        *
+                        FROM
+                        tempTransfer
+                        ORDER BY
+                        second_arrival_time ASC,
+                        first_trip_time DESC
+                        LIMIT 1;
+                                           """;
+                Statement stmt1 = conn.createStatement();
+                ResultSet rs = stmt1.executeQuery(sql);
+                if (rs.next()) {
+                    bestTrip = new TripInfo(
+                            rs.getString("first_route_id"),
+                            rs.getString("first_route_short_name"),
+                            rs.getString("first_trip_id"),
+                            rs.getString("first_start_bus_stop_id"),
+                            rs.getString("first_end_bus_stop_id"),
+                            rs.getString("first_departure_time"),
+                            rs.getString("first_arrival_time"),
+                            rs.getInt("first_trip_time"));
+                }
+                // Debugging print statements
+                System.out.println("Best Trip: " + bestTrip);
+                System.out.println("========================================");
                 queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+                System.out.println("========================================");
 
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 if (id2 == 0) {
@@ -135,16 +155,32 @@ public class BusConnectionDev {
                 DataManagers.LogicManager.distance = totalDistance;
 
                 DataManagers.LogicManager.busInfo = new String[] {
-                        bestTrip.getBusName(),
+                        "n",
                         bestTrip.getBusNumber(),
                         startBusStop,
                         endBusStop,
                         bestTrip.endArrivalTime,
                         bestTrip.startDepartureTime };
-
+                // for second trip
+                bestTrip = null;
                 id2 = 0;
-                bestTrip = processRoutes(conn, stationLon, stationLan, x2, y2);
+                rs = stmt1.executeQuery(sql);
+                if (rs.next()) {
+                    bestTrip = new TripInfo(
+                            rs.getString("second_route_id"),
+                            rs.getString("second_route_short_name"),
+                            rs.getString("second_trip_id"),
+                            rs.getString("second_start_bus_stop_id"),
+                            rs.getString("second_end_bus_stop_id"),
+                            rs.getString("second_departure_time"),
+                            rs.getString("second_arrival_time"),
+                            rs.getInt("second_trip_time"));
+                }
+                // Debugging print statements
+                System.out.println("Best Trip: " + bestTrip);
+                System.out.println("========================================");
                 queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
+                System.out.println("========================================");
 
                 queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
                 if (id2 == 0) {
@@ -154,13 +190,19 @@ public class BusConnectionDev {
                     createMap.drawPath(tripNodes, stopNodes);
                 }
 
-                totalDistance += calculateTotalDistance(tripNodes);
-                if (totalDistance == 0)
-                    totalDistance = calculateTotalDistance(stopNodes);
+                totalDistance += calculateTotalDistance(stopNodes);
                 System.out.println("Total Distance: " + totalDistance + " km");
 
                 DataManagers.LogicManager.time = bestTrip.getTripTime();
                 DataManagers.LogicManager.distance = totalDistance;
+
+                DataManagers.LogicManager.busInfo = new String[] {
+                        "n",
+                        bestTrip.getBusNumber(),
+                        startBusStop,
+                        endBusStop,
+                        bestTrip.endArrivalTime,
+                        bestTrip.startDepartureTime };
 
             }
 
@@ -186,21 +228,16 @@ public class BusConnectionDev {
             throws SQLException {
         setupNearestStops(conn, x1, y1, x2, y2);
         findPotentialRoutes(conn);
-        List<RouteStopInfo> routes = findRouteBusStops(conn);
-        TripInfo bestTrip = null; // Initialize with no best trip found
+        RouteStopInfo routes = findRouteBusStops(conn);
+        TripInfo bestTrip = printNextDepartureAndArrival(conn, routes.routeId, routes.startStopId, routes.endStopId);
+        ; // Initialize with no best trip found
 
-        for (RouteStopInfo route : routes) {
-            List<TripInfo> tripsForRoute = printNextDepartureAndArrival(conn,
-                    route.routeId, route.startStopId, route.endStopId);
-            for (TripInfo trip : tripsForRoute) {
-                // Update the best trip based on trip time and arrival time
-                if (bestTrip == null || trip.getTripTime() < bestTrip.getTripTime() ||
-                        (trip.getTripTime() == bestTrip.getTripTime()
-                                && trip.getArrivalTime().compareTo(bestTrip.getArrivalTime()) < 0)) {
-                    bestTrip = trip; // Found a new best trip
-                }
-            }
-        }
+        return bestTrip;
+    }
+
+    public static TripInfo processTransferRoutes(Connection conn, double x1, double y1, double x2, double y2)
+            throws SQLException {
+
         return bestTrip;
     }
 
@@ -305,8 +342,8 @@ public class BusConnectionDev {
      * @return a list of RouteStopInfo objects
      * @throws SQLException if a database error occurs
      */
-    private static List<RouteStopInfo> findRouteBusStops(Connection conn) throws SQLException {
-        List<RouteStopInfo> routes = new ArrayList<>();
+    private static RouteStopInfo findRouteBusStops(Connection conn) throws SQLException {
+        RouteStopInfo routes = null;
         String setGroupConcatMaxLen = "SET SESSION group_concat_max_len = 1000000;";
         String sql = "SELECT route_id, start_stop_id, end_stop_id FROM route_bus_stops;";
         String sqlDropRouteBusStops = "DROP TABLE IF EXISTS route_bus_stops;";
@@ -338,7 +375,7 @@ public class BusConnectionDev {
 
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                routes.add(new RouteStopInfo(
+                routes = (new RouteStopInfo(
                         rs.getString("route_id"),
                         rs.getString("start_stop_id"),
                         rs.getString("end_stop_id")));
@@ -358,19 +395,37 @@ public class BusConnectionDev {
      * @return a list of TripInfo objects with departure and arrival information
      * @throws SQLException if a database error occurs
      */
-    private static List<TripInfo> printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
+    private static TripInfo printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
             String endStopId) throws SQLException {
-        String sql = "SELECT t.route_id, r.route_short_name, r.route_long_name, st1.trip_id, st1.departure_time AS start_departure_time, st2.arrival_time AS end_arrival_time, "
-                + "TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time "
-                + "FROM stop_times st1 "
-                + "JOIN stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence "
-                + "JOIN trips t ON t.trip_id = st1.trip_id "
-                + "JOIN routes r ON t.route_id = r.route_id "
-                + "WHERE st1.stop_id = ? AND st2.stop_id = ? AND t.route_id = ? AND st1.departure_time >= CURRENT_TIME() "
-                + "ORDER BY CASE WHEN st1.departure_time >= CURRENT_TIME() THEN 0 ELSE 1 END, st1.departure_time ASC "
-                + "LIMIT 1;";
+        String sql = """
+                SELECT
+                    t.route_id,
+                    r.route_short_name,
+                    r.route_long_name,
+                    st1.trip_id,
+                    st1.departure_time AS start_departure_time,
+                    st2.arrival_time AS end_arrival_time,
+                    TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
+                FROM
+                    stop_times st1
+                JOIN
+                    stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
+                JOIN
+                    trips t ON t.trip_id = st1.trip_id
+                JOIN
+                    routes r ON t.route_id = r.route_id
+                WHERE
+                    st1.stop_id = ?
+                    AND st2.stop_id = ?
+                    AND t.route_id = ?
+                    AND st1.departure_time >= CURRENT_TIME()
+                ORDER BY
+                    CASE WHEN st1.departure_time >= CURRENT_TIME() THEN 0 ELSE 1 END,
+                    st1.departure_time ASC
+                LIMIT 1;
+                """;
 
-        List<TripInfo> trips = new ArrayList<>();
+        TripInfo trips = null;
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, startStopId);
@@ -378,7 +433,7 @@ public class BusConnectionDev {
             pstmt.setString(3, routeId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                trips.add(new TripInfo(
+                trips = (new TripInfo(
                         rs.getString("route_id"),
                         rs.getString("route_short_name"),
                         rs.getString("route_long_name"),

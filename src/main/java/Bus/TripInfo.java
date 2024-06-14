@@ -40,6 +40,18 @@ public class TripInfo {
         this.tripTime = tripTime;
     }
 
+    public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
+        this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.tripId = tripId;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
+        this.startDepartureTime = startDepartureTime;
+        this.endArrivalTime = endArrivalTime;
+        this.tripTime = tripTime;
+    }
+
     public String getBusNumber() {
         return busNumber;
     }
@@ -58,6 +70,14 @@ public class TripInfo {
 
     public String getTripId() {
         return tripId;
+    }
+
+    public String getStartDepartureTime() {
+        return startDepartureTime;
+    }
+
+    public String getEndArrivalTime() {
+        return endArrivalTime;
     }
 
     public String getArrivalTime() {

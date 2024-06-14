@@ -242,12 +242,6 @@ public class BusConnectionTest {
         return bestTrip;
     }
 
-    public static TripInfo processTransferRoutes(Connection conn, double x1, double y1, double x2, double y2)
-            throws SQLException {
-
-        return bestTrip;
-    }
-
     /**
      * Sets up the nearest start and end stops based on the provided coordinates.
      * 

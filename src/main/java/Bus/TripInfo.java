@@ -1,5 +1,9 @@
 package Bus;
 
+import java.sql.*;
+
+import Database.DatabaseConnection;
+
 /**
  * Represents information about a specific bus trip.
  */
@@ -90,6 +94,23 @@ public class TripInfo {
 
     public String getEndStopId() {
         return endStopId;
+    }
+
+    public String getColor(String routeId) throws SQLException {
+        String sql = """
+                SELECT route_color
+                from routes r
+                where r.route_id = ?;
+                    """;
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, routeId);
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            return rs.getString(1);
+        }
+        return "blue";
+
     }
 
     @Override

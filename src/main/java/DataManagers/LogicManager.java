@@ -56,6 +56,7 @@ public class LogicManager extends GetUserData {
         } else {
             calculateRoute(startPostCode, endPostCode, mode);
             // Display the shortest path on the map
+
             GUI.createMap.drawPath(shortestPath, null);
         }
 
@@ -143,13 +144,30 @@ public class LogicManager extends GetUserData {
         }
     }
 
+    public static List<Node> calculateRouteByCoordinates(double x1, double y1, double x2, double y2, String mode) {
+        List<Node> shortestPath = null;
+        try {
+            // Find the start and end nodes
+            Node startNode = graph.getNodeByLatLon(x1, y1);
+            Node endNode = graph.getNodeByLatLon(x2, y2);
+
+            // Find the shortest path
+            Calculators.AStar aStar = new Calculators.AStar(graph);
+            shortestPath = aStar.findShortestPath(startNode, endNode);
+            return shortestPath;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return shortestPath;
+    }
+
     /**
      * Calculates the distance of a given path.
      *
      * @param path The path for which the distance is to be calculated.
      * @return The total distance of the path.
      */
-    public double calculateDistance(List<Node> path) {
+    public static double calculateDistance(List<Node> path) {
         double distance = 0;
         for (int i = 0; i < path.size() - 1; i++) {
             Node startNode = path.get(i);
@@ -159,7 +177,6 @@ public class LogicManager extends GetUserData {
         }
         return distance;
     }
-
 
     public List<Node> getShortestPath() {
         return shortestPath;

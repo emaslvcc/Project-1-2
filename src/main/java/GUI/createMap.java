@@ -13,6 +13,8 @@ import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -149,12 +151,18 @@ public class createMap {
      *
      * @param stops The list of stops along the path.
      */
-    public static void drawPath(List<Node> stops) {
+    public static void drawPath(List<Node> stops, String color) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
+                    Color lineColor;
+                    if (color == "blue") {
+                        lineColor = Color.BLUE;
+                    } else {
+                        lineColor = hexToColor(color);
+                    }
                     // Draw start and end markers
                     // createStartAndEndPoints(g, map);
                     createStartAndEndPointsForBus(g, map, stops);
@@ -174,7 +182,9 @@ public class createMap {
                         // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
                         if (i > 0) {
-                            g.setColor(Color.BLUE); // Set the color for the lines
+
+                            g.setColor(lineColor);
+                            // Set the color for the lines
                             g.setStroke(new BasicStroke(3));
                             g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
                                     (int) pointMap.getY());
@@ -204,14 +214,20 @@ public class createMap {
      * @param stops The list of stops along the path.
      * @param path  The list of paths.
      */
-    public static void drawPath(List<Node> path, List<Node> stops) {
+    public static void drawPath(List<Node> path, List<Node> stops, String color) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
+                    Color lineColor;
+                    if (color == "blue") {
+                        lineColor = Color.BLUE;
+                    } else {
+                        lineColor = hexToColor(color);
+                    }
 
-                    g.setColor(Color.BLUE);
+                    g.setColor(lineColor);
                     g.setStroke(new BasicStroke(3));
 
                     for (int i = 0; i < path.size() - 1; i++) {
@@ -252,6 +268,13 @@ public class createMap {
         // Set the new painter
         jXMapViewer.setOverlayPainter(pathOverlay);
 
+    }
+
+    private static Color hexToColor(String colorStr) {
+        if (!colorStr.startsWith("#")) {
+            colorStr = "#" + colorStr; // Ensure the string starts with "#"
+        }
+        return Color.decode(colorStr);
     }
 
     private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
@@ -323,7 +346,7 @@ public class createMap {
                 GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
                 Point2D startP = map.convertGeoPositionToPoint(point1);
                 Point2D endP = map.convertGeoPositionToPoint(point2);
-                System.out.println("Start: " + startP + " End: " + endP);
+                // System.out.println("Start: " + startP + " End: " + endP);
                 g.draw(new Line2D.Double(startP, endP));
             }
         }

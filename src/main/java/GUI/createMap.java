@@ -255,29 +255,13 @@ public class createMap {
     }
 
     private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
-        GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
-        GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
-
         GeoPosition startBusStop = new GeoPosition(stops.get(0).getLat(), stops.get(0).getLon());
         GeoPosition endBusStop = new GeoPosition(stops.get(stops.size() - 1).getLat(),
                 stops.get(stops.size() - 1).getLon());
         drawWalkingPath(g, startBusStop.getLatitude(), startBusStop.getLongitude(), endBusStop.getLatitude(),
                 endBusStop.getLongitude(), map);
         System.out.println("Start Bus Stop: " + startBusStop + " End Bus Stop: " + endBusStop);
-
-        Image PointerImage = returnPointerImage();
-
-        g = (Graphics2D) g.create();
-        Point2D start = map.convertGeoPositionToPoint(startPos);
-        Point2D end = map.convertGeoPositionToPoint(endPos);
-
-        assert PointerImage != null;
-        int imgX = PointerImage.getWidth(null);
-        int imgY = PointerImage.getHeight(null);
-
-        g.drawImage(PointerImage, (int) start.getX() - imgX / 2, (int) start.getY() - imgY, null);
-        g.drawImage(PointerImage, (int) end.getX() - imgX / 2, (int) end.getY() - imgY, null);
-
+        createStartAndEndPoints(g,map);
     }
 
     private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat,
@@ -339,18 +323,24 @@ public class createMap {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
 
-        Image PointerImage = returnPointerImage();
+        Image PointerImage = returnImage("/Images/pointer.png");
+        Image PersonImage = returnImage("/Images/Person.png");
 
         g = (Graphics2D) g.create();
         Point2D start = map.convertGeoPositionToPoint(startPos);
         Point2D end = map.convertGeoPositionToPoint(endPos);
 
         assert PointerImage != null;
-        int imgX = PointerImage.getWidth(null);
-        int imgY = PointerImage.getHeight(null);
+        assert PersonImage != null;
 
-        g.drawImage(PointerImage, (int) start.getX() - imgX / 2, (int) start.getY() - imgY, null);
-        g.drawImage(PointerImage, (int) end.getX() - imgX / 2, (int) end.getY() - imgY, null);
+        int PointX = PointerImage.getWidth(null);
+        int PointY = PointerImage.getHeight(null);
+        int PersonX = PersonImage.getWidth(null);
+        int PersonY = PersonImage.getHeight(null);
+
+
+        g.drawImage(PersonImage, (int) start.getX() - PersonX / 2, (int) start.getY() - PersonY, null);
+        g.drawImage(PointerImage, (int) end.getX() - PointX / 2, (int) end.getY() - PointY, null);
 
     }
 
@@ -359,10 +349,10 @@ public class createMap {
      *
      * @return The image for the start and end points.
      */
-    public static Image returnPointerImage() {
+    public static Image returnImage(String path) {
         Image pointerImage;
         try {
-            URL imageUrl = createMap.class.getResource("/Images/pointer.png");
+            URL imageUrl = createMap.class.getResource(path);
             assert imageUrl != null;
             pointerImage = ImageIO.read(imageUrl);
             pointerImage = pointerImage.getScaledInstance(25, 25, Image.SCALE_SMOOTH);
@@ -372,6 +362,7 @@ public class createMap {
         }
         return pointerImage;
     }
+
 
     /**
      * Clear the map.

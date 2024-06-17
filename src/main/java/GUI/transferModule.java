@@ -21,9 +21,10 @@ public class transferModule {
         this.endTime = endTime;
     }
 
-    public transferModule(String mode, String startTime, String endTime, int busNum, String busName, String startBusStop, String endBusStop) {
+    public transferModule(String mode, String startTime, String endTime, int busNum, String busName,
+            String startBusStop, String endBusStop) {
         this.mode = mode;
-            
+
         this.startTime = startTime;
         this.endTime = endTime;
         this.busNum = busNum;
@@ -134,7 +135,7 @@ public class transferModule {
 
             transferPanel.setPreferredSize(new Dimension(308, 150));
             transferPanel.setMaximumSize(new Dimension(308,900));
-        } 
+        }
 
-        return transferPanel;
-    }
+    return transferPanel;
+}

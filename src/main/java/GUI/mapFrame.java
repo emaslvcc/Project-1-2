@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class mapFrame extends JFrame {
@@ -384,6 +385,67 @@ public class mapFrame extends JFrame {
                 LogicManager logicManager = new LogicManager();
                 logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox);
 
+        }
+
+        private void testThis() {
+
+                transferModule walkToBus = new transferModule("Walk", "12:00", "12:10");
+                transferModule busToDest = new transferModule("Bus", "12:10", "12:20", 1,
+                                "Nieuw-Vennep P+R Getsewoud Zuid - Amsterdam CS", "Boschstraat maagdendries for real",
+                                "Bus Stop 2");
+                transferModule busToDest2 = new transferModule("Bus", "12:22", "12:25", 2,
+                                "a b c d e f g h i j k l m n o p q r s t u v w", "Bus Stop 2", "Bus Stop 3");
+                transferModule walktoDest = new transferModule("Walk", "12:25", "12:30");
+                transferModule lastBus = new transferModule("Bus", "12:30", "12:35", 3, "Bus 3", "Bus Stop 4",
+                                "Bus Stop 5");
+                transferModule finalWalk = new transferModule("Walk", "12:35", "12:50");
+
+                ArrayList<transferModule> transfers = new ArrayList<>();
+                transfers.add(walkToBus);
+                transfers.add(busToDest);
+                transfers.add(busToDest2);
+                transfers.add(walktoDest);
+                transfers.add(lastBus);
+                transfers.add(finalWalk);
+
+                transfers.add(walkToBus);
+                transfers.add(busToDest);
+                transfers.add(walktoDest);
+
+                showBusInfo(transfers);
+
+        }
+
+        public void showBusInfo(ArrayList<transferModule> transfers) {
+                busInfoPanel.removeAll(); // Clear previous components
+
+                int totalHeight = 0;
+                int strutHeight = 10; // Height of the vertical strut
+
+                for (int i = 0; i < transfers.size(); i++) {
+                        JPanel transferPanel = transfers.get(i).getTransferPanel();
+                        busInfoPanel.add(transferPanel);
+
+                        totalHeight += transferPanel.getPreferredSize().height; // Update total height
+
+                        if (transfers.get(i).getMode().equals("Bus")
+                                        && (i + 1 < transfers.size() && transfers.get(i + 1).getMode().equals("Bus"))) {
+                                totalHeight += 30; // Extra space between consecutive bus modules
+                        }
+
+                        // Add vertical strut if not the last transfer
+                        if (i < transfers.size() - 1) {
+                                transferPanel.setSize(new Dimension(308,
+                                                transferPanel.getPreferredSize().height + strutHeight));
+                                busInfoPanel.add(Box.createVerticalStrut(strutHeight));
+                                totalHeight += strutHeight; // Update total height
+                        }
+                }
+
+                // Set the preferred size of busInfoPanel to accommodate all transfer panels
+                busInfoPanel.setPreferredSize(new Dimension(308, totalHeight));
+                busInfoPanel.revalidate();
+                busInfoPanel.repaint();
         }
 
         /**

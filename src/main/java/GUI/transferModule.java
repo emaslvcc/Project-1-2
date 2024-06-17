@@ -24,7 +24,6 @@ public class transferModule {
     public transferModule(String mode, String startTime, String endTime, int busNum, String busName,
             String startBusStop, String endBusStop) {
         this.mode = mode;
-
         this.startTime = startTime;
         this.endTime = endTime;
         this.busNum = busNum;
@@ -71,8 +70,8 @@ public class transferModule {
             busNameLabel.setFont(new Font("Segoe UI", 1, 14));
             busNameLabel.setForeground(new Color(0, 0, 0));
 
-            JLabel startBusStopLabel = new JLabel("<html>Start Bus Stop: " + startBusStop+ "</html>");
-            startBusStopLabel.setFont(new Font("Segoe UI", 1, 14)); 
+            JLabel startBusStopLabel = new JLabel("<html>Start Bus Stop: " + startBusStop + "</html>");
+            startBusStopLabel.setFont(new Font("Segoe UI", 1, 14));
             startBusStopLabel.setForeground(new Color(0, 0, 0));
 
             JLabel endBusStopLabel = new JLabel("End Bus Stop: " + endBusStop);
@@ -132,10 +131,12 @@ public class transferModule {
         transferPanel.add(labelsPanel);
         transferPanel.add(Box.createHorizontalStrut(10));
 
-
+        if (mode.equals("Bus")) {
             transferPanel.setPreferredSize(new Dimension(308, 150));
-            transferPanel.setMaximumSize(new Dimension(308,900));
+            transferPanel.setMaximumSize(new Dimension(308, 900));
         }
 
-    return transferPanel;
+        return transferPanel;
+    }
+
 }

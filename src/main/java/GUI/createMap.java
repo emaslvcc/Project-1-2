@@ -13,8 +13,6 @@ import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -221,7 +219,7 @@ public class createMap {
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
                     Color lineColor;
-                    if (color == "blue") {
+                    if ("blue".equals(color)) {
                         lineColor = Color.BLUE;
                     } else {
                         lineColor = hexToColor(color);

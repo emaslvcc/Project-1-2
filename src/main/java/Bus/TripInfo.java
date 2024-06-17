@@ -14,9 +14,10 @@ public class TripInfo {
     String tripId;
     String startStopId;
     String endStopId;
-    String startDepartureTime;
-    String endArrivalTime;
+    Time startDepartureTime;
+    Time endArrivalTime;
     int tripTime;
+    double distanceToFirstBusstop;
 
     /**
      * Constructs a new trip with the specified details.
@@ -32,7 +33,7 @@ public class TripInfo {
      * @param tripTime           the duration of the trip in minutes
      */
     public TripInfo(String routeId, String busNumber, String busName, String tripId, String startStopId,
-            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
+            String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime) {
         this.routeId = routeId;
         this.busNumber = busNumber;
         this.busName = busName;
@@ -45,7 +46,7 @@ public class TripInfo {
     }
 
     public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
-            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
+            String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime) {
         this.routeId = routeId;
         this.busNumber = busNumber;
         this.tripId = tripId;
@@ -54,6 +55,20 @@ public class TripInfo {
         this.startDepartureTime = startDepartureTime;
         this.endArrivalTime = endArrivalTime;
         this.tripTime = tripTime;
+    }
+
+    public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
+            String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime,
+            double distanceToFirstBusstop) {
+        this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.tripId = tripId;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
+        this.startDepartureTime = startDepartureTime;
+        this.endArrivalTime = endArrivalTime;
+        this.tripTime = tripTime;
+        this.distanceToFirstBusstop = distanceToFirstBusstop;
     }
 
     public String getBusNumber() {
@@ -76,15 +91,11 @@ public class TripInfo {
         return tripId;
     }
 
-    public String getStartDepartureTime() {
+    public Time getStartDepartureTime() {
         return startDepartureTime;
     }
 
-    public String getEndArrivalTime() {
-        return endArrivalTime;
-    }
-
-    public String getArrivalTime() {
+    public Time getEndArrivalTime() {
         return endArrivalTime;
     }
 

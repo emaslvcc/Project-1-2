@@ -2,18 +2,14 @@ package Bus;
 
 import Database.DatabaseConnection;
 import java.sql.*;
-import java.util.List;
 
-import Calculators.AverageTimeCalculator;
-import Calculators.DistanceCalculatorHaversine;
-import Calculators.TimeCalculator;
-import DataManagers.LogicManager;
-import DataManagers.Node;
+import Calculators.*;
 
 public class tempTransfer {
-    private static DistanceCache distanceCache = new DistanceCache();
 
-    public static void processTransfers(double x1, double y1, double x2, double y2) { // Initialize database connection
+    public static TripInfo processTransfers(double x1, double y1, double x2, double y2) throws SQLException { // Initialize
+                                                                                                              // database
+        // connection
         try (Connection con = DatabaseConnection.getConnection()) {
             /*
              * from 6227 XB to 6125 RB
@@ -84,36 +80,33 @@ public class tempTransfer {
                     double endStopLat = rs.getDouble("end_stop_lat");
                     double endStopLon = rs.getDouble("end_stop_lon");
 
-                    Time baseTime = Time.valueOf("10:20:00"); // Base time
+                    Time currentTime = TimeCalculator.getCurrentTime();// Base time
 
                     // Step 2: Process each row to find the trips
                     String firstTripQuery = getFirstTripQuery();
-                    TripDetails firstTrip = fetchTripDetails(con, firstTripQuery, startStopId, stop1ID,
-                            startRouteId, baseTime);
+                    TripInfo firstTrip = fetchTripDetails(con, firstTripQuery, startStopId, stop1ID,
+                            startRouteId, currentTime);
 
                     if (firstTrip != null) {
+                        double distanceToStartBusstop = TimeCalculator.calculateDistanceIfNotCached(endStopLat,
+                                endStopLon, x2, y2);
 
-                        double distanceToStartBusstop = calculateDistanceIfNotCached(x1, y1, startStopLat,
+                        Time newTime = TimeCalculator.calculateTime(x1, y1, startStopLat,
                                 startStopLon);
-
-                        TimeCalculator timeCalc = new AverageTimeCalculator(distanceToStartBusstop);
-                        int time = (int) (Math.round(timeCalc.getWalkingTime()));
-                        long baseTimeInMs = baseTime.getTime();
-                        long additionalTimeInMs = time * 60 * 1000;
-                        Time newTime = new Time(baseTimeInMs + additionalTimeInMs);
                         firstTrip = fetchTripDetails(con, firstTripQuery, startStopId, stop1ID,
                                 startRouteId, newTime);
 
                         String secondTripQuery = getSecondTripQuery();
-                        TripDetails secondTrip = fetchTripDetails(con, secondTripQuery, stop2ID, endStopId,
+                        TripInfo secondTrip = fetchTripDetails(con, secondTripQuery, stop2ID, endStopId,
                                 endRouteId, firstTrip.getEndArrivalTime());
 
                         // Step 3: Insert the result of secondTrip into tempTransfer
                         if (secondTrip != null) {
 
-                            double distanceToDest = calculateDistanceIfNotCached(endStopLat, endStopLon, x2, y2);
+                            double distanceToDest = TimeCalculator.calculateDistanceIfNotCached(endStopLat, endStopLon,
+                                    x2, y2);
 
-                            timeCalc = new AverageTimeCalculator(distanceToDest);
+                            TimeCalculator timeCalc = new AverageTimeCalculator(distanceToDest);
                             int timeToDestination = (int) (Math.round(timeCalc.getWalkingTime()));
                             // int timeToDestination = 0;
                             insertIntoTempTransfer(con, firstTrip, secondTrip, timeToDestination,
@@ -121,11 +114,68 @@ public class tempTransfer {
 
                         }
                     }
+
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return getTransferBestTrip();
+    }
+
+    public static TripInfo getFirstTrip() throws SQLException {
+        Connection conn = DatabaseConnection.getConnection();
+        TripInfo transferBestTrip = null;
+        String sqlGetEarliestArrTime = """
+                SELECT tt.*
+                FROM tempTransfer tt
+                ORDER BY second_arrival_time ASC,distanceToFirstBusstop ASC
+                LIMIT 1;
+                                                               """;
+        Statement stmtGetBesttrip = conn.createStatement();
+
+        ResultSet rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
+        if (rs.next()) {
+            transferBestTrip = new TripInfo(
+                    rs.getString("first_route_id"),
+                    rs.getString("first_route_short_name"),
+                    rs.getString("first_trip_id"),
+                    rs.getString("first_start_bus_stop_id"),
+                    rs.getString("first_end_bus_stop_id"),
+                    rs.getTime("first_departure_time"),
+                    rs.getTime("first_arrival_time"),
+                    rs.getInt("first_trip_time"));
+        }
+        return transferBestTrip;
+
+    }
+
+    public static TripInfo getTransferBestTrip() throws SQLException {
+        Connection conn = DatabaseConnection.getConnection();
+        TripInfo transferBestTrip = null;
+        String sqlGetEarliestArrTime = """
+                SELECT tt.*
+                FROM tempTransfer tt
+                ORDER BY second_arrival_time ASC,distanceToFirstBusstop ASC
+                LIMIT 1;
+                                                               """;
+        Statement stmtGetBesttrip = conn.createStatement();
+
+        ResultSet rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
+        if (rs.next()) {
+            transferBestTrip = new TripInfo(
+                    rs.getString("second_route_id"),
+                    rs.getString("second_route_short_name"),
+                    rs.getString("second_trip_id"),
+                    rs.getString("second_start_bus_stop_id"),
+                    rs.getString("second_end_bus_stop_id"),
+                    rs.getTime("second_departure_time"),
+                    rs.getTime("second_arrival_time"),
+                    rs.getInt("second_trip_time"));
+        }
+        return transferBestTrip;
+
     }
 
     public static void setupNearestStops(Connection conn, double startLat, double startLon, double endLat,
@@ -134,12 +184,12 @@ public class tempTransfer {
         String createNearestStartStops = """
                 CREATE TEMPORARY TABLE nearest_start_stops AS
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
-                FROM stops ORDER BY distance LIMIT 12;""";
+                FROM stops ORDER BY distance LIMIT 20;""";
         String sqlDropEndStops = "DROP TABLE IF EXISTS nearest_end_stops;";
         String createNearestEndStops = """
                 CREATE TEMPORARY TABLE nearest_end_stops AS
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
-                FROM stops ORDER BY distance LIMIT 12;""";
+                FROM stops ORDER BY distance LIMIT 20;""";
 
         try (PreparedStatement pstmt1 = conn.prepareStatement(createNearestStartStops);
                 PreparedStatement pstmt2 = conn.prepareStatement(createNearestEndStops)) {
@@ -280,7 +330,7 @@ public class tempTransfer {
                         """;
     }
 
-    private static TripDetails fetchTripDetails(Connection conn, String query, Object... params) {
+    private static TripInfo fetchTripDetails(Connection conn, String query, Object... params) {
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]); // Simplified setting parameters
@@ -289,10 +339,10 @@ public class tempTransfer {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return new TripDetails(
+                    return new TripInfo(
                             rs.getString("route_id"),
                             rs.getString("route_short_name"),
-                            rs.getInt("trip_id"),
+                            rs.getString("trip_id"),
                             rs.getString("start_stop_id"), // start stop ID
                             rs.getString("end_stop_id"), // end stop ID
                             rs.getTime("start_departure_time"),
@@ -308,7 +358,7 @@ public class tempTransfer {
 
     }
 
-    private static void insertIntoTempTransfer(Connection conn, TripDetails firstTrip, TripDetails secondTrip,
+    private static void insertIntoTempTransfer(Connection conn, TripInfo firstTrip, TripInfo secondTrip,
             int timeToDestination, double distanceToStartBusstop) {
         String insert = """
                 INSERT INTO tempTransfer (
@@ -323,13 +373,14 @@ public class tempTransfer {
             pstmt.setString(1, firstTrip.getStartStopId());
             pstmt.setString(2, firstTrip.getEndStopId());
             pstmt.setString(3, firstTrip.getRouteId());
-            pstmt.setString(4, firstTrip.getRouteShortName());
-            pstmt.setInt(5, firstTrip.getTripId());
+            pstmt.setString(4, firstTrip.getBusNumber());
+            pstmt.setString(5, firstTrip.getTripId());
             pstmt.setTime(6, firstTrip.getStartDepartureTime());
             pstmt.setTime(7, firstTrip.getEndArrivalTime());
             pstmt.setInt(8, firstTrip.getTripTime());
 
-            long timeInMs = secondTrip.getEndArrivalTime().getTime(); // Get time in milliseconds since the epoch
+            long timeInMs = secondTrip.getEndArrivalTime().getTime(); // Get time in milliseconds since
+                                                                      // the epoch
             long timeToAdd = timeToDestination * 60 * 1000; // Convert minutes to milliseconds
 
             // Create a new Time object with the added time
@@ -341,8 +392,8 @@ public class tempTransfer {
             pstmt.setString(9, secondTrip.getStartStopId());
             pstmt.setString(10, secondTrip.getEndStopId());
             pstmt.setString(11, secondTrip.getRouteId());
-            pstmt.setString(12, secondTrip.getRouteShortName());
-            pstmt.setInt(13, secondTrip.getTripId());
+            pstmt.setString(12, secondTrip.getBusNumber());
+            pstmt.setString(13, secondTrip.getTripId());
             pstmt.setTime(14, secondTrip.getStartDepartureTime());
             pstmt.setTime(15, newTime);
             pstmt.setInt(16, secondTrip.getTripTime());
@@ -353,93 +404,6 @@ public class tempTransfer {
         }
     }
 
-    public static double calculateDistanceIfNotCached(double startLat, double startLon, double endLat, double endLon) {
-        Double cachedDistance = distanceCache.getDistance(startLat, startLon, endLat, endLon);
-        if (cachedDistance != null) {
-            return cachedDistance;
-        } else {
-            List<Node> path = LogicManager.calculateRouteByCoordinates(startLat, startLon, endLat, endLon, "walk");
-            double distance = LogicManager.calculateDistance(path);
-            distanceCache.putDistance(startLat, startLon, endLat, endLon, distance);
-            return distance;
-        }
-    }
-
     // }
 
-}
-
-class TripDetails {
-    private final String routeId;
-    private final String routeShortName;
-    private final int tripId;
-    private final String startStopId;
-    private final String endStopId;
-    private final Time startDepartureTime;
-    private final Time endArrivalTime;
-    private final int tripTime;
-    private final double distanceToFirstBusstop;
-
-    public TripDetails(String routeId, String routeShortName, int tripId,
-            String startStopId, String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime,
-            double distanceToFirstBusstop) {
-        this.routeId = routeId;
-        this.routeShortName = routeShortName;
-        this.tripId = tripId;
-        this.startStopId = startStopId;
-        this.endStopId = endStopId;
-        this.startDepartureTime = startDepartureTime;
-        this.endArrivalTime = endArrivalTime;
-        this.tripTime = tripTime;
-        this.distanceToFirstBusstop = distanceToFirstBusstop;
-    }
-
-    public TripDetails(String routeId, String routeShortName, int tripId,
-            String startStopId, String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime) {
-        this.routeId = routeId;
-        this.routeShortName = routeShortName;
-        this.tripId = tripId;
-        this.startStopId = startStopId;
-        this.endStopId = endStopId;
-        this.startDepartureTime = startDepartureTime;
-        this.endArrivalTime = endArrivalTime;
-        this.tripTime = tripTime;
-        this.distanceToFirstBusstop = 0;
-    }
-
-    public double getDistanceToFirstBusstop() {
-        return distanceToFirstBusstop;
-    }
-
-    public String getRouteId() {
-        return routeId;
-    }
-
-    public String getRouteShortName() {
-        return routeShortName;
-    }
-
-    public int getTripId() {
-        return tripId;
-    }
-
-    public String getStartStopId() {
-        return startStopId;
-    }
-
-    public String getEndStopId() {
-        return endStopId;
-    }
-
-    public Time getStartDepartureTime() {
-        return startDepartureTime;
-    }
-
-    public Time getEndArrivalTime() {
-        return endArrivalTime;
-    }
-
-    public int getTripTime() {
-        return tripTime;
-    }
 }

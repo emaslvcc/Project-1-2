@@ -11,7 +11,6 @@ import DataManagers.LogicManager;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
-import GUI.mapFrame;
 
 /**
  * Manages the logic behind bus trips.
@@ -128,18 +127,23 @@ public class BusConnectionDev {
                             bestTrip.startDepartureTime };
                 } else {
                     tempTransfer.processTransfers(x1, y1, x2, y2);
-                    String sql = """
-                            SELECT
-                            *
-                            FROM
-                            tempTransfer
-                            ORDER BY
-                            second_arrival_time ASC,
-                            first_trip_time DESC
+                    String sqlGetEarliestArrTime = """
+                            SELECT tt.*,
+                                   ST_Distance_Sphere(point(?,?), point(s.stop_lon, s.stop_lat)) AS distance_to_start_stop
+                            FROM tempTransfer tt
+                            JOIN stops s ON s.stop_id = tt.first_start_bus_stop_id
+                            WHERE tt.second_arrival_time = (
+                                SELECT MIN(second_arrival_time)
+                                FROM tempTransfer
+                            )
+                            ORDER BY distance_to_start_stop ASC
                             LIMIT 1;
-                                               """;
-                    Statement stmt1 = conn.createStatement();
-                    ResultSet rs = stmt1.executeQuery(sql);
+                                                                           """;
+                    PreparedStatement pstmt = conn.prepareStatement(sqlGetEarliestArrTime);
+                    pstmt.setDouble(1, x1);
+                    pstmt.setDouble(2, y1);
+
+                    ResultSet rs = pstmt.executeQuery();
                     if (rs.next()) {
                         bestTrip = new TripInfo(
                                 rs.getString("first_route_id"),
@@ -184,7 +188,8 @@ public class BusConnectionDev {
                     // for second trip
                     bestTrip = null;
                     id2 = 0;
-                    rs = stmt1.executeQuery(sql);
+                    rs = pstmt.executeQuery();
+
                     if (rs.next()) {
                         bestTrip = new TripInfo(
                                 rs.getString("second_route_id"),
@@ -252,15 +257,31 @@ public class BusConnectionDev {
         RouteStopInfo routes = findRouteBusStops(conn);
         TripInfo bestTrip = null;
         if (routes != null) {
+            List<Node> shortestPath = LogicManager.calculateRouteByCoordinates(x1, y1,
+                    getStopLocation(conn, routes.startStopId)[0],
+                    getStopLocation(conn, routes.startStopId)[1],
+                    "walk");
+            double distanceToBusstop = LogicManager.calculateDistance(shortestPath);
 
-            bestTrip = printNextDepartureAndArrival(conn, routes.routeId, routes.startStopId, routes.endStopId);
+            TimeCalculator timeCalc = new AverageTimeCalculator(distanceToBusstop);
+            time = (int) (Math.round(timeCalc.getWalkingTime()));
+            Calendar calendar = Calendar.getInstance();
+
+            // Resetting seconds and milliseconds to zero to make the time addition more
+            // predictable
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Time currentTime = new Time(calendar.getTimeInMillis());
+
+            // Calculate the additional time in milliseconds
+            long additionalTimeInMs = time * 60 * 1000;
+
+            // Creating a new Time object with the adjusted time
+            Time newTime = new Time(currentTime.getTime() + additionalTimeInMs);
+
+            bestTrip = printNextDepartureAndArrival(conn, routes.routeId, routes.startStopId, routes.endStopId,
+                    newTime);
         }
-
-        return bestTrip;
-    }
-
-    public static TripInfo processTransferRoutes(Connection conn, double x1, double y1, double x2, double y2)
-            throws SQLException {
 
         return bestTrip;
     }
@@ -438,7 +459,7 @@ public class BusConnectionDev {
      * @throws SQLException if a database error occurs
      */
     private static TripInfo printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
-            String endStopId) throws SQLException {
+            String endStopId, Time time) throws SQLException {
         String sql = """
                 SELECT
                     t.route_id,
@@ -460,7 +481,7 @@ public class BusConnectionDev {
                     st1.stop_id = ?
                     AND st2.stop_id = ?
                     AND t.route_id = ?
-                    AND st1.departure_time >= CURRENT_TIME()
+                    AND st1.departure_time >= ?
                 ORDER BY
                     CASE WHEN st1.departure_time >= CURRENT_TIME() THEN 0 ELSE 1 END,
                     st1.departure_time ASC
@@ -473,6 +494,7 @@ public class BusConnectionDev {
             pstmt.setString(1, startStopId);
             pstmt.setString(2, endStopId);
             pstmt.setString(3, routeId);
+            pstmt.setTime(4, time);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 trips = (new TripInfo(
@@ -629,5 +651,22 @@ public class BusConnectionDev {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private static double[] getStopLocation(Connection conn, String stopId) {
+        String sql = "SELECT stop_lat, stop_lon FROM stops WHERE stop_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, stopId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    double lat = rs.getDouble("stop_lat");
+                    double lon = rs.getDouble("stop_lon");
+                    return new double[] { lat, lon };
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Exception: " + e.getMessage());
+        }
+        return null; // Return null if no location found or if an exception occurred
     }
 }

@@ -22,7 +22,7 @@ public class DataProcess {
                   JOIN stop_times st ON t.trip_id = st.trip_id
                   JOIN routes r ON t.route_id = r.route_id
                   JOIN stops s ON s.stop_id = st.stop_id
-                  WHERE (s.stop_lat BETWEEN 50.803792 AND 50.9)
+                  WHERE (s.stostp_lat BETWEEN 50.803792 AND 50.9)
                     AND (s.stop_lon BETWEEN 5.640811 AND 5.739475)
                     AND r.route_type = '3'
                     AND r.route_short_name <> '797'

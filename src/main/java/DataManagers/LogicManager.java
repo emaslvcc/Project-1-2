@@ -144,12 +144,13 @@ public class LogicManager extends GetUserData {
         }
     }
 
-    public static List<Node> calculateRouteByCoordinates(double x1, double y1, double x2, double y2, String mode) {
+    public static List<Node> calculateRouteByCoordinates(double lat_1, double lon_1, double lat_2, double lon_2,
+            String mode) {
         List<Node> shortestPath = null;
         try {
             // Find the start and end nodes
-            Node startNode = graph.getNodeByLatLon(x1, y1);
-            Node endNode = graph.getNodeByLatLon(x2, y2);
+            Node startNode = graph.getNodeByLatLon(lat_1, lon_1);
+            Node endNode = graph.getNodeByLatLon(lat_2, lon_2);
 
             // Find the shortest path
             Calculators.AStar aStar = new Calculators.AStar(graph);

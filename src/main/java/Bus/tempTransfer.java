@@ -143,8 +143,8 @@ public class tempTransfer {
                     rs.getString("first_trip_id"),
                     rs.getString("first_start_bus_stop_id"),
                     rs.getString("first_end_bus_stop_id"),
-                    rs.getTime("first_departure_time"),
-                    rs.getTime("first_arrival_time"),
+                    rs.getString("first_departure_time"),
+                    rs.getString("first_arrival_time"),
                     rs.getInt("first_trip_time"));
         }
         return transferBestTrip;
@@ -170,8 +170,8 @@ public class tempTransfer {
                     rs.getString("second_trip_id"),
                     rs.getString("second_start_bus_stop_id"),
                     rs.getString("second_end_bus_stop_id"),
-                    rs.getTime("second_departure_time"),
-                    rs.getTime("second_arrival_time"),
+                    rs.getString("second_departure_time"),
+                    rs.getString("second_arrival_time"),
                     rs.getInt("second_trip_time"));
         }
         return transferBestTrip;
@@ -291,7 +291,7 @@ public class tempTransfer {
                     end_arrival_time,
                     TIMESTAMPDIFF(MINUTE, start_departure_time, end_arrival_time) AS trip_time
                 FROM
-                preComputedTripDetails
+                    preComputedTripDetails
                 WHERE
                     start_stop_id = ?
                     AND end_stop_id = ?
@@ -325,6 +325,7 @@ public class tempTransfer {
                     AND start_departure_time > ?
                 ORDER BY
                     start_departure_time ASC
+
                 LIMIT 1;
 
                         """;
@@ -345,8 +346,8 @@ public class tempTransfer {
                             rs.getString("trip_id"),
                             rs.getString("start_stop_id"), // start stop ID
                             rs.getString("end_stop_id"), // end stop ID
-                            rs.getTime("start_departure_time"),
-                            rs.getTime("end_arrival_time"),
+                            rs.getString("start_departure_time"),
+                            rs.getString("end_arrival_time"),
                             rs.getInt("trip_time"));
 
                 }
@@ -375,12 +376,12 @@ public class tempTransfer {
             pstmt.setString(3, firstTrip.getRouteId());
             pstmt.setString(4, firstTrip.getBusNumber());
             pstmt.setString(5, firstTrip.getTripId());
-            pstmt.setTime(6, firstTrip.getStartDepartureTime());
-            pstmt.setTime(7, firstTrip.getEndArrivalTime());
+            pstmt.setString(6, firstTrip.getStartDepartureTime());
+            pstmt.setString(7, firstTrip.getEndArrivalTime());
             pstmt.setInt(8, firstTrip.getTripTime());
 
-            long timeInMs = secondTrip.getEndArrivalTime().getTime(); // Get time in milliseconds since
-                                                                      // the epoch
+            long timeInMs = secondTrip.getArrTimeInMs(); // Get time in milliseconds since
+                                                         // the epoch
             long timeToAdd = timeToDestination * 60 * 1000; // Convert minutes to milliseconds
 
             // Create a new Time object with the added time
@@ -394,7 +395,7 @@ public class tempTransfer {
             pstmt.setString(11, secondTrip.getRouteId());
             pstmt.setString(12, secondTrip.getBusNumber());
             pstmt.setString(13, secondTrip.getTripId());
-            pstmt.setTime(14, secondTrip.getStartDepartureTime());
+            pstmt.setString(14, secondTrip.getStartDepartureTime());
             pstmt.setTime(15, newTime);
             pstmt.setInt(16, secondTrip.getTripTime());
             pstmt.setDouble(17, distanceToStartBusstop);

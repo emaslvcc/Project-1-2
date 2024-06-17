@@ -20,7 +20,7 @@ public class BusConnectionDev {
     public static boolean testClass = false;
 
     static List<Node> stopNodes = new ArrayList<>();
-    static int id = 0;
+    static int number_stop_id = 0;
 
     static List<Node> tripNodes = new ArrayList<>();
     static int number_shape_id = 0;
@@ -44,7 +44,7 @@ public class BusConnectionDev {
      */
     public static void resetLists() {
         stopNodes = new ArrayList<>();
-        id = 0;
+        number_stop_id = 0;
         tripNodes = new ArrayList<>();
         number_shape_id = 0;
     }
@@ -96,8 +96,8 @@ public class BusConnectionDev {
                 System.out.println("best direct trip" + directBestTrip);
                 transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
 
-                if (directBestTrip != null && directBestTrip.getEndArrivalTime().getTime() < transferBestTrip
-                        .getEndArrivalTime().getTime()) {
+                if (directBestTrip != null && directBestTrip.getArrTimeInMs() < transferBestTrip
+                        .getArrTimeInMs()) {
                     // Debugging print statements
                     System.out.println("Best Trip: " + directBestTrip);
                     System.out.println("========================================");
@@ -107,10 +107,10 @@ public class BusConnectionDev {
                             directBestTrip.getEndStopId());
 
                     if (number_shape_id == 0) {
-                        createMap.drawPath(stopNodes, directBestTrip.getColor(directBestTrip.getRouteId()));
+                        createMap.drawPath(stopNodes, directBestTrip.getColor());
                         System.out.println("no shape");
                     } else {
-                        createMap.drawPath(tripNodes, stopNodes, directBestTrip.getColor(directBestTrip.getRouteId()));
+                        createMap.drawPath(tripNodes, stopNodes, directBestTrip.getColor());
                     }
                     double totalDistance = calculateTotalDistance(tripNodes);
                     if (totalDistance == 0)
@@ -136,14 +136,7 @@ public class BusConnectionDev {
                             firstTrip.getEndStopId());
                     queryStopsBetween(conn, firstTrip.getTripId(), firstTrip.getStartStopId(),
                             firstTrip.getEndStopId());
-                    System.out.println("1st" + firstTrip.getColor(firstTrip.getRouteId()));
-
-                    if (number_shape_id == 0) {
-                        createMap.drawPath(stopNodes, firstTrip.getColor(firstTrip.getRouteId()));
-                        System.out.println("no shape");
-                    } else {
-                        createMap.drawPath(tripNodes, stopNodes, firstTrip.getColor(firstTrip.getRouteId()));
-                    }
+                    System.out.println("1st" + firstTrip.getColor());
 
                     double totalDistance = calculateTotalDistance(tripNodes);
                     if (totalDistance == 0)
@@ -161,7 +154,7 @@ public class BusConnectionDev {
                             firstTrip.endArrivalTime.toString(),
                             firstTrip.startDepartureTime.toString() };
                     // for second trip
-
+                    int numberOfFirstTripNode = tripNodes.size();
                     number_shape_id = 0;
 
                     // Debugging print statements
@@ -171,14 +164,17 @@ public class BusConnectionDev {
                             transferBestTrip.getEndStopId());
                     queryStopsBetween(conn, transferBestTrip.getTripId(), transferBestTrip.getStartStopId(),
                             transferBestTrip.getEndStopId());
-                    System.out.println("2nd:" + transferBestTrip.getColor(transferBestTrip.getRouteId()));
+                    System.out.println("2nd:" + transferBestTrip.getColor());
 
                     if (number_shape_id == 0) {
-                        createMap.drawPath(stopNodes, transferBestTrip.getColor(transferBestTrip.getRouteId()));
+                        createMap.drawPath(stopNodes, numberOfFirstTripNode,
+                                firstTrip.getColor(),
+                                transferBestTrip.getColor());
                         System.out.println("no shape");
                     } else {
-                        createMap.drawPath(tripNodes, stopNodes,
-                                transferBestTrip.getColor(transferBestTrip.getRouteId()));
+                        createMap.drawPath(tripNodes, stopNodes, numberOfFirstTripNode,
+                                firstTrip.getColor(),
+                                transferBestTrip.getColor());
                     }
 
                     totalDistance += calculateTotalDistance(stopNodes);
@@ -460,8 +456,8 @@ public class BusConnectionDev {
                         rs.getString("trip_id"),
                         startStopId,
                         endStopId,
-                        rs.getTime("start_departure_time"),
-                        rs.getTime("end_arrival_time"),
+                        rs.getString("start_departure_time"),
+                        rs.getString("end_arrival_time"),
                         rs.getInt("trip_time")));
             }
         }
@@ -583,15 +579,15 @@ public class BusConnectionDev {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 String stopName = rs.getString("stop_name");
-                if (id == 0)
+                if (number_stop_id == 0)
                     startBusStop = stopName;
                 endBusStop = stopName;
 
                 double stopLat = rs.getDouble("stop_lat");
                 double stopLon = rs.getDouble("stop_lon");
 
-                stopNodes.add(new Node(id, stopLat, stopLon));
-                id++;
+                stopNodes.add(new Node(number_stop_id, stopLat, stopLon));
+                number_stop_id++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -615,10 +611,4 @@ public class BusConnectionDev {
         return null; // Return null if no location found or if an exception occurred
     }
 
-    private static TripInfo compareTrips(TripInfo direct, TripInfo transfer) {
-        if (direct.getEndArrivalTime().getTime() > transfer.getEndArrivalTime().getTime()) {
-            return transfer;
-        }
-        return direct;
-    }
 }

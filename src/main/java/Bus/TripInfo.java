@@ -14,8 +14,8 @@ public class TripInfo {
     String tripId;
     String startStopId;
     String endStopId;
-    Time startDepartureTime;
-    Time endArrivalTime;
+    String startDepartureTime;
+    String endArrivalTime;
     int tripTime;
     double distanceToFirstBusstop;
 
@@ -33,7 +33,7 @@ public class TripInfo {
      * @param tripTime           the duration of the trip in minutes
      */
     public TripInfo(String routeId, String busNumber, String busName, String tripId, String startStopId,
-            String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime) {
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
         this.routeId = routeId;
         this.busNumber = busNumber;
         this.busName = busName;
@@ -46,7 +46,7 @@ public class TripInfo {
     }
 
     public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
-            String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime) {
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
         this.routeId = routeId;
         this.busNumber = busNumber;
         this.tripId = tripId;
@@ -58,7 +58,7 @@ public class TripInfo {
     }
 
     public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
-            String endStopId, Time startDepartureTime, Time endArrivalTime, int tripTime,
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime,
             double distanceToFirstBusstop) {
         this.routeId = routeId;
         this.busNumber = busNumber;
@@ -91,11 +91,11 @@ public class TripInfo {
         return tripId;
     }
 
-    public Time getStartDepartureTime() {
+    public String getStartDepartureTime() {
         return startDepartureTime;
     }
 
-    public Time getEndArrivalTime() {
+    public String getEndArrivalTime() {
         return endArrivalTime;
     }
 
@@ -107,7 +107,7 @@ public class TripInfo {
         return endStopId;
     }
 
-    public String getColor(String routeId) throws SQLException {
+    public String getColor() throws SQLException {
         String sql = """
                 SELECT route_color
                 from routes r
@@ -115,13 +115,18 @@ public class TripInfo {
                     """;
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, routeId);
+        pstmt.setString(1, this.routeId);
         ResultSet rs = pstmt.executeQuery();
         while (rs.next()) {
             return rs.getString(1);
         }
         return "blue";
 
+    }
+
+    public long getArrTimeInMs() {
+        Time timeObject = Time.valueOf(this.getEndArrivalTime());
+        return timeObject.getTime();
     }
 
     @Override

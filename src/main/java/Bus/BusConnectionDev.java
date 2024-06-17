@@ -128,22 +128,14 @@ public class BusConnectionDev {
                 } else {
                     tempTransfer.processTransfers(x1, y1, x2, y2);
                     String sqlGetEarliestArrTime = """
-                            SELECT tt.*,
-                                   ST_Distance_Sphere(point(?,?), point(s.stop_lon, s.stop_lat)) AS distance_to_start_stop
+                            SELECT tt.*
                             FROM tempTransfer tt
-                            JOIN stops s ON s.stop_id = tt.first_start_bus_stop_id
-                            WHERE tt.second_arrival_time = (
-                                SELECT MIN(second_arrival_time)
-                                FROM tempTransfer
-                            )
-                            ORDER BY distance_to_start_stop ASC
+                            ORDER BY second_arrival_time ASC,distanceToFirstBusstop ASC
                             LIMIT 1;
                                                                            """;
-                    PreparedStatement pstmt = conn.prepareStatement(sqlGetEarliestArrTime);
-                    pstmt.setDouble(1, x1);
-                    pstmt.setDouble(2, y1);
+                    Statement stmtGetBesttrip = conn.createStatement();
 
-                    ResultSet rs = pstmt.executeQuery();
+                    ResultSet rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
                     if (rs.next()) {
                         bestTrip = new TripInfo(
                                 rs.getString("first_route_id"),
@@ -188,7 +180,7 @@ public class BusConnectionDev {
                     // for second trip
                     bestTrip = null;
                     id2 = 0;
-                    rs = pstmt.executeQuery();
+                    rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
 
                     if (rs.next()) {
                         bestTrip = new TripInfo(
@@ -587,15 +579,9 @@ public class BusConnectionDev {
             pstmt.setInt(3, Math.max(startShapeSeq, endShapeSeq));
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                String shapeId = rs.getString("shape_id");
-                int shapePtSequence = rs.getInt("shape_pt_sequence");
+
                 double shapePtLat = rs.getDouble("shape_pt_lat");
                 double shapePtLon = rs.getDouble("shape_pt_lon");
-
-                // System.out.println("Shape ID: " + shapeId +
-                // ", Shape Pt Sequence: " + shapePtSequence +
-                // ", Latitude: " + shapePtLat +
-                // ", Longitude: " + shapePtLon);
 
                 tripNodes.add(new Node(id2, shapePtLat, shapePtLon));
                 id2++;

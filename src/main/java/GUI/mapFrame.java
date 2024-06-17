@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
+import java.time.LocalTime;
 
 public class mapFrame extends JFrame {
         private JPanel backPanel;
@@ -30,6 +31,8 @@ public class mapFrame extends JFrame {
         private static JLabel arrivalTime;
         private static JLabel startBusStop;
         private static JLabel endBusStop;
+        private static JComboBox<String> startHour;
+        private static JComboBox<String> startMinute;
 
         /**
          * Calls the component initializer.
@@ -58,6 +61,8 @@ public class mapFrame extends JFrame {
                 timeTextLabel = new JLabel();
                 timeNumberLabel = new JLabel();
                 busInfoPanel = new JPanel();
+                startHour = new JComboBox<>();
+                startMinute = new JComboBox<>();
 
                 setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 setName("mapFrame");
@@ -144,6 +149,38 @@ public class mapFrame extends JFrame {
                 destinationCodeLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 destinationCodeLabel.setText("Destination Zipcode:");
 
+                String[] hours = new String[25];
+                for (int i = 0; i <= 24; i++) {
+                        hours[i] = String.format("%02d", i);
+                }
+
+                String[] minutes = new String[60];
+                for (int i = 0; i <= 59; i++) {
+                        minutes[i] = String.format("%02d", i);
+                }
+
+                startHour.setOpaque(false);
+                startHour.setBackground(new Color(170, 211, 223));
+                startHour.setFont(new Font("Segoe UI", 1, 12)); // NOI18N
+                startHour.setForeground(new Color(255, 255, 255));
+                startHour.setModel(new DefaultComboBoxModel<>(hours));
+                startHour.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                startMinute.setOpaque(false);
+                startMinute.setBackground(new Color(170, 211, 223));
+                startMinute.setFont(new Font("Segoe UI", 1, 12)); // NOI18N
+                startMinute.setForeground(new Color(255, 255, 255));
+                startMinute.setModel(new DefaultComboBoxModel<>(minutes));
+                startMinute.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                int currentHour = LocalTime.now().getHour();
+                String currentHourString = String.format("%02d", currentHour);
+                startHour.setSelectedItem(currentHourString);
+
+                int currentMinute = LocalTime.now().getMinute();
+                String currentMinuteString = String.format("%02d", currentMinute);
+                startMinute.setSelectedItem(currentMinuteString);
+
                 startCodeField.setForeground(new Color(0, 0, 0));
 
                 destinationCodeField.setForeground(new Color(0, 0, 0));
@@ -191,6 +228,15 @@ public class mapFrame extends JFrame {
                                                                                                                 LayoutStyle.ComponentPlacement.RELATED,
                                                                                                                 GroupLayout.DEFAULT_SIZE,
                                                                                                                 Short.MAX_VALUE))
+                                                                                .addGroup(backPanelLayout
+                                                                                                .createParallelGroup(
+                                                                                                                GroupLayout.Alignment.LEADING)
+                                                                                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                                                                                .addGap(400, 400, 400)
+                                                                                                                .addComponent(startHour, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+                                                                                                                .addGap(15, 15, 15)
+                                                                                                                .addComponent(startMinute, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+                                                                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                                                                 .addGroup(backPanelLayout
                                                                                                 .createSequentialGroup()
                                                                                                 .addGroup(backPanelLayout
@@ -332,6 +378,14 @@ public class mapFrame extends JFrame {
                                                                                                 .addComponent(distanceTextLabel,
                                                                                                                 GroupLayout.PREFERRED_SIZE,
                                                                                                                 14,
+                                                                                                                GroupLayout.PREFERRED_SIZE)
+                                                                                                .addComponent(startHour,
+                                                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                                                30,
+                                                                                                                GroupLayout.PREFERRED_SIZE)
+                                                                                                .addComponent(startMinute,
+                                                                                                                GroupLayout.PREFERRED_SIZE,
+                                                                                                                30,
                                                                                                                 GroupLayout.PREFERRED_SIZE))
                                                                 .addPreferredGap(
                                                                                 LayoutStyle.ComponentPlacement.RELATED)
@@ -382,7 +436,7 @@ public class mapFrame extends JFrame {
                         return;
                 }
                 LogicManager logicManager = new LogicManager();
-                logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox);
+                logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox, startHour, startMinute);
 
         }
 

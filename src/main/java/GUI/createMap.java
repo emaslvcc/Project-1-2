@@ -200,6 +200,47 @@ public class createMap {
         jXMapViewer.setOverlayPainter(pathOverlay);
     }
 
+    public static void drawPath(List<Node> stops) {
+
+        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
+                try {
+                    // Draw start and end markers
+                    createStartAndEndPoints(g, map);
+                    Point2D pointMapPrev = null; // Initialize a variable to hold the previous point
+
+                    for (int i = 0; i < stops.size(); i++) {
+                        Node node = stops.get(i);
+                        GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                        Point2D pointMap = map.convertGeoPositionToPoint(point);
+
+                        // If this is not the first stop, draw a blue line from the previous stop to the
+                        // current stop
+                        if (i > 0) {
+                            g.setColor(Color.GREEN); // Set the color for the lines
+                            g.setStroke(new BasicStroke(3));
+                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                    (int) pointMap.getY());
+                        }
+
+                        // Update pointMapPrev to the current stop for the next iteration
+                        pointMapPrev = pointMap;
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error in drawing path" + e);
+                    e.printStackTrace();
+                } finally {
+                    g.dispose();
+                }
+
+            }
+        };
+        jXMapViewer.setOverlayPainter(pathOverlay);
+
+    }
+
     public static void drawPath(List<Node> path, List<Node> stops, String firstTripColor) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {

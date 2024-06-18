@@ -58,7 +58,7 @@ public class LogicManager extends GetUserData {
             calculateRoute(startPostCode, endPostCode, mode);
             // Display the shortest path on the map
 
-            GUI.createMap.drawPath(shortestPath, null);
+            GUI.createMap.drawPath(shortestPath);
         }
 
         TimeCalculator timeCalc = new AverageTimeCalculator(distance);

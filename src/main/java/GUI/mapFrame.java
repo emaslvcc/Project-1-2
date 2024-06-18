@@ -25,12 +25,6 @@ public class mapFrame extends JFrame {
         private static JLabel timeNumberLabel;
         private JLabel timeTextLabel;
         private static JPanel busInfoPanel;
-        private static JLabel busName;
-        private static JLabel busNum;
-        private static JLabel departureTime;
-        private static JLabel arrivalTime;
-        private static JLabel startBusStop;
-        private static JLabel endBusStop;
 
         /**
          * Calls the component initializer.

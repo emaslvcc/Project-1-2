@@ -5,15 +5,35 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class transferModule {
     private String mode;
     private String startTime;
     private String endTime;
-    private int busNum;
-    private String busName;
+    private String busNum;
     private String startBusStop;
     private String endBusStop;
+    private static ArrayList<transferModule> transfers = new ArrayList<>();
+
+    public static void addTransferModule(String mode, String startTime, String endTime, String busNumber,
+            String startBusStop, String endBusStop) {
+        transferModule newTransfer = new transferModule(mode, startTime, endTime, busNumber, startBusStop, endBusStop);
+        transfers.add(newTransfer);
+    }
+
+    public static void addTransferModule(String mode, String startTime, String endTime) {
+        transferModule newTransfer = new transferModule(mode, startTime, endTime);
+        transfers.add(newTransfer);
+    }
+
+    public static ArrayList<transferModule> getTransfers() {
+        return transfers;
+    }
+
+    public static void clearTransfers() {
+        transfers.clear();
+    }
 
     public transferModule(String mode, String startTime, String endTime) {
         this.mode = mode;
@@ -21,13 +41,13 @@ public class transferModule {
         this.endTime = endTime;
     }
 
-    public transferModule(String mode, String startTime, String endTime, int busNum, String busName,
+    public transferModule(String mode, String startTime, String endTime, String busNum,
             String startBusStop, String endBusStop) {
         this.mode = mode;
         this.startTime = startTime;
         this.endTime = endTime;
         this.busNum = busNum;
-        this.busName = busName;
+
         this.startBusStop = startBusStop;
         this.endBusStop = endBusStop;
     }
@@ -66,10 +86,6 @@ public class transferModule {
             busNumLabel.setFont(new Font("Segoe UI", 1, 14));
             busNumLabel.setForeground(new Color(0, 0, 0));
 
-            JLabel busNameLabel = new JLabel("<html>Bus Name: " + busName + "</html>");
-            busNameLabel.setFont(new Font("Segoe UI", 1, 14));
-            busNameLabel.setForeground(new Color(0, 0, 0));
-
             JLabel startBusStopLabel = new JLabel("<html>Start Bus Stop: " + startBusStop + "</html>");
             startBusStopLabel.setFont(new Font("Segoe UI", 1, 14));
             startBusStopLabel.setForeground(new Color(0, 0, 0));
@@ -82,7 +98,6 @@ public class transferModule {
 
             labelsPanel.add(startBusStopLabel);
             labelsPanel.add(busNumLabel);
-            labelsPanel.add(busNameLabel);
             labelsPanel.add(endBusStopLabel);
 
             try {

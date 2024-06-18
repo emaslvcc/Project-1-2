@@ -368,6 +368,10 @@ public class mapFrame extends JFrame {
          * @throws Exception Exception if an error occurs during calculation.
          */
         private void calculateButtonActionPerformed(ActionEvent evt, ActionListener frame) throws Exception {
+
+                if (busMode) {
+                        transferModule.clearTransfers();
+                }
                 if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
                         createMap.clearMap();
                         addPanelForBusInfo(frame);
@@ -385,34 +389,30 @@ public class mapFrame extends JFrame {
                 LogicManager logicManager = new LogicManager();
                 logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox);
 
+                showBusInfo(transferModule.getTransfers());
+
         }
 
-        private void testThis() {
+        private void addPanelForBusInfo(ActionListener frame) {
+                this.setSize(new Dimension(1210, 598)); // Adjust the size of the frame as well
+                this.setLayout(new BorderLayout());
 
-                transferModule walkToBus = new transferModule("Walk", "12:00", "12:10");
-                transferModule busToDest = new transferModule("Bus", "12:10", "12:20", 1,
-                                "Nieuw-Vennep P+R Getsewoud Zuid - Amsterdam CS", "Boschstraat maagdendries for real",
-                                "Bus Stop 2");
-                transferModule busToDest2 = new transferModule("Bus", "12:22", "12:25", 2,
-                                "a b c d e f g h i j k l m n o p q r s t u v w", "Bus Stop 2", "Bus Stop 3");
-                transferModule walktoDest = new transferModule("Walk", "12:25", "12:30");
-                transferModule lastBus = new transferModule("Bus", "12:30", "12:35", 3, "Bus 3", "Bus Stop 4",
-                                "Bus Stop 5");
-                transferModule finalWalk = new transferModule("Walk", "12:35", "12:50");
+                busInfoPanel.setLayout(new BoxLayout(busInfoPanel, BoxLayout.Y_AXIS));
+                busInfoPanel.setBackground(new Color(244, 244, 244));
+                busInfoPanel.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 
-                ArrayList<transferModule> transfers = new ArrayList<>();
-                transfers.add(walkToBus);
-                transfers.add(busToDest);
-                transfers.add(busToDest2);
-                transfers.add(walktoDest);
-                transfers.add(lastBus);
-                transfers.add(finalWalk);
+                JScrollPane scrollPane = new JScrollPane(busInfoPanel);
+                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-                transfers.add(walkToBus);
-                transfers.add(busToDest);
-                transfers.add(walktoDest);
+                JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
+                verticalScrollBar.setUnitIncrement(16);
+                verticalScrollBar.setBlockIncrement(100);
 
-                showBusInfo(transfers);
+                this.add(scrollPane, BorderLayout.EAST);
+                this.revalidate();
+                this.repaint();
+                recenterWindow();
 
         }
 
@@ -483,96 +483,6 @@ public class mapFrame extends JFrame {
          */
         private void minimizeButtonMouseClicked(java.awt.event.MouseEvent evt) {
                 this.setExtendedState(mapFrame.ICONIFIED);
-        }
-
-        /**
-         * Adds a panel for displaying bus information to the map frame.
-         *
-         * @param frame The action listener for the frame.
-         */
-        private void addPanelForBusInfo(ActionListener frame) {
-                this.setSize(new Dimension(1100, 598));
-                this.setLayout(new BorderLayout());
-
-                busInfoPanel.setPreferredSize(new Dimension(200, 598));
-                busInfoPanel.setBackground(new Color(244, 244, 244)); // Set the background color to white
-                busInfoPanel.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-                busInfoPanel.setLayout(new BoxLayout(busInfoPanel, BoxLayout.Y_AXIS));
-
-                busName = new JLabel("Bus Name: ");
-                busName.setFont(new Font("Segoe UI", 1, 14));
-                busName.setForeground(new Color(0, 0, 0));
-
-                busNum = new JLabel("Bus Number: ");
-                busNum.setFont(new Font("Segoe UI", 1, 14));
-                busNum.setForeground(new Color(0, 0, 0));
-
-                startBusStop = new JLabel("Start Bus Stop: ");
-                startBusStop.setFont(new Font("Segoe UI", 1, 14));
-                startBusStop.setForeground(new Color(0, 0, 0));
-
-                endBusStop = new JLabel("End Bus Stop: ");
-                endBusStop.setFont(new Font("Segoe UI", 1, 14));
-                endBusStop.setForeground(new Color(0, 0, 0));
-
-                arrivalTime = new JLabel("Arrival Time: ");
-                arrivalTime.setFont(new Font("Segoe UI", 1, 14));
-                arrivalTime.setForeground(new Color(0, 0, 0));
-
-                departureTime = new JLabel("Departure Time: ");
-                departureTime.setFont(new Font("Segoe UI", 1, 14));
-                departureTime.setForeground(new Color(0, 0, 0));
-
-                busName.setAlignmentX(Component.LEFT_ALIGNMENT);
-                busNum.setAlignmentX(Component.LEFT_ALIGNMENT);
-                startBusStop.setAlignmentX(Component.LEFT_ALIGNMENT);
-                endBusStop.setAlignmentX(Component.LEFT_ALIGNMENT);
-                arrivalTime.setAlignmentX(Component.LEFT_ALIGNMENT);
-                departureTime.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                busInfoPanel.add(new Box.Filler(new Dimension(0, 0), new Dimension(0, 0),
-                                new Dimension(0, Integer.MAX_VALUE)));
-                busInfoPanel.add(Box.createHorizontalStrut(20));
-
-                busInfoPanel.add(busName);
-                busInfoPanel.add(Box.createVerticalStrut(10)); // Add space
-                busInfoPanel.add(busNum);
-                busInfoPanel.add(Box.createVerticalStrut(100)); // Add space
-                busInfoPanel.add(startBusStop);
-                busInfoPanel.add(Box.createVerticalStrut(10)); // Add space
-                busInfoPanel.add(endBusStop);
-                busInfoPanel.add(Box.createVerticalStrut(100)); // Add space
-                busInfoPanel.add(arrivalTime);
-                busInfoPanel.add(Box.createVerticalStrut(10)); // Add space
-                busInfoPanel.add(departureTime);
-
-                busInfoPanel.add(new Box.Filler(new Dimension(0, 0), new Dimension(0, 0),
-                                new Dimension(0, Integer.MAX_VALUE)));
-
-                this.add(busInfoPanel, BorderLayout.EAST);
-                this.revalidate();
-                this.repaint();
-                recenterWindow();
-        }
-
-        /**
-         * Sets the bus information on the map frame.
-         *
-         * @param busName       The name of the bus.
-         * @param busNum        The number of the bus.
-         * @param startBusStop  The starting bus stop.
-         * @param endBusStop    The ending bus stop.
-         * @param arrivalTime   The arrival time of the bus.
-         * @param departureTime The departure time of the bus.
-         */
-        public static void setBusInfo(String busName, String busNum, String startBusStop, String endBusStop,
-                        String arrivalTime, String departureTime) {
-                mapFrame.busName.setText("<html>Bus Name:<br>" + busName + "</html>");
-                mapFrame.busNum.setText("<html>Bus Number:<br>" + busNum + "</html>");
-                mapFrame.startBusStop.setText("<html>Start Bus Stop:<br>" + startBusStop + "</html>");
-                mapFrame.endBusStop.setText("<html>End Bus Stop:<br>" + endBusStop + "</html>");
-                mapFrame.arrivalTime.setText("<html>Arrival Time:<br>" + arrivalTime + "</html>");
-                mapFrame.departureTime.setText("<html>Departure Time:<br>" + departureTime + "</html>");
         }
 
         /**

@@ -49,6 +49,30 @@ public abstract class TimeCalculator {
         return this.cyclingTime;
     }
 
+    public static Time getwalkingTime(double startLat, double startLon, double endLat, double endLon) {
+        double distanceToStartBusstop = calculateDistanceIfNotCached(startLat, startLon, endLat, endLon);
+        TimeCalculator timeCalc = new AverageTimeCalculator(distanceToStartBusstop);
+        int time = (int) (Math.round(timeCalc.getWalkingTime()));
+        long timeInLong = time * 60 * 1000;
+        Time walkingTime = new Time(timeInLong);
+        return walkingTime;
+    }
+
+    public static int calculateTripTime(String startTime, String endTime) {
+
+        // Convert the String to a Time object
+        Time startTime1 = Time.valueOf(startTime);
+        Time startTime2 = Time.valueOf(endTime);
+
+        // Calculate the difference in milliseconds
+        long differenceInMilliseconds = Math.abs(startTime1.getTime() - startTime2.getTime());
+
+        // Convert milliseconds to minutes
+        int differenceInMinutes = (int) differenceInMilliseconds / (1000 * 60);
+
+        return differenceInMinutes;
+    }
+
     public static Time calculateTime(double startLat, double startLon, double endLat, double endLon) {
 
         double distanceToStartBusstop = calculateDistanceIfNotCached(startLat, startLon, endLat, endLon);
@@ -68,8 +92,11 @@ public abstract class TimeCalculator {
         if (cachedDistance != null) {
             return cachedDistance;
         } else {
-            List<Node> path = LogicManager.calculateRouteByCoordinates(startLat, startLon, endLat, endLon, "walk");
-            double distance = LogicManager.calculateDistance(path);
+            double distance = DistanceCalculatorHaversine.calculate(startLat, startLon, endLat, endLon);
+            if (distance > 0.3) {
+                List<Node> path = LogicManager.calculateRouteByCoordinates(startLat, startLon, endLat, endLon, "walk");
+                distance = LogicManager.calculateDistance(path);
+            }
             distanceCache.putDistance(startLat, startLon, endLat, endLon, distance);
             return distance;
         }

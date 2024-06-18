@@ -22,7 +22,7 @@ public class LogicManager extends GetUserData {
     public static double distance;
     public static String[] busInfo;
     protected int[] finalStops;
-    private List<Node> shortestPath;
+    private static List<Node> shortestPath;
 
     /**
      * This method takes care of the main logic regarding the post codes.
@@ -52,7 +52,8 @@ public class LogicManager extends GetUserData {
         if ((mode).equals("Bus")) {
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude());
-            GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3], busInfo[4], busInfo[5]);
+            // GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3],
+            // busInfo[4], busInfo[5]);
         } else {
             calculateRoute(startPostCode, endPostCode, mode);
             // Display the shortest path on the map
@@ -146,7 +147,6 @@ public class LogicManager extends GetUserData {
 
     public static List<Node> calculateRouteByCoordinates(double lat_1, double lon_1, double lat_2, double lon_2,
             String mode) {
-        List<Node> shortestPath = null;
         try {
             // Find the start and end nodes
             Node startNode = graph.getNodeByLatLon(lat_1, lon_1);
@@ -169,12 +169,15 @@ public class LogicManager extends GetUserData {
      * @return The total distance of the path.
      */
     public static double calculateDistance(List<Node> path) {
+        if (path == null) {
+            return 0;
+        }
         double distance = 0;
         for (int i = 0; i < path.size() - 1; i++) {
             Node startNode = path.get(i);
             Node endNode = path.get(i + 1);
-            distance += Calculators.DistanceCalculatorHaversine.calculate(startNode.getLon(), startNode.getLat(),
-                    endNode.getLon(), endNode.getLat());
+            distance += Calculators.DistanceCalculatorHaversine.calculate(startNode.getLat(), startNode.getLon(),
+                    endNode.getLat(), endNode.getLon());
         }
         return distance;
     }
@@ -182,4 +185,5 @@ public class LogicManager extends GetUserData {
     public List<Node> getShortestPath() {
         return shortestPath;
     }
+
 }

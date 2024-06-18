@@ -151,7 +151,7 @@ public class createMap {
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
                     Color firstLineColor;
-                    if ("blue".equals(firstTripColor)) {
+                    if ("blue".equals(firstTripColor) || firstTripColor == null) {
                         firstLineColor = Color.BLUE;
                     } else {
                         firstLineColor = hexToColor(firstTripColor);
@@ -412,48 +412,6 @@ public class createMap {
         }
         return Color.decode(colorStr);
     }
-
-    // public static void drawPathsNew(List<Node> path, List<Node> stops, String
-    // color) {
-    // Graphics2D g = ;
-    // JXMapViewer map;
-    // Color lineColor;
-    // if ("blue".equals(color)) {
-    // lineColor = Color.BLUE;
-    // } else {
-    // lineColor = hexToColor(color);
-    // }
-
-    // g.setColor(lineColor);
-    // g.setStroke(new BasicStroke(3));
-
-    // for (int i = 0; i < path.size() - 1; i++) {
-    // Node startNode = path.get(i);
-    // Node endNode = path.get(i + 1);
-    // GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
-    // GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
-    // Point2D startP = map.convertGeoPositionToPoint(point1);
-    // Point2D endP = map.convertGeoPositionToPoint(point2);
-    // g.draw(new Line2D.Double(startP, endP));
-    // }
-    // if (stops != null) {
-    // createStartAndEndPointsForBus(g, map, stops);
-
-    // g.setColor(Color.RED);
-    // for (int i = 0; i < stops.size(); i++) {
-    // Node node = stops.get(i);
-    // GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
-    // Point2D pointMap = map.convertGeoPositionToPoint(point);
-    // Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(),
-    // pointMap.getY(), 10, 10);
-    // g.fill(circle);
-    // }
-    // } else {
-    // // Draw start and end markers
-    // createStartAndEndPoints(g, map);
-    // }
-
-    // }
 
     private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);

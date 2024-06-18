@@ -90,7 +90,7 @@ public class transferModule {
             startBusStopLabel.setFont(new Font("Segoe UI", 1, 14));
             startBusStopLabel.setForeground(new Color(0, 0, 0));
 
-            JLabel endBusStopLabel = new JLabel("End Bus Stop: " + endBusStop);
+            JLabel endBusStopLabel = new JLabel("<html>End Bus Stop: " + endBusStop + "</html>");
             endBusStopLabel.setFont(new Font("Segoe UI", 1, 14));
             endBusStopLabel.setForeground(new Color(0, 0, 0));
 

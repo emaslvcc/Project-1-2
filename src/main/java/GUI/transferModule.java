@@ -16,7 +16,7 @@ public class transferModule {
     private String startBusStop;
     private String endBusStop;
     private static ArrayList<transferModule> transfers = new ArrayList<>();
-    
+
     public static void addTransferModule(String mode, String startTime, String endTime, int busNumber, String busName, String startBusStop, String endBusStop) {
         transferModule newTransfer = new transferModule(mode, startTime, endTime, busNumber, busName, startBusStop, endBusStop);
         transfers.add(newTransfer);
@@ -93,7 +93,7 @@ public class transferModule {
             startBusStopLabel.setFont(new Font("Segoe UI", 1, 14));
             startBusStopLabel.setForeground(new Color(0, 0, 0));
 
-            JLabel endBusStopLabel = new JLabel("End Bus Stop: " + endBusStop);
+            JLabel endBusStopLabel = new JLabel("<html>End Bus Stop: " + endBusStop+ "</html>");
             endBusStopLabel.setFont(new Font("Segoe UI", 1, 14));
             endBusStopLabel.setForeground(new Color(0, 0, 0));
 

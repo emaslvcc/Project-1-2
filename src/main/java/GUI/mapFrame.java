@@ -368,6 +368,10 @@ public class mapFrame extends JFrame {
      * @throws Exception Exception if an error occurs during calculation.
      */
     private void calculateButtonActionPerformed(ActionEvent evt, ActionListener frame) throws Exception {
+
+        if (busMode) {
+            transferModule.clearTransfers();
+        }
         if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
             createMap.clearMap();
             addPanelForBusInfo(frame);
@@ -385,13 +389,14 @@ public class mapFrame extends JFrame {
         LogicManager logicManager = new LogicManager();
         logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox);
 
+        showBusInfo(transferModule.getTransfers());
+
     }
 
     private void addPanelForBusInfo(ActionListener frame) {
         this.setSize(new Dimension(1210, 598)); // Adjust the size of the frame as well
         this.setLayout(new BorderLayout());
 
-        //busInfoPanel.setLayout(new BoxLayout(busInfoPanel, BoxLayout.PAGE_AXIS));
         busInfoPanel.setLayout(new BoxLayout(busInfoPanel, BoxLayout.Y_AXIS));
         busInfoPanel.setBackground(new Color(244, 244, 244));
         busInfoPanel.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
@@ -404,40 +409,18 @@ public class mapFrame extends JFrame {
         verticalScrollBar.setUnitIncrement(16);
         verticalScrollBar.setBlockIncrement(100);
 
-
         this.add(scrollPane, BorderLayout.EAST);
         this.revalidate();
         this.repaint();
         recenterWindow();
 
-        testThis();
     }
 
-
-
     private void testThis() {
-
-        transferModule walkToBus = new transferModule("Walk", "12:00", "12:10");
-        transferModule busToDest = new transferModule("Bus", "12:10", "12:20", 1, "Nieuw-Vennep P+R Getsewoud Zuid - Amsterdam CS", "Boschstraat maagdendries for real", "Bus Stop 2");
-        transferModule busToDest2 = new transferModule("Bus", "12:22", "12:25", 2, "a b c d e f g h i j k l m n o p q r s t u v w", "Bus Stop 2", "Bus Stop 3");
-        transferModule walktoDest = new transferModule("Walk", "12:25", "12:30");
-        transferModule lastBus = new transferModule("Bus", "12:30", "12:35", 3, "Bus 3", "Bus Stop 4", "Bus Stop 5");
-        transferModule finalWalk = new transferModule("Walk", "12:35", "12:50");
-
-        ArrayList<transferModule> transfers = new ArrayList<>();
-        transfers.add(walkToBus);
-        transfers.add(busToDest);
-        transfers.add(busToDest2);
-        transfers.add(walktoDest);
-        transfers.add(lastBus);
-        transfers.add(finalWalk);
-
-        transfers.add(walkToBus);
-        transfers.add(busToDest);
-        transfers.add(walktoDest);
-
-        showBusInfo(transfers);
-
+        transferModule.addTransferModule("Walk", "12:00", "12:10");
+        transferModule.addTransferModule("Bus", "12:10", "12:20", 1, "Nieuw-Vennep P+R Getsewoud Zuid - Amsterdam CS", "Boschstraat maagdendries for real", "Bus Stop 2");
+        transferModule.addTransferModule("Bus", "12:22", "12:25", 2, "a b c d e f g h i j k l m n o p q r s t u v w", "Bus Stop 2", "Bus Stop 3");
+        transferModule.addTransferModule("Walk", "12:25", "12:30");
     }
 
     public void showBusInfo(ArrayList<transferModule> transfers) {

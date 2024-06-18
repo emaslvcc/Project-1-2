@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class transferModule {
     private String mode;
@@ -14,6 +15,25 @@ public class transferModule {
     private String busName;
     private String startBusStop;
     private String endBusStop;
+    private static ArrayList<transferModule> transfers = new ArrayList<>();
+    
+    public static void addTransferModule(String mode, String startTime, String endTime, int busNumber, String busName, String startBusStop, String endBusStop) {
+        transferModule newTransfer = new transferModule(mode, startTime, endTime, busNumber, busName, startBusStop, endBusStop);
+        transfers.add(newTransfer);
+    }
+
+    public static void addTransferModule(String mode, String startTime, String endTime) {
+        transferModule newTransfer = new transferModule(mode, startTime, endTime);
+        transfers.add(newTransfer);
+    }
+
+    public static ArrayList<transferModule> getTransfers() {
+        return transfers;
+    }
+
+    public static void clearTransfers() {
+        transfers.clear();
+    }
 
     public transferModule(String mode, String startTime, String endTime) {
         this.mode = mode;

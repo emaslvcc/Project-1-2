@@ -103,11 +103,11 @@ public abstract class TimeCalculator {
     }
 
     public static Time getCurrentTime() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Time currentTime = new Time(calendar.getTimeInMillis());
-        // Time currentTime = Time.valueOf("10:20:00");
+        // Calendar calendar = Calendar.getInstance();
+        // calendar.set(Calendar.SECOND, 0);
+        // calendar.set(Calendar.MILLISECOND, 0);
+        // Time currentTime = new Time(calendar.getTimeInMillis());
+        Time currentTime = Time.valueOf("10:20:00");
         return currentTime;
     }
 

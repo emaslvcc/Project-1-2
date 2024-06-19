@@ -507,26 +507,48 @@ public class createMap {
         double totalDistance = distance1 + distance2;
 
         List<List<Node>> paths = new java.util.ArrayList<>();
+        if (path1 == null || path1.isEmpty()) {
+            drawLineBetweenPoints(g, map, startPostCode, startBus);
+        } else {
+            paths.add(path1);
+        }
 
+        if (path2 == null || path2.isEmpty()) {
+            drawLineBetweenPoints(g, map, endPostCode, endBus);
+        } else {
+            paths.add(path2);
+        }
         paths.add(path1);
         paths.add(path2);
 
         drawPaths(paths, g, map);
     }
 
+    private static void drawLineBetweenPoints(Graphics2D g, JXMapViewer map, PostCode point1, PostCode point2) {
+        g.setColor(Color.GREEN);
+        GeoPosition geoPoint1 = new GeoPosition(point1.getLatitude(), point1.getLongitude());
+        GeoPosition geoPoint2 = new GeoPosition(point2.getLatitude(), point2.getLongitude());
+        Point2D mapPoint1 = map.convertGeoPositionToPoint(geoPoint1);
+        Point2D mapPoint2 = map.convertGeoPositionToPoint(geoPoint2);
+        g.draw(new Line2D.Double(mapPoint1, mapPoint2));
+    }
+
     public static void drawPaths(List<List<Node>> paths, Graphics2D g, JXMapViewer map) {
         g.setColor(Color.GREEN);
 
         for (List<Node> path : paths) {
-            for (int i = 0; i < path.size() - 1; i++) {
-                Node startNode = path.get(i);
-                Node endNode = path.get(i + 1);
-                GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
-                GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
-                Point2D startP = map.convertGeoPositionToPoint(point1);
-                Point2D endP = map.convertGeoPositionToPoint(point2);
-                g.draw(new Line2D.Double(startP, endP));
+            if (path != null) {
+                for (int i = 0; i < path.size() - 1; i++) {
+                    Node startNode = path.get(i);
+                    Node endNode = path.get(i + 1);
+                    GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
+                    GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
+                    Point2D startP = map.convertGeoPositionToPoint(point1);
+                    Point2D endP = map.convertGeoPositionToPoint(point2);
+                    g.draw(new Line2D.Double(startP, endP));
+                }
             }
+
         }
     }
 

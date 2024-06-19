@@ -101,7 +101,8 @@ public class tempTransfer {
                 FROM tempTransfer tt
                 JOIN stops s1 on s1.stop_id = tt.first_start_bus_stop_id
                 JOIN stops s2 on s2.stop_id = tt.first_end_bus_stop_id
-                ORDER BY timeOfArrDestination ASC,distanceToFirstBusstop ASC
+                ORDER BY
+                timeOfArrDestination ASC,distanceToFirstBusstop ASC
                 LIMIT 1;
                                                                """;
         Statement stmtGetBesttrip = conn.createStatement();
@@ -133,7 +134,8 @@ public class tempTransfer {
                 FROM tempTransfer tt
                 JOIN stops s1 on s1.stop_id = tt.second_start_bus_stop_id
                 JOIN stops s2 on s2.stop_id = tt.second_end_bus_stop_id
-                ORDER BY timeOfArrDestination ASC,distanceToFirstBusstop ASC
+                ORDER BY
+                timeOfArrDestination ASC,distanceToFirstBusstop ASC
                 LIMIT 1;
                                                                    """;
         Statement stmtGetBesttrip = conn.createStatement();
@@ -260,54 +262,62 @@ public class tempTransfer {
     private static String getFirstTripQuery() {
         return """
                     SELECT
-                    start_stop_id,
-                    end_stop_id,
-                    route_id,
-                    route_short_name,
-                    route_long_name,
-                    trip_id,
-                    start_departure_time,
-                    end_arrival_time,
-                    TIMESTAMPDIFF(MINUTE, start_departure_time, end_arrival_time) AS trip_time
+                    st1.stop_id AS start_stop_id,
+                    st2.stop_id AS end_stop_id,
+                    t.route_id,
+                    r.route_short_name,
+                    st1.trip_id,
+                    st1.departure_time AS start_departure_time,
+                    st2.arrival_time AS end_arrival_time,
+                    TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
                 FROM
-                    preComputedTripDetails
+                    stop_times st1
+                JOIN
+                    stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
+                JOIN
+                    trips t ON t.trip_id = st1.trip_id
+                JOIN
+                    routes r ON t.route_id = r.route_id
                 WHERE
-                    start_stop_id = ?
-                    AND end_stop_id = ?
-                    AND route_id = ?
-                    AND start_departure_time >= ?
+                    st1.stop_id = ?
+                    AND st2.stop_id = ?
+                    AND t.route_id = ?
+                    AND st1.departure_time >= ?
                 ORDER BY
-                    start_departure_time ASC
+                    st1.departure_time ASC
                 LIMIT 1;
-                        """;
+                                """;
     }
 
     private static String getSecondTripQuery() {
 
         return """
                     SELECT
-                    start_stop_id,
-                    end_stop_id,
-                    route_id,
-                    route_short_name,
-                    route_long_name,
-                    trip_id,
-                    start_departure_time,
-                    end_arrival_time,
-                    TIMESTAMPDIFF(MINUTE, start_departure_time, end_arrival_time) AS trip_time
+                    st1.stop_id AS start_stop_id,
+                    st2.stop_id AS end_stop_id,
+                    t.route_id,
+                    r.route_short_name,
+                    st1.trip_id,
+                    st1.departure_time AS start_departure_time,
+                    st2.arrival_time AS end_arrival_time,
+                    TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
                 FROM
-                preComputedTripDetails
+                    stop_times st1
+                JOIN
+                    stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
+                JOIN
+                    trips t ON t.trip_id = st1.trip_id
+                JOIN
+                    routes r ON t.route_id = r.route_id
                 WHERE
-                    start_stop_id = ?
-                    AND end_stop_id = ?
-                    AND route_id = ?
-                    AND start_departure_time > ?
+                    st1.stop_id = ?
+                    AND st2.stop_id = ?
+                    AND t.route_id = ?
+                    AND st1.departure_time >= ?
                 ORDER BY
-                    start_departure_time ASC
-
+                    st1.departure_time ASC
                 LIMIT 1;
-
-                        """;
+                                """;
     }
 
     private static TripInfo fetchTripDetails(Connection conn, String query, Object... params) {

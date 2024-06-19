@@ -40,14 +40,21 @@ public class AStar {
         costSoFar.put(start, 0.0);
 
         while (!frontier.isEmpty()) {
+            // long startTime = System.currentTimeMillis(); // Start time
+            // long timeLimit = 2000; // Time limit in milliseconds
+
             Node current = frontier.poll();
 
             if (current.equals(goal)) {
+                // if (System.currentTimeMillis() - startTime > timeLimit) {
+                // return null;
+                // }
                 System.out.println("Path found");
                 return constructPath(cameFrom, goal);
             }
 
             for (Edge edge : graph.getEdges(current)) {
+
                 Node next = edge.getDestination();
                 double newCost = costSoFar.get(current) + edge.getWeight();
 

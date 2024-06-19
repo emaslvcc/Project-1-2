@@ -94,30 +94,10 @@ public class BusConnectionDev {
                         TimeCalculator.addMinutesToTime(TimeCalculator.getCurrentTime(), time).toString());
 
             } else {
-                directBestTrip = processRoutes(conn, x1, y1, x2, y2);
 
-                System.out.println("best direct trip is: " + directBestTrip);
+                transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
+                showTransferInfo(conn, transferBestTrip);
 
-                if (directBestTrip != null) {
-                    directTripTime = TimeCalculator
-                            .calculateTripTime(TimeCalculator.getCurrentTime().toString(),
-                                    directBestTrip.getTimeOfArrDest());
-                    if (directTripTime < 30) {
-                        showDirectInfo(conn, directBestTrip);
-                    } else {
-                        transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
-                        if ((directBestTrip.getTimeOfArrDestINMs() <= transferBestTrip.getStartFromOriginInMs())) {
-                            showDirectInfo(conn, directBestTrip);
-                        } else {
-                            showTransferInfo(conn, transferBestTrip);
-                        }
-
-                    }
-                } else {
-                    transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
-                    showTransferInfo(conn, transferBestTrip);
-
-                }
             }
         } catch (
 
@@ -214,14 +194,23 @@ public class BusConnectionDev {
 
         transferModule.addTransferModule("Walk", firstTrip.getStartFromOrigin(),
                 firstTrip.getStartDepartureTime());
-        transferModule.addTransferModule("Bus", firstTrip.getStartDepartureTime(),
-                firstTrip.getEndArrivalTime(), firstTrip.getBusNumber(),
-                firstTrip.getStartStopName(),
-                firstTrip.getEndStopName());
-        transferModule.addTransferModule("Bus", transferBestTrip.getStartDepartureTime(),
-                transferBestTrip.getEndArrivalTime(), transferBestTrip.getBusNumber(),
-                transferBestTrip.getStartStopName(),
-                transferBestTrip.getEndStopName());
+        if (firstTrip.getBusNumber().equals(transferBestTrip.getBusNumber())) {
+            transferModule.addTransferModule("Bus", firstTrip.getStartDepartureTime(),
+                    transferBestTrip.getEndArrivalTime(), firstTrip.getBusNumber(),
+                    firstTrip.getStartStopName(),
+                    transferBestTrip.getEndStopName());
+
+        } else {
+            transferModule.addTransferModule("Bus", firstTrip.getStartDepartureTime(),
+                    firstTrip.getEndArrivalTime(), firstTrip.getBusNumber(),
+                    firstTrip.getStartStopName(),
+                    firstTrip.getEndStopName());
+            transferModule.addTransferModule("Bus", transferBestTrip.getStartDepartureTime(),
+                    transferBestTrip.getEndArrivalTime(), transferBestTrip.getBusNumber(),
+                    transferBestTrip.getStartStopName(),
+                    transferBestTrip.getEndStopName());
+        }
+
         transferModule.addTransferModule("Walk", transferBestTrip.getEndArrivalTime(),
                 transferBestTrip.getStartFromOrigin());
     }
@@ -439,32 +428,38 @@ public class BusConnectionDev {
     private static TripInfo getBestTrip(Connection conn, String routeId, String startStopId,
             String endStopId, Time time, long additionalTimeInMs, double x2, double y2) throws SQLException {
         String sql = """
-                    SELECT
-                    start_stop_id,
-                    s1.stop_name AS start_stop_name,
-                    end_stop_id ,
-                    s2.stop_name AS end_stop_name,
-                    route_id,
-                    route_short_name,
-                    route_long_name,
-                    trip_id,
-                    start_departure_time,
-                    end_arrival_time,
-                    TIMESTAMPDIFF(MINUTE, start_departure_time, end_arrival_time) AS trip_time
-                FROM
-                preComputedTripDetails
-                JOIN
-                    stops s1 on s1.stop_id = start_stop_id
-                JOIN stops s2 on s2.stop_id = end_stop_id
-                WHERE
-                    start_stop_id = ?
-                    AND end_stop_id = ?
-                    AND route_id = ?
-                    AND start_departure_time >= ?
-                ORDER BY
-                    start_departure_time ASC
-                LIMIT 1;
-                    """;
+                SELECT
+                        st1.stop_id AS start_stop_id,
+                        s1.stop_name AS start_stop_name,
+                        st2.stop_id AS end_stop_id,
+                        s2.stop_name AS end_stop_name
+                        t.route_id,
+                        r.route_short_name,
+                        st1.trip_id,
+                        st1.departure_time AS start_departure_time,
+                        st2.arrival_time AS end_arrival_time,
+                        TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
+                    FROM
+                        stop_times st1
+                    JOIN
+                        stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
+                    JOIN
+                        trips t ON t.trip_id = st1.trip_id
+                    JOIN
+                        routes r ON t.route_id = r.route_id
+                    JOIN
+                        stops s1 on s1.stop_id = start_stop_id
+                    JOIN
+                    	stops s2 on s2.stop_id = end_stop_id
+                    WHERE
+                        st1.stop_id = ?
+                        AND st2.stop_id = ?
+                        AND t.route_id = ?
+                        AND st1.departure_time >= ?
+                    ORDER BY
+                        st1.departure_time ASC
+                    LIMIT 1;
+                        """;
 
         TripInfo trips = null;
         Time bestTimeToDestination = null;

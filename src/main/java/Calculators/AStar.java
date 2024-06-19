@@ -21,16 +21,19 @@ public class AStar {
     }
 
     /**
-     * Finds the shortest path between the start and goal nodes using the A* algorithm.
+     * Finds the shortest path between the start and goal nodes using the A*
+     * algorithm.
      *
      * @param start the starting node
-     * @param goal the goal node
-     * @return a list of nodes representing the shortest path from start to goal, or null if no path is found
+     * @param goal  the goal node
+     * @return a list of nodes representing the shortest path from start to goal, or
+     *         null if no path is found
      */
     public List<Node> findShortestPath(Node start, Node goal) {
         Map<Node, Node> cameFrom = new HashMap<>();
         Map<Node, Double> costSoFar = new HashMap<>();
-        PriorityQueue<Node> frontier = new PriorityQueue<>(Comparator.comparingDouble(n -> costSoFar.get(n) + heuristic(n, goal)));
+        PriorityQueue<Node> frontier = new PriorityQueue<>(
+                Comparator.comparingDouble(n -> costSoFar.get(n) + heuristic(n, goal)));
 
         frontier.add(start);
         cameFrom.put(start, null);
@@ -45,14 +48,14 @@ public class AStar {
             }
 
             for (Edge edge : graph.getEdges(current)) {
-                    Node next = edge.getDestination();
-                    double newCost = costSoFar.get(current) + edge.getWeight();
+                Node next = edge.getDestination();
+                double newCost = costSoFar.get(current) + edge.getWeight();
 
-                    if (!costSoFar.containsKey(next) || newCost < costSoFar.get(next)) {
-                        costSoFar.put(next, newCost);
-                        frontier.add(next);
-                        cameFrom.put(next, current);
-                    }
+                if (!costSoFar.containsKey(next) || newCost < costSoFar.get(next)) {
+                    costSoFar.put(next, newCost);
+                    frontier.add(next);
+                    cameFrom.put(next, current);
+                }
             }
         }
 
@@ -61,7 +64,8 @@ public class AStar {
     }
 
     /**
-     * Calculates the estimate of the distance between two nodes using the Euclidean formula.
+     * Calculates the estimate of the distance between two nodes using the Euclidean
+     * formula.
      *
      * @param a the first node
      * @param b the second node
@@ -70,7 +74,7 @@ public class AStar {
     private static double heuristic(Node a, Node b) {
         return Math.sqrt(Math.pow(a.getLat() - b.getLat(), 2) + Math.pow(a.getLon() - b.getLon(), 2));
     }
-    
+
     private List<Node> constructPath(Map<Node, Node> cameFrom, Node goal) {
         List<Node> path = new ArrayList<>();
         Node current = goal;

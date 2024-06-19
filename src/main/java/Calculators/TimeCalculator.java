@@ -103,11 +103,29 @@ public abstract class TimeCalculator {
     }
 
     public static Time getCurrentTime() {
-        // Calendar calendar = Calendar.getInstance();
-        // calendar.set(Calendar.SECOND, 0);
-        // calendar.set(Calendar.MILLISECOND, 0);
-        // Time currentTime = new Time(calendar.getTimeInMillis());
-        Time currentTime = Time.valueOf("10:20:00");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Time currentTime = new Time(calendar.getTimeInMillis());
+        // Time currentTime = Time.valueOf("10:20:00");
         return currentTime;
+    }
+
+    /**
+     * Adds minutes to a given Time object.
+     * 
+     * @param time         The Time object.
+     * @param minutesToAdd The number of minutes to add.
+     * @return A new Time object representing the time after adding the specified
+     *         minutes.
+     */
+    public static Time addMinutesToTime(Time time, int minutesToAdd) {
+        // Get a calendar instance to perform the addition
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
+        // Add the minutes
+        calendar.add(Calendar.MINUTE, minutesToAdd);
+        // Create a new Time object with the updated time
+        return new Time(calendar.getTimeInMillis());
     }
 }

@@ -215,7 +215,8 @@ public class createMap {
                         GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
                         Point2D pointMap = map.convertGeoPositionToPoint(point);
 
-                        // If this is not the first stop, draw a blue line from the previous stop to the
+                        // If this is not the first stop, draw a green line from the previous stop to
+                        // the
                         // current stop
                         if (i > 0) {
                             g.setColor(Color.GREEN); // Set the color for the lines
@@ -455,6 +456,7 @@ public class createMap {
     }
 
     private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
+
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
 

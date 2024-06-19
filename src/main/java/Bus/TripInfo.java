@@ -96,6 +96,24 @@ public class TripInfo {
     }
 
     public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime, String startFromOrigin,
+            String startStopName,
+            String endStopName, String timeOfArrDest) {
+        this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.tripId = tripId;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
+        this.startDepartureTime = startDepartureTime;
+        this.endArrivalTime = endArrivalTime;
+        this.tripTime = tripTime;
+        this.startFromOrigin = startFromOrigin;
+        this.startStopName = startStopName;
+        this.endStopName = endStopName;
+        this.timeOfArrDest = timeOfArrDest;
+    }
+
+    public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
             String endStopId, String startDepartureTime, String endArrivalTime, int tripTime,
             double distanceToFirstBusstop) {
         this.routeId = routeId;
@@ -115,6 +133,12 @@ public class TripInfo {
 
     public String getTimeOfArrDest() {
         return timeOfArrDest;
+    };
+
+    public long getTimeOfArrDestINMs() {
+        Time time = Time.valueOf(this.getTimeOfArrDest());
+
+        return time.getTime();
     };
 
     public String getBusName() {
@@ -160,6 +184,11 @@ public class TripInfo {
     public String getStartFromOrigin() {
         return startFromOrigin;
     }
+
+    public long getStartFromOriginInMs() {
+        Time time = Time.valueOf(this.getStartFromOrigin());
+        return time.getTime();
+    };
 
     public String getColor() throws SQLException {
         String sql = """

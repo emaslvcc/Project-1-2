@@ -192,6 +192,161 @@ CREATE TABLE transfers (
 LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/transfers.txt' INTO TABLE transfers FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 
+-- below is for phase 3
+
+DROP TABLE IF EXISTS post_codes;
+
+CREATE TABLE post_codes(
+	zipcode CHAR(6) PRIMARY KEY,
+	latitude DECIMAL(11,7),
+	longitude DECIMAL(11,7)
+);
+
+LOAD DATA LOCAL INFILE  '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/MassZipLatLon.csv' INTO TABLE post_codes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+INSERT into post_codes values(
+'6212xp','50.831516', '5.69584');
+
+               
+               
+
+
+CREATE TABLE post_codes_join_table AS
+SELECT 
+    pc.zipcode,
+    pc.latitude,
+    pc.longitude,
+    pc2.zipcode AS sec_zipcode,
+    pc2.latitude AS sec_lat,
+    pc2.longitude AS sec_lon
+FROM 
+    post_codes pc
+JOIN 
+    post_codes pc2 
+ON 
+    pc.zipcode <> pc2.zipcode
+where ST_Distance_Sphere(POINT(pc.latitude,
+    pc.longitude), POINT(pc2.latitude,pc2.longitude)) > 600
+;
+
+
+
+CREATE table AllTransferStops (
+  `route_id_1` varchar(255) NOT NULL,
+  `route_short_name_1` varchar(255) DEFAULT NULL,
+  `stop_1_id` varchar(255),
+  `route_id_2` varchar(255) NOT NULL,
+  `route_short_name_2` varchar(255) DEFAULT NULL,
+    `stop_2_id` varchar(255),
+  PRIMARY KEY (`route_id_1`,`stop_1_id`,`route_id_2`,`stop_2_id`)
+);
+
+
+TRUNCATE table AllTransferStops ; 
+insert into AllTransferStops (           
+SELECT
+    a.route_id AS route_id_1,
+    a.route_short_name AS route_short_name_1,
+    a.stop_id AS stop_1,
+    b.route_id AS route_id_2,
+    b.route_short_name AS route_short_name_2,
+    b.stop_id AS stop_2
+FROM (
+    SELECT DISTINCT t.route_id, r.route_short_name, st.stop_id, s.stop_lat, s.stop_lon
+    FROM trips t
+    JOIN stop_times st ON t.trip_id = st.trip_id
+    JOIN routes r ON t.route_id = r.route_id
+    JOIN stops s ON s.stop_id = st.stop_id
+    WHERE (s.stop_lat BETWEEN 50.803792 AND 50.9)
+      AND (s.stop_lon BETWEEN 5.640811 AND 5.739475)
+      AND r.route_type = '3'
+      AND r.route_short_name <> '797'
+      AND r.route_short_name <> '62'
+      AND r.route_short_name NOT LIKE '%trein%'
+) a
+JOIN (
+    SELECT DISTINCT t.route_id, r.route_short_name, st.stop_id, s.stop_lat, s.stop_lon
+    FROM trips t
+    JOIN stop_times st ON t.trip_id = st.trip_id
+    JOIN routes r ON t.route_id = r.route_id
+    JOIN stops s ON s.stop_id = st.stop_id
+    WHERE (s.stop_lat BETWEEN 50.803792 AND 50.9)
+      AND (s.stop_lon BETWEEN 5.640811 AND 5.739475)
+      AND r.route_type = '3'
+      AND r.route_short_name <> '797'
+      AND r.route_short_name <> '62'
+      AND r.route_short_name NOT LIKE '%trein%'
+) b 
+ON (a.stop_id = b.stop_id OR ST_Distance_Sphere(point(a.stop_lon, a.stop_lat), point(b.stop_lon, b.stop_lat)) < 80)
+AND a.route_id <> b.route_id
+ORDER BY a.route_id, b.route_id);
+
+
+
+drop table if exists tempTransfer;
+ CREATE TABLE tempTransfer (	
+   					first_start_bus_stop_id VARCHAR(40),
+   					first_end_bus_stop_id VARCHAR(40),
+   					first_route_id VARCHAR(255),
+                    first_route_short_name VARCHAR(255),
+                    first_trip_id INT,
+                    first_departure_time TIME,
+                    first_arrival_time TIME,
+                    first_trip_time INT,
+                    second_start_bus_stop_id VARCHAR(40),
+    second_end_bus_stop_id VARCHAR(40),
+    second_route_id VARCHAR(255),
+    second_route_short_name VARCHAR(255),
+    second_trip_id INT,
+    second_departure_time TIME,
+    second_arrival_time TIME,
+    second_trip_time INT,
+    distanceToFirstBusstop float,
+    timeOfArrDestination TIME,
+    timeOfDepart Time
+                );
+               
+   CREATE TABLE `preComputedTripDetails` (
+  `start_stop_id` varchar(40) DEFAULT NULL,
+  `end_stop_id` varchar(40) DEFAULT NULL,
+  `route_id` varchar(255) DEFAULT NULL,
+  `route_short_name` varchar(255) DEFAULT NULL,
+  `route_long_name` varchar(255) DEFAULT NULL,
+  `trip_id` int DEFAULT NULL,
+  `start_departure_time` time DEFAULT NULL,
+  `end_arrival_time` time DEFAULT NULL,
+  `trip_time` int DEFAULT NULL,
+  KEY `idx_trip_details_query` (`start_stop_id`,`end_stop_id`,`route_id`,`start_departure_time`)
+) ;
+
+
+                   
+               
+  INSERT into preComputedTripDetails(                        
+               SELECT
+    st1.stop_id AS start_stop_id,
+    st2.stop_id AS end_stop_id,
+    t.route_id,
+    r.route_short_name,
+    r.route_long_name,
+    st1.trip_id,
+    st1.departure_time AS start_departure_time,
+    st2.arrival_time AS end_arrival_time,
+    TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
+FROM
+    stop_times st1
+JOIN
+    stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
+JOIN
+    trips t ON t.trip_id = st1.trip_id
+JOIN
+    routes r ON t.route_id = r.route_id);
+
+-- Index to speed up subsequent queries
+CREATE INDEX idx_start_stop_id ON PrecomputedTrips(start_stop_id);
+CREATE INDEX idx_end_stop_id ON PrecomputedTrips(end_stop_id);
+CREATE INDEX idx_route_id ON PrecomputedTrips(route_id);
+CREATE INDEX idx_trip_details ON preComputedTripDetails (start_stop_id, end_stop_id, route_id, start_departure_time);
+
 
 
 

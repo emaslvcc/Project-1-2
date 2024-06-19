@@ -113,6 +113,10 @@ public class BusConnectionDev {
                         }
 
                     }
+                } else {
+                    transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
+                    showTransferInfo(conn, transferBestTrip);
+
                 }
             }
         } catch (

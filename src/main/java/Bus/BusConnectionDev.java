@@ -95,25 +95,26 @@ public class BusConnectionDev {
 
             } else {
                 directBestTrip = processRoutes(conn, x1, y1, x2, y2);
-                directTripTime = TimeCalculator
-                        .calculateTripTime(TimeCalculator.getCurrentTime().toString(),
-                                directBestTrip.getTimeOfArrDest());
+
                 System.out.println("best direct trip is: " + directBestTrip);
 
-                if (directBestTrip != null && directTripTime < 30) {
-                    showDirectInfo(conn, directBestTrip);
-                } else {
-                    transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
-                    if ((directBestTrip != null
-                            && directBestTrip.getTimeOfArrDestINMs() <= transferBestTrip.getStartFromOriginInMs())) {
+                if (directBestTrip != null) {
+                    directTripTime = TimeCalculator
+                            .calculateTripTime(TimeCalculator.getCurrentTime().toString(),
+                                    directBestTrip.getTimeOfArrDest());
+                    if (directTripTime < 30) {
                         showDirectInfo(conn, directBestTrip);
                     } else {
-                        showTransferInfo(conn, transferBestTrip);
-                    }
+                        transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
+                        if ((directBestTrip.getTimeOfArrDestINMs() <= transferBestTrip.getStartFromOriginInMs())) {
+                            showDirectInfo(conn, directBestTrip);
+                        } else {
+                            showTransferInfo(conn, transferBestTrip);
+                        }
 
+                    }
                 }
             }
-
         } catch (
 
         SQLException e) {
@@ -154,7 +155,7 @@ public class BusConnectionDev {
                 directBestTrip.getTimeOfArrDest());
     }
 
-    public static void showTransferInfo(Connection conn, TripInfo tempTransfer) throws SQLException {
+    public static void showTransferInfo(Connection conn, TripInfo transferBestTrip) throws SQLException {
         // when transfer is better
         TripInfo firstTrip = Bus.tempTransfer.getFirstTrip();
         System.out.println("First Best Trip: " + firstTrip);

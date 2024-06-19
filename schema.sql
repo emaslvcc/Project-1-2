@@ -159,6 +159,10 @@ CREATE TABLE stop_times (
 
 );
 CREATE INDEX idx_stop_sequence ON stop_times (stop_sequence);
+CREATE INDEX idx_arrival_time ON stop_times (arrival_time);
+CREATE INDEX idx_departure_time ON stop_times (departure_time);
+CREATE INDEX idx_trip_idANDstop_sequence on stop_times(trip_id, stop_sequence);
+CREATE INDEX idx_stop_idANDtrip_id on stop_times(stop_id, trip_id);
 
 
 select count(*)
@@ -173,26 +177,21 @@ LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/ph
 
 DROP TABLE IF EXISTS transfers;
 
-
 CREATE TABLE transfers (
   from_stop_id VARCHAR(40),
   to_stop_id VARCHAR(40),
-  from_route_id VARCHAR(255),
-  to_route_id VARCHAR(255),
+  from_route_id  VARCHAR(255),
+  to_route_id VARCHAR(255) ,
   from_trip_id INT,
   to_trip_id INT,
   transfer_type INT,
-  PRIMARY KEY (from_stop_id, from_trip_id, to_trip_id),
-  FOREIGN KEY (from_stop_id) REFERENCES stops(stop_id),
-  FOREIGN KEY (to_stop_id) REFERENCES stops(stop_id),
-  FOREIGN KEY (from_trip_id) REFERENCES trips(trip_id),
-  FOREIGN KEY (to_trip_id) REFERENCES trips(trip_id)
+  PRIMARY KEY(from_stop_id,from_trip_id, to_trip_id)
+ 
+
 );
 
+
 LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/transfers.txt' INTO TABLE transfers FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
-
-
--- below is for phase 3
 
 DROP TABLE IF EXISTS post_codes;
 
@@ -346,6 +345,26 @@ CREATE INDEX idx_start_stop_id ON PrecomputedTrips(start_stop_id);
 CREATE INDEX idx_end_stop_id ON PrecomputedTrips(end_stop_id);
 CREATE INDEX idx_route_id ON PrecomputedTrips(route_id);
 CREATE INDEX idx_trip_details ON preComputedTripDetails (start_stop_id, end_stop_id, route_id, start_departure_time);
+
+   
+-- test (not need now)
+
+CREATE table distanceToBusstop(
+	start_latitude DECIMAL(11,7),
+	start_longitude DECIMAL(11,7),
+	end_latitude DECIMAL(11,7),
+	end_longitude DECIMAL(11,7),
+	distance INT,
+	primary key(start_latitude,start_longitude,
+	end_latitude ,
+	end_longitude)
+);
+
+
+
+
+
+
 
 
 

@@ -94,7 +94,8 @@ public abstract class TimeCalculator {
         } else {
             double distance = DistanceCalculatorHaversine.calculate(startLat, startLon, endLat, endLon);
             if (distance > 0.3) {
-                List<Node> path = LogicManager.calculateRouteByCoordinates(startLat, startLon, endLat, endLon, "walk");
+                List<Node> path = LogicManager.calculateRouteByCoordinates(startLat,
+                        startLon, endLat, endLon, "walk");
                 distance = LogicManager.calculateDistance(path);
             }
             distanceCache.putDistance(startLat, startLon, endLat, endLon, distance);

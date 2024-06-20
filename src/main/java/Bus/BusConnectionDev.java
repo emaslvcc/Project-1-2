@@ -40,31 +40,7 @@ public class BusConnectionDev {
 
     static double aerialDistance = 0;
     static int directTripTime = 0;
-
-    /**
-     * Resets the lists and IDs used for tracking stops and trips.
-     */
-    public static void resetLists() {
-        stopNodes = new ArrayList<>();
-        number_stop_id = 0;
-        tripNodes = new ArrayList<>();
-        number_shape_id = 0;
-    }
-
-    /**
-     * Calculates the total distance between a list of nodes using the Haversine
-     * formula.
-     * 
-     * @param nodes the list of nodes
-     * @return the total distance in kilometers
-     */
-    public static double calculateTotalDistance(List<Node> nodes) {
-        double totalDistance = 0.0;
-        for (int i = 0; i < nodes.size() - 1; i++) {
-            totalDistance += DistanceCalculatorHaversine.haversineDistance(nodes.get(i), nodes.get(i + 1));
-        }
-        return totalDistance;
-    }
+    static double distanceBetweenTwoZipCodes;
 
     /**
      * Finds and processes the best bus route between two coordinates.
@@ -79,15 +55,15 @@ public class BusConnectionDev {
     public static void busLogic(double x1, double y1, double x2, double y2) throws Exception {
         try {
             Connection conn = DatabaseConnection.getConnection();
-            aerialDistance = DistanceCalculatorHaversine.calculate(x1, y1, x2, y2);
+            List<Node> shortestPath = LogicManager.calculateRouteByCoordinates(x1, y1, x2, y2, "walk");
+            distanceBetweenTwoZipCodes = LogicManager.calculateDistance(shortestPath);
+            TimeCalculator timeCalc = new AverageTimeCalculator(distanceBetweenTwoZipCodes);
 
-            if (aerialDistance < 0.6) {
+            time = (int) (Math.round(timeCalc.getWalkingTime()));
+            if (time <= 15) {
                 // If the distance is less than 1 km, it's considered a walking distance
-                List<Node> shortestPath = LogicManager.calculateRouteByCoordinates(x1, y1, x2, y2, "walk");
-                double distanceBetweenTwoZipCodes = LogicManager.calculateDistance(shortestPath);
+
                 GUI.createMap.drawPath(shortestPath);
-                TimeCalculator timeCalc = new AverageTimeCalculator(distanceBetweenTwoZipCodes);
-                time = (int) (Math.round(timeCalc.getWalkingTime()));
                 DataManagers.LogicManager.time = time;
                 DataManagers.LogicManager.distance = distanceBetweenTwoZipCodes;
                 transferModule.addTransferModule("Walk", TimeCalculator.getCurrentTime().toString(),
@@ -95,8 +71,33 @@ public class BusConnectionDev {
 
             } else {
 
-                transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2);
-                showTransferInfo(conn, transferBestTrip);
+                directBestTrip = processRoutes(conn, x1, y1, x2, y2);
+                System.out.println("best direct trip is: " + directBestTrip);
+
+                if (directBestTrip != null) {
+                    directTripTime = TimeCalculator
+                            .calculateTripTime(TimeCalculator.getCurrentTime().toString(),
+                                    directBestTrip.getTimeOfArrDest());
+                    if (directTripTime < 40) {
+                        showDirectInfo(conn, directBestTrip);
+                    } else {
+                        transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2,
+                                directBestTrip.getTimeOfArrDestINMs());
+                        if ((directBestTrip.getTimeOfArrDestINMs() <= transferBestTrip.getStartFromOriginInMs())) {
+                            showDirectInfo(conn, directBestTrip);
+                        } else {
+                            showTransferInfo(conn, transferBestTrip);
+                        }
+
+                    }
+                } else {
+                    transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2,
+                            100000);
+                    showTransferInfo(conn, transferBestTrip);
+
+                }
+                // transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2, 10000);
+                // showTransferInfo(conn, transferBestTrip);
 
             }
         } catch (
@@ -271,7 +272,7 @@ public class BusConnectionDev {
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
                 FROM stops
                 where ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) < ?
-                ORDER BY distance LIMIT ?
+                ORDER BY distance LIMIT 20
                 ;""";
         String sqlDropEndStops = "DROP TABLE IF EXISTS nearest_end_stops;";
         String createNearestEndStops = """
@@ -279,7 +280,7 @@ public class BusConnectionDev {
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
                 FROM stops
                 where ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) < ?
-                ORDER BY distance LIMIT ?
+                ORDER BY distance LIMIT 20
                 ;""";
 
         try (PreparedStatement pstmt1 = conn.prepareStatement(createNearestStartStops);
@@ -297,16 +298,9 @@ public class BusConnectionDev {
             pstmt2.setDouble(2, endLat);
             pstmt2.setDouble(3, endLon);
             pstmt2.setDouble(4, endLat);
-            if (aerialDistance < 2) {
-                pstmt1.setInt(6, 12);
-                pstmt2.setInt(6, 12);
 
-            } else {
-                pstmt1.setInt(6, 20);
-                pstmt2.setInt(6, 20);
-            }
-            pstmt1.setDouble(5, aerialDistance * 1000 / 1.2);
-            pstmt2.setDouble(5, aerialDistance * 1000 / 1.2);
+            pstmt1.setDouble(5, distanceBetweenTwoZipCodes * 1000 / 1.3);
+            pstmt2.setDouble(5, distanceBetweenTwoZipCodes * 1000 / 1.3);
             pstmt1.executeUpdate();
             pstmt2.executeUpdate();
         }
@@ -432,7 +426,7 @@ public class BusConnectionDev {
                         st1.stop_id AS start_stop_id,
                         s1.stop_name AS start_stop_name,
                         st2.stop_id AS end_stop_id,
-                        s2.stop_name AS end_stop_name
+                        s2.stop_name AS end_stop_name,
                         t.route_id,
                         r.route_short_name,
                         st1.trip_id,
@@ -448,9 +442,9 @@ public class BusConnectionDev {
                     JOIN
                         routes r ON t.route_id = r.route_id
                     JOIN
-                        stops s1 on s1.stop_id = start_stop_id
+                        stops s1 on s1.stop_id = st1.stop_id
                     JOIN
-                    	stops s2 on s2.stop_id = end_stop_id
+                    	stops s2 on s2.stop_id = st2.stop_id
                     WHERE
                         st1.stop_id = ?
                         AND st2.stop_id = ?
@@ -474,7 +468,7 @@ public class BusConnectionDev {
                 Time startDepartureTime = rs.getTime("start_departure_time");
                 Time TimeOfArrStartBusStop = new Time(startDepartureTime.getTime() - additionalTimeInMs);
 
-                String endBusstopID = rs.getString("end_stop_id");
+                String endBusstopID = rs.getString(3);
 
                 double endStopLat = getStopLocation(conn, endBusstopID)[0];
                 double endStopLon = getStopLocation(conn, endBusstopID)[1];
@@ -654,6 +648,31 @@ public class BusConnectionDev {
             System.err.println("SQL Exception: " + e.getMessage());
         }
         return null; // Return null if no location found or if an exception occurred
+    }
+
+    /**
+     * Resets the lists and IDs used for tracking stops and trips.
+     */
+    public static void resetLists() {
+        stopNodes = new ArrayList<>();
+        number_stop_id = 0;
+        tripNodes = new ArrayList<>();
+        number_shape_id = 0;
+    }
+
+    /**
+     * Calculates the total distance between a list of nodes using the Haversine
+     * formula.
+     * 
+     * @param nodes the list of nodes
+     * @return the total distance in kilometers
+     */
+    public static double calculateTotalDistance(List<Node> nodes) {
+        double totalDistance = 0.0;
+        for (int i = 0; i < nodes.size() - 1; i++) {
+            totalDistance += DistanceCalculatorHaversine.haversineDistance(nodes.get(i), nodes.get(i + 1));
+        }
+        return totalDistance;
     }
 
 }

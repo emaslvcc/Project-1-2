@@ -6,9 +6,13 @@ import java.sql.*;
 import Calculators.*;
 
 public class tempTransfer {
+    static boolean stop = false;
 
-    public static TripInfo processTransfers(double x1, double y1, double x2, double y2) throws SQLException {
+    public static TripInfo processTransfers(double x1, double y1, double x2, double y2, long directTripToDest)
+            throws SQLException {
         try (Connection con = DatabaseConnection.getConnection()) {
+            int insertTime = 0;
+            boolean stop = false;
             setupNearestStops(con, x1, y1, x2, y2);
             createRouteTransferTable(con);
             createFinalRouteTransferTable(con);
@@ -36,7 +40,7 @@ public class tempTransfer {
 
                 // Create the tempTransfer table
                 stmt1.executeUpdate("TRUNCATE table tempTransfer; ");
-                while (rs.next()) {
+                while (rs.next() && !stop && insertTime < 450) {
                     String startRouteId = rs.getString("start_route_id");
                     String startStopId = rs.getString("start_stop_id");
                     String endRouteId = rs.getString("end_route_id");
@@ -49,9 +53,9 @@ public class tempTransfer {
                     double endStopLon = rs.getDouble("end_stop_lon");
 
                     Time currentTime = TimeCalculator.getCurrentTime();// Base time
-
                     // Step 2: Process each row to find the trips
                     String firstTripQuery = getFirstTripQuery();
+                    // TripInfo firstTrip = null;
                     TripInfo firstTrip = fetchTripDetails(con, firstTripQuery, startStopId, stop1ID,
                             startRouteId, currentTime);
 
@@ -67,21 +71,26 @@ public class tempTransfer {
                                 startRouteId, newTime);
 
                         String secondTripQuery = getSecondTripQuery();
-                        TripInfo secondTrip = fetchTripDetails(con, secondTripQuery, stop2ID, endStopId,
+                        TripInfo secondTrip = null;
+                        secondTrip = fetchTripDetails(con, secondTripQuery, stop2ID, endStopId,
                                 endRouteId, firstTrip.getEndArrivalTime());
 
                         // Step 3: Insert the result of secondTrip into tempTransfer
                         if (secondTrip != null) {
 
-                            double distanceToDest = TimeCalculator.calculateDistanceIfNotCached(endStopLat, endStopLon,
+                            double distanceToDest = TimeCalculator.calculateDistanceIfNotCached(endStopLat,
+                                    endStopLon,
                                     x2, y2);
                             timeCalc = new AverageTimeCalculator(distanceToDest);
 
                             int timeToDestination = (int) (Math.round(timeCalc.getWalkingTime()));
                             insertIntoTempTransfer(con, firstTrip, secondTrip, timeToDestination,
-                                    distanceToStartBusstop, walkingTimeToStartBusstop);
+                                    distanceToStartBusstop, walkingTimeToStartBusstop, directTripToDest);
+                            insertTime++;
+                            System.out.println(insertTime);
 
                         }
+
                     }
 
                 }
@@ -165,12 +174,12 @@ public class tempTransfer {
         String createNearestStartStops = """
                 CREATE TEMPORARY TABLE nearest_start_stops AS
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
-                FROM stops ORDER BY distance LIMIT 20;""";
+                FROM stops ORDER BY distance LIMIT 16;""";
         String sqlDropEndStops = "DROP TABLE IF EXISTS nearest_end_stops;";
         String createNearestEndStops = """
                 CREATE TEMPORARY TABLE nearest_end_stops AS
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
-                FROM stops ORDER BY distance LIMIT 20;""";
+                FROM stops ORDER BY distance LIMIT 16;""";
 
         try (PreparedStatement pstmt1 = conn.prepareStatement(createNearestStartStops);
                 PreparedStatement pstmt2 = conn.prepareStatement(createNearestEndStops)) {
@@ -350,7 +359,8 @@ public class tempTransfer {
     }
 
     private static void insertIntoTempTransfer(Connection conn, TripInfo firstTrip, TripInfo secondTrip,
-            int timeToDestination, double distanceToStartBusstop, long walkingTimeToStartBusstop) {
+            int timeToDestination, double distanceToStartBusstop, long walkingTimeToStartBusstop,
+            long directTripToDest) {
         String insert = """
                 INSERT INTO tempTransfer (
                     first_start_bus_stop_id, first_end_bus_stop_id, first_route_id, first_route_short_name, first_trip_id, first_departure_time, first_arrival_time, first_trip_time,
@@ -379,7 +389,9 @@ public class tempTransfer {
 
             // Create a new Time object with the added time
             Time timeOfArrDestination = new Time(timeInMs + timeToAdd);
-
+            if (timeOfArrDestination.getTime() < directTripToDest) {
+                stop = true;
+            }
             // Use the new Time object in your PreparedStatement
 
             pstmt.setString(9, secondTrip.getStartStopId());

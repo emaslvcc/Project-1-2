@@ -418,6 +418,9 @@ public class mapFrame extends JFrame {
          * @throws Exception Exception if an error occurs during calculation.
          */
         private void calculateButtonActionPerformed(ActionEvent evt, ActionListener frame) throws Exception {
+                if (busMode) {
+                        transferModule.clearTransfers();
+                }
                 if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
                         createMap.clearMap();
                         addPanelForBusInfo(frame);

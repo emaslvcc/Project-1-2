@@ -1,12 +1,14 @@
-package Bus;
+package busjoris;
 
+import Bus.BusConnectionDev;
+import Calculators.AStar;
 import Calculators.AverageTimeCalculator;
 import Calculators.DistanceCalculatorHaversine;
+import DataManagers.Graph;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
 
-import javax.xml.transform.Source;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.*;
@@ -17,6 +19,11 @@ public class Raptor {
     String endStation ="";
     List<StopTime> endingStations = new ArrayList<>();
     int nodeCount = 0;
+    Graph graph;
+
+    public Raptor(Graph g){
+        this.graph = g;
+    }
 
     public List<StopTime> setupNearestStops(Connection conn, double lat, double lon, LocalTime startTime, double dist) throws SQLException {
         List<StopTime> nearbyStops = new ArrayList<>();
@@ -45,9 +52,9 @@ WHERE
                 double stopLat = res.getDouble(2);
                 double stopLon = res.getDouble(3);
 
-                double distance = DistanceCalculatorHaversine.calculate(lon, lat, stopLon,stopLat);                     // get distance from where we start to bus stop;
-                AverageTimeCalculator time = new AverageTimeCalculator(distance);
-                double minsToWalk = time.getWalkingTime();
+                List<Node> walkingNodes = getAndDrawWalking(lat, lon, stopLat, stopLon, conn);
+                double distance = getDistance(walkingNodes);
+                double minsToWalk = getWalkingTime(distance);
 
                 nearbyStops.add(new StopTime(stopId, startTime.plusMinutes((long) minsToWalk)));
             }
@@ -83,6 +90,8 @@ WHERE
 
         Map<String, String[]> routeTracker = new HashMap<>();
 
+        Set<String> checkedTripIDs = new HashSet<>();
+
         String startNode = startStation;
         String endNode = endStation;
         int transfers = 0;
@@ -102,7 +111,7 @@ WHERE
 
 
         routeTracker.put(startNode, new String[]{"","",""});
-        while(transfers < 2){
+        while(transfers < 3){
             //System.out.println("transfer:   "+ transfers);
 
             // This first block is just for getting all the trips based on the stops that we accumulated
@@ -114,8 +123,10 @@ WHERE
                     if(tr == null){
                         continue;
                     }
-                    // todo add pruning do not check later trips it is just a waste of time
+                    if(!checkedTripIDs.contains(tr.getTripID())){
                         transferToCheck.add(tr);
+                        checkedTripIDs.add(tr.getTripID());
+                    }
                 }
             }
 
@@ -147,14 +158,11 @@ WHERE
                         LocalTime time = rs.getTime("arrival_time").toLocalTime();
 
 
-                        if(stopArrivalTime.getOrDefault(stopId, new DepartureAndArrival(LocalTime.MAX, LocalTime.MAX)).getArrival().isAfter(time)){     // if our new found time is earlier or we have not visited this one before then update
+                        if(stopArrivalTime.getOrDefault(stopId, new DepartureAndArrival(LocalTime.MAX, LocalTime.MAX)).getArrival().isAfter(time.plusMinutes(1))){     // if our new found time is earlier or we have not visited this one before then update
+
                             stopArrivalTime.put(stopId, new DepartureAndArrival(departedTime, time));        // departed time is the time where the bus departed from the stop from before
 
                             busStopsToCheckForTrips.add(new StopTime(stopId, time));   // Add the bus stop to be checked in the next loop
-//                            System.out.println("updated stopid     "+ stopId+ " time : "+ time);
-//                            if(endingStations.contains(stopId)){
-//                                System.out.println("lksad;lkdsaf;alkjdsf!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//                            }
                             routeTracker.put(stopId, new String[]{currentTransfer.getStopID(),currentTransfer.getBusInfo(), currentTransfer.getTripID()});
                         }
 
@@ -191,11 +199,10 @@ WHERE
                 builder.insert(0,"Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() +" ");
 
                 // from answer to old answer
-                nodeList.addAll(queryShapeDetails(conn, routeTracker.get(oldAnswer)[2],answer, oldAnswer));
-                createMap.drawPath(queryShapeDetails(conn, routeTracker.get(oldAnswer)[2],answer, oldAnswer), getBusStopsBetween(conn,answer, oldAnswer, routeTracker.get(oldAnswer)[2]));
+                nodeList = queryShapeDetails(conn, routeTracker.get(oldAnswer)[2],answer, oldAnswer);
+                stopList =  getBusStopsBetween(conn,answer, oldAnswer, routeTracker.get(oldAnswer)[2]);
+                createMap.drawPath(nodeList, stopList, "blue" );   //getColor(routeTracker.get(oldAnswer)[2]));
             }
-        createMap.drawPath(nodeList, stopList);
-
 
 
         System.out.println("Taking the Bus from station: "+ getStopName(conn,startStation)+ " to: " + getStopName(conn, endStation));
@@ -204,13 +211,15 @@ WHERE
         System.out.println(builder);
 
         double[] latlon = getStationCoordinates(conn,endStation);
-        double distance = DistanceCalculatorHaversine.calculate(endLon, endLat, latlon[1],latlon[0]);                     // get distance from where we start to bus stop;
-        AverageTimeCalculator time = new AverageTimeCalculator(distance);
-        int minsToWalk = (int) time.getWalkingTime();
 
-        System.out.println("Walking to destination for "+ minsToWalk +" minutes");
+        List<Node> walkPath = getAndDrawWalking(endLat, endLon, latlon[0], latlon[1], conn);
+        System.out.println(endLat + " "+ endLon + " "+ latlon[0]+ " "+ latlon[1]);
+        double distance = getDistance(walkPath);
+        double time = getWalkingTime(distance);
 
-        return stopArrivalTime.get(endNode).arrival;
+        System.out.println("Walking to destination for "+ time +" minutes");
+
+        return stopArrivalTime.get(endStation).getArrival().plusMinutes((long) Math.ceil(time));
     }
         // while less reps than the set max of transfers maybe smth like 2
             // for each next trip coming of from the start node
@@ -224,9 +233,10 @@ WHERE
 
         for(StopTime stop : options){
             double[] latlon = getStationCoordinates(conn, stop.getStopID());
-            double distance = DistanceCalculatorHaversine.calculate(lon, lat, latlon[1],latlon[0]);                     // get distance from where we start to bus stop;
-            AverageTimeCalculator time = new AverageTimeCalculator(distance);
-            int minsToWalk = (int) time.getWalkingTime();
+            List<Node> nodes = getAndDrawWalking(lat, lon, latlon[0], latlon[1], conn);
+
+            double distance = getDistance(nodes);
+            int minsToWalk = (int) getWalkingTime(distance);
 
             if(times.containsKey(stop.getStopID())){
                 if(times.get(stop.getStopID()).getArrival().plusMinutes(minsToWalk).isBefore(fastestTime)){
@@ -238,6 +248,31 @@ WHERE
         return fastest;
     }
 
+    public List<Node> getAndDrawWalking(double lat1, double lon1, double lat2, double lon2, Connection conn){
+
+        // Find the start and end nodes
+        Node startNode = graph.getNodeByLatLon(lat1, lon1);
+        Node endNode = graph.getNodeByLatLon(lat2, lon2);
+
+        // Find the shortest path
+        Calculators.AStar aStar = new Calculators.AStar(graph);
+
+
+        // todo draw the walking
+        return aStar.findShortestPath(startNode, endNode);
+    }
+
+    public double getDistance(List<Node> nodes){
+        if(nodes == null){
+            return 0;
+        }
+        return BusConnectionDev.calculateTotalDistance(nodes);
+    }
+
+    public double getWalkingTime(double distance){
+        AverageTimeCalculator time = new AverageTimeCalculator(distance);
+        return time.getWalkingTime();
+    }
 
     public LocalTime getDepartedTime(Connection conn, String stop, String trip){
         String queryToGetDepartedTime = """
@@ -529,10 +564,10 @@ ORDER BY
                 double shapePtLat = rs.getDouble("shape_pt_lat");
                 double shapePtLon = rs.getDouble("shape_pt_lon");
 
-                System.out.println("Shape ID: " + shapeId +
-                        ", Shape Pt Sequence: " + shapePtSequence +
-                        ", Latitude: " + shapePtLat +
-                        ", Longitude: " + shapePtLon);
+                //System.out.println("Shape ID: " + shapeId +
+                        //", Shape Pt Sequence: " + shapePtSequence +
+                        //", Latitude: " + shapePtLat +
+                        //", Longitude: " + shapePtLon);
 
 
                 tripNodes.add(new Node(nodeCount, shapePtLat, shapePtLon));
@@ -542,5 +577,28 @@ ORDER BY
         return tripNodes;
     }
 
+    public String getColor(String tripID) throws SQLException {
+        String query = """
+        SELECT
+            r.route_color
+        FROM
+            trips t
+        JOIN
+            routes r ON t.route_id = r.route_id
+        WHERE
+            t.trip_id = ?;
+""";
+
+
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, tripID);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            return rs.getString(1);
+        }
+        return "blue";
+
+    }
 
 }

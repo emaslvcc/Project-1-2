@@ -1,4 +1,4 @@
-package Bus;
+package busjoris;
 
 import java.time.LocalTime;
 

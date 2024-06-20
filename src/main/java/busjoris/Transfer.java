@@ -1,4 +1,4 @@
-package Bus;
+package busjoris;
 
 public class Transfer {
     private final String stopID;

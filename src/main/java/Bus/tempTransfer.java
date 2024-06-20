@@ -40,7 +40,7 @@ public class tempTransfer {
 
                 // Create the tempTransfer table
                 stmt1.executeUpdate("TRUNCATE table tempTransfer; ");
-                while (rs.next() && !stop && insertTime < 450) {
+                while (rs.next() && !stop && insertTime < 410) {
                     String startRouteId = rs.getString("start_route_id");
                     String startStopId = rs.getString("start_stop_id");
                     String endRouteId = rs.getString("end_route_id");
@@ -104,68 +104,141 @@ public class tempTransfer {
 
     public static TripInfo getFirstTrip() throws SQLException {
         Connection conn = DatabaseConnection.getConnection();
-        TripInfo transferBestTrip = null;
-        String sqlGetEarliestArrTime = """
-                SELECT tt.*,s1.stop_name AS start_busstop_name, s2.stop_name AS end_busstop_name
+        TripInfo firstTrip = null;
+
+        // First try with direct transfers where routes are the same
+        String sqlGetDirect = """
+                SELECT tt.*, s1.stop_name AS start_busstop_name, s2.stop_name AS end_busstop_name
                 FROM tempTransfer tt
-                JOIN stops s1 on s1.stop_id = tt.first_start_bus_stop_id
-                JOIN stops s2 on s2.stop_id = tt.first_end_bus_stop_id
-                ORDER BY
-                timeOfArrDestination ASC,distanceToFirstBusstop ASC
+                JOIN stops s1 ON s1.stop_id = tt.first_start_bus_stop_id
+                JOIN stops s2 ON s2.stop_id = tt.first_end_bus_stop_id
+                WHERE tt.timeOfArrDestination = (
+                    SELECT MIN(timeOfArrDestination) FROM tempTransfer WHERE first_route_id = second_route_id
+                ) AND tt.first_route_id = tt.second_route_id
                 LIMIT 1;
-                                                               """;
-        Statement stmtGetBesttrip = conn.createStatement();
+                """;
 
-        ResultSet rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
-        if (rs.next()) {
-            transferBestTrip = new TripInfo(
-                    rs.getString("first_route_id"),
-                    rs.getString("first_route_short_name"),
-                    rs.getString("first_trip_id"),
-                    rs.getString("first_start_bus_stop_id"),
-                    rs.getString("first_end_bus_stop_id"),
-                    rs.getString("first_departure_time"),
-                    rs.getString("first_arrival_time"),
-                    rs.getInt("first_trip_time"),
-                    rs.getString("timeOfDepart"),
-                    rs.getString("start_busstop_name"),
-                    rs.getString("end_busstop_name"));
+        // Query for the earliest arrival time overall
+        String sqlGetEarliestArrTime = """
+                SELECT tt.*, s1.stop_name AS start_busstop_name, s2.stop_name AS end_busstop_name
+                FROM tempTransfer tt
+                JOIN stops s1 ON s1.stop_id = tt.first_start_bus_stop_id
+                JOIN stops s2 ON s2.stop_id = tt.first_end_bus_stop_id
+                ORDER BY
+                timeOfArrDestination ASC, distanceToFirstBusstop ASC
+                LIMIT 1;
+                """;
+
+        try (Statement stmt = conn.createStatement()) {
+            // First execute the direct transfers query
+            ResultSet rs = stmt.executeQuery(sqlGetDirect);
+            if (rs.next()) {
+                firstTrip = createFirstTripInfo(rs);
+            } else {
+                // If no result from direct transfers, then check for earliest arrival
+                rs = stmt.executeQuery(sqlGetEarliestArrTime);
+                if (rs.next()) {
+                    firstTrip = createFirstTripInfo(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e; // Or handle more gracefully
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
-        return transferBestTrip;
-
+        return firstTrip;
     }
 
     public static TripInfo getTransferBestTrip() throws SQLException {
         Connection conn = DatabaseConnection.getConnection();
         TripInfo transferBestTrip = null;
-        String sqlGetEarliestArrTime = """
-                SELECT tt.*,s1.stop_name AS start_busstop_name, s2.stop_name AS end_busstop_name
-                FROM tempTransfer tt
-                JOIN stops s1 on s1.stop_id = tt.second_start_bus_stop_id
-                JOIN stops s2 on s2.stop_id = tt.second_end_bus_stop_id
-                ORDER BY
-                timeOfArrDestination ASC,distanceToFirstBusstop ASC
-                LIMIT 1;
-                                                                   """;
-        Statement stmtGetBesttrip = conn.createStatement();
 
-        ResultSet rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
-        if (rs.next()) {
-            transferBestTrip = new TripInfo(
-                    rs.getString("second_route_id"),
-                    rs.getString("second_route_short_name"),
-                    rs.getString("second_trip_id"),
-                    rs.getString("second_start_bus_stop_id"),
-                    rs.getString("second_end_bus_stop_id"),
-                    rs.getString("second_departure_time"),
-                    rs.getString("second_arrival_time"),
-                    rs.getInt("second_trip_time"),
-                    rs.getString("timeOfArrDestination"),
-                    rs.getString("start_busstop_name"),
-                    rs.getString("end_busstop_name"));
+        // First try with direct transfers where routes are the same
+        String sqlGetDirect = """
+                SELECT tt.*, s1.stop_name AS start_busstop_name, s2.stop_name AS end_busstop_name
+                FROM tempTransfer tt
+                JOIN stops s1 ON s1.stop_id = tt.second_start_bus_stop_id
+                JOIN stops s2 ON s2.stop_id = tt.second_end_bus_stop_id
+                WHERE tt.timeOfArrDestination = (
+                    SELECT MIN(timeOfArrDestination) FROM tempTransfer WHERE first_route_id = second_route_id
+                ) AND tt.first_route_id = tt.second_route_id
+                LIMIT 1;
+                """;
+
+        // Query for the earliest arrival time overall
+        String sqlGetEarliestArrTime = """
+                SELECT tt.*, s1.stop_name AS start_busstop_name, s2.stop_name AS end_busstop_name
+                FROM tempTransfer tt
+                JOIN stops s1 ON s1.stop_id = tt.second_start_bus_stop_id
+                JOIN stops s2 ON s2.stop_id = tt.second_end_bus_stop_id
+                ORDER BY
+                timeOfArrDestination ASC, distanceToFirstBusstop ASC
+                LIMIT 1;
+                """;
+
+        try (Statement stmt = conn.createStatement()) {
+            // First execute the direct transfers query
+            ResultSet rs = stmt.executeQuery(sqlGetDirect);
+            if (rs.next()) {
+                transferBestTrip = createSecondTripInfo(rs);
+            } else {
+                // If no result from direct transfers, then check for earliest arrival
+                rs = stmt.executeQuery(sqlGetEarliestArrTime);
+                if (rs.next()) {
+                    transferBestTrip = createSecondTripInfo(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e; // Or handle more gracefully
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
         return transferBestTrip;
+    }
 
+    private static TripInfo createFirstTripInfo(ResultSet rs) throws SQLException {
+        return new TripInfo(
+                rs.getString("first_route_id"),
+                rs.getString("first_route_short_name"),
+                rs.getString("first_trip_id"),
+                rs.getString("first_start_bus_stop_id"),
+                rs.getString("first_end_bus_stop_id"),
+                rs.getString("first_departure_time"),
+                rs.getString("first_arrival_time"),
+                rs.getInt("first_trip_time"),
+                rs.getString("timeOfDepart"),
+                rs.getString("start_busstop_name"),
+                rs.getString("end_busstop_name"));
+    }
+
+    // Utility method to create TripInfo from ResultSet
+    private static TripInfo createSecondTripInfo(ResultSet rs) throws SQLException {
+        return new TripInfo(
+                rs.getString("second_route_id"),
+                rs.getString("second_route_short_name"),
+                rs.getString("second_trip_id"),
+                rs.getString("second_start_bus_stop_id"),
+                rs.getString("second_end_bus_stop_id"),
+                rs.getString("second_departure_time"),
+                rs.getString("second_arrival_time"),
+                rs.getInt("second_trip_time"),
+                rs.getString("timeOfArrDestination"),
+                rs.getString("start_busstop_name"),
+                rs.getString("end_busstop_name"));
     }
 
     public static void setupNearestStops(Connection conn, double startLat, double startLon, double endLat,

@@ -13,10 +13,16 @@ public class TripInfo {
     String busName;
     String tripId;
     String startStopId;
+
     String endStopId;
+    String startStopName;
+    String endStopName;
     String startDepartureTime;
     String endArrivalTime;
     int tripTime;
+    double distanceToFirstBusstop;
+    String startFromOrigin;
+    String timeOfArrDest;
 
     /**
      * Constructs a new trip with the specified details.
@@ -45,7 +51,7 @@ public class TripInfo {
     }
 
     public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
-            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime) {
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime, String startFromOrigin) {
         this.routeId = routeId;
         this.busNumber = busNumber;
         this.tripId = tripId;
@@ -54,11 +60,86 @@ public class TripInfo {
         this.startDepartureTime = startDepartureTime;
         this.endArrivalTime = endArrivalTime;
         this.tripTime = tripTime;
+        this.startFromOrigin = startFromOrigin;
+    }
+
+    public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime, String startFromOrigin,
+            String timeOfArrDest) {
+        this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.tripId = tripId;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
+        this.startDepartureTime = startDepartureTime;
+        this.endArrivalTime = endArrivalTime;
+        this.tripTime = tripTime;
+        this.startFromOrigin = startFromOrigin;
+        this.timeOfArrDest = timeOfArrDest;
+    }
+
+    public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime, String startFromOrigin,
+            String startStopName,
+            String endStopName) {
+        this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.tripId = tripId;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
+        this.startDepartureTime = startDepartureTime;
+        this.endArrivalTime = endArrivalTime;
+        this.tripTime = tripTime;
+        this.startFromOrigin = startFromOrigin;
+        this.startStopName = startStopName;
+        this.endStopName = endStopName;
+    }
+
+    public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime, String startFromOrigin,
+            String startStopName,
+            String endStopName, String timeOfArrDest) {
+        this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.tripId = tripId;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
+        this.startDepartureTime = startDepartureTime;
+        this.endArrivalTime = endArrivalTime;
+        this.tripTime = tripTime;
+        this.startFromOrigin = startFromOrigin;
+        this.startStopName = startStopName;
+        this.endStopName = endStopName;
+        this.timeOfArrDest = timeOfArrDest;
+    }
+
+    public TripInfo(String routeId, String busNumber, String tripId, String startStopId,
+            String endStopId, String startDepartureTime, String endArrivalTime, int tripTime,
+            double distanceToFirstBusstop) {
+        this.routeId = routeId;
+        this.busNumber = busNumber;
+        this.tripId = tripId;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
+        this.startDepartureTime = startDepartureTime;
+        this.endArrivalTime = endArrivalTime;
+        this.tripTime = tripTime;
+        this.distanceToFirstBusstop = distanceToFirstBusstop;
     }
 
     public String getBusNumber() {
         return busNumber;
     }
+
+    public String getTimeOfArrDest() {
+        return timeOfArrDest;
+    };
+
+    public long getTimeOfArrDestINMs() {
+        Time time = Time.valueOf(this.getTimeOfArrDest());
+
+        return time.getTime();
+    };
 
     public String getBusName() {
         return busName;
@@ -80,11 +161,15 @@ public class TripInfo {
         return startDepartureTime;
     }
 
-    public String getEndArrivalTime() {
-        return endArrivalTime;
+    public String getStartStopName() {
+        return startStopName;
     }
 
-    public String getArrivalTime() {
+    public String getEndStopName() {
+        return endStopName;
+    }
+
+    public String getEndArrivalTime() {
         return endArrivalTime;
     }
 
@@ -96,7 +181,16 @@ public class TripInfo {
         return endStopId;
     }
 
-    public String getColor(String routeId) throws SQLException {
+    public String getStartFromOrigin() {
+        return startFromOrigin;
+    }
+
+    public long getStartFromOriginInMs() {
+        Time time = Time.valueOf(this.getStartFromOrigin());
+        return time.getTime();
+    };
+
+    public String getColor() throws SQLException {
         String sql = """
                 SELECT route_color
                 from routes r
@@ -104,13 +198,23 @@ public class TripInfo {
                     """;
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, routeId);
+        pstmt.setString(1, this.routeId);
         ResultSet rs = pstmt.executeQuery();
         while (rs.next()) {
             return rs.getString(1);
         }
         return "blue";
 
+    }
+
+    public long getArrTimeInMs() {
+        Time timeObject = Time.valueOf(this.getEndArrivalTime());
+        return timeObject.getTime();
+    }
+
+    public long getDepartTimeInMs() {
+        Time timeObject = Time.valueOf(this.getStartDepartureTime());
+        return timeObject.getTime();
     }
 
     @Override

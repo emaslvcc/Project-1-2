@@ -159,6 +159,10 @@ CREATE TABLE stop_times (
 
 );
 CREATE INDEX idx_stop_sequence ON stop_times (stop_sequence);
+CREATE INDEX idx_arrival_time ON stop_times (arrival_time);
+CREATE INDEX idx_departure_time ON stop_times (departure_time);
+CREATE INDEX idx_trip_idANDstop_sequence on stop_times(trip_id, stop_sequence);
+CREATE INDEX idx_stop_idANDtrip_id on stop_times(stop_id, trip_id);
 
 
 select count(*)
@@ -173,23 +177,159 @@ LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/ph
 
 DROP TABLE IF EXISTS transfers;
 
-
 CREATE TABLE transfers (
   from_stop_id VARCHAR(40),
   to_stop_id VARCHAR(40),
-  from_route_id VARCHAR(255),
-  to_route_id VARCHAR(255),
+  from_route_id  VARCHAR(255),
+  to_route_id VARCHAR(255) ,
   from_trip_id INT,
   to_trip_id INT,
   transfer_type INT,
-  PRIMARY KEY (from_stop_id, from_trip_id, to_trip_id),
-  FOREIGN KEY (from_stop_id) REFERENCES stops(stop_id),
-  FOREIGN KEY (to_stop_id) REFERENCES stops(stop_id),
-  FOREIGN KEY (from_trip_id) REFERENCES trips(trip_id),
-  FOREIGN KEY (to_trip_id) REFERENCES trips(trip_id)
+  PRIMARY KEY(from_stop_id,from_trip_id, to_trip_id)
+ 
+
 );
 
+
 LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/transfers.txt' INTO TABLE transfers FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+
+
+
+-- below is for phase 3
+DROP TABLE IF EXISTS post_codes;
+
+CREATE TABLE post_codes(
+	zipcode CHAR(6) PRIMARY KEY,
+	latitude DECIMAL(11,7),
+	longitude DECIMAL(11,7)
+);
+
+LOAD DATA LOCAL INFILE  '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/MassZipLatLon.csv' INTO TABLE post_codes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+
+INSERT into post_codes values(
+'6212xp','50.831516', '5.69584');
+       
+               
+
+CREATE TABLE post_codes_join_table AS
+SELECT 
+    pc.zipcode,
+    pc.latitude,
+    pc.longitude,
+    pc2.zipcode AS sec_zipcode,
+    pc2.latitude AS sec_lat,
+    pc2.longitude AS sec_lon
+FROM 
+    post_codes pc
+JOIN 
+    post_codes pc2 
+ON 
+    pc.zipcode <> pc2.zipcode
+where ST_Distance_Sphere(POINT(pc.latitude,
+    pc.longitude), POINT(pc2.latitude,pc2.longitude)) > 600
+;
+
+
+
+CREATE table AllTransferStops (
+  `route_id_1` varchar(255) NOT NULL,
+  `route_short_name_1` varchar(255) DEFAULT NULL,
+  `stop_1_id` varchar(255),
+  `route_id_2` varchar(255) NOT NULL,
+  `route_short_name_2` varchar(255) DEFAULT NULL,
+    `stop_2_id` varchar(255),
+  PRIMARY KEY (`route_id_1`,`stop_1_id`,`route_id_2`,`stop_2_id`)
+);
+
+
+
+TRUNCATE table AllTransferStops ; 
+insert into AllTransferStops (           
+SELECT
+    a.route_id AS route_id_1,
+    a.route_short_name AS route_short_name_1,
+    a.stop_id AS stop_1,
+    b.route_id AS route_id_2,
+    b.route_short_name AS route_short_name_2,
+    b.stop_id AS stop_2
+FROM (
+    SELECT DISTINCT t.route_id, r.route_short_name, st.stop_id, s.stop_lat, s.stop_lon
+    FROM trips t
+    JOIN stop_times st ON t.trip_id = st.trip_id
+    JOIN routes r ON t.route_id = r.route_id
+    JOIN stops s ON s.stop_id = st.stop_id
+    WHERE (s.stop_lat BETWEEN 50.803792 AND 50.9)
+      AND (s.stop_lon BETWEEN 5.640811 AND 5.739475)
+      AND r.route_type = '3'
+      AND r.route_short_name <> '797'
+      AND r.route_short_name <> '62'
+      AND r.route_short_name NOT LIKE '%trein%'
+) a
+JOIN (
+    SELECT DISTINCT t.route_id, r.route_short_name, st.stop_id, s.stop_lat, s.stop_lon
+    FROM trips t
+    JOIN stop_times st ON t.trip_id = st.trip_id
+    JOIN routes r ON t.route_id = r.route_id
+    JOIN stops s ON s.stop_id = st.stop_id
+    WHERE (s.stop_lat BETWEEN 50.803792 AND 50.9)
+      AND (s.stop_lon BETWEEN 5.640811 AND 5.739475)
+      AND r.route_type = '3'
+      AND r.route_short_name <> '797'
+      AND r.route_short_name <> '62'
+      AND r.route_short_name NOT LIKE '%trein%'
+) b 
+ON (a.stop_id = b.stop_id OR ST_Distance_Sphere(point(a.stop_lon, a.stop_lat), point(b.stop_lon, b.stop_lat)) < 80)
+ORDER BY a.route_id, b.route_id);
+
+
+
+
+drop table if exists tempTransfer;
+ CREATE TABLE tempTransfer (	
+   					first_start_bus_stop_id VARCHAR(40),
+   					first_end_bus_stop_id VARCHAR(40),
+   					first_route_id VARCHAR(255),
+                    first_route_short_name VARCHAR(255),
+                    first_trip_id INT,
+                    first_departure_time TIME,
+                    first_arrival_time TIME,
+                    first_trip_time INT,
+                    second_start_bus_stop_id VARCHAR(40),
+    second_end_bus_stop_id VARCHAR(40),
+    second_route_id VARCHAR(255),
+    second_route_short_name VARCHAR(255),
+    second_trip_id INT,
+    second_departure_time TIME,
+    second_arrival_time TIME,
+    second_trip_time INT,
+    distanceToFirstBusstop float,
+    timeOfArrDestination TIME,
+    timeOfDepart Time
+                );
+               
+
+
+
+
+
+   
+-- test (not need now)
+
+CREATE table distanceToBusstop(
+	start_latitude DECIMAL(11,7),
+	start_longitude DECIMAL(11,7),
+	end_latitude DECIMAL(11,7),
+	end_longitude DECIMAL(11,7),
+	distance INT,
+	primary key(start_latitude,start_longitude,
+	end_latitude ,
+	end_longitude)
+);
+
+
+
+
+
 
 
 

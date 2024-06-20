@@ -11,6 +11,7 @@ import DataManagers.LogicManager;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
+import GUI.transferModule;
 
 /**
  * Manages the logic behind bus trips.
@@ -20,11 +21,13 @@ public class BusConnectionDev {
     public static boolean testClass = false;
 
     static List<Node> stopNodes = new ArrayList<>();
-    static int id = 0;
+    static int number_stop_id = 0;
 
     static List<Node> tripNodes = new ArrayList<>();
-    static int id2 = 0;
+    static int number_shape_id = 0;
 
+    static TripInfo directBestTrip;
+    static TripInfo transferBestTrip;
     static TripInfo bestTrip;
     static int time;
 
@@ -35,36 +38,9 @@ public class BusConnectionDev {
     static String departureTime = "";
     static String arrivalTime = "";
 
-    static double distanceBetweenTwoZipCodes = 0;
-
-    /**
-     * Resets the lists and IDs used for tracking stops and trips.
-     */
-    public static void resetLists() {
-        stopNodes = new ArrayList<>();
-        id = 0;
-        tripNodes = new ArrayList<>();
-        id2 = 0;
-    }
-
-    public static int getId2() {
-        return id2;
-    }
-
-    /**
-     * Calculates the total distance between a list of nodes using the Haversine
-     * formula.
-     * 
-     * @param nodes the list of nodes
-     * @return the total distance in kilometers
-     */
-    public static double calculateTotalDistance(List<Node> nodes) {
-        double totalDistance = 0.0;
-        for (int i = 0; i < nodes.size() - 1; i++) {
-            totalDistance += DistanceCalculatorHaversine.haversineDistance(nodes.get(i), nodes.get(i + 1));
-        }
-        return totalDistance;
-    }
+    static double aerialDistance = 0;
+    static int directTripTime = 0;
+    static double distanceBetweenTwoZipCodes;
 
     /**
      * Finds and processes the best bus route between two coordinates.
@@ -81,154 +57,163 @@ public class BusConnectionDev {
             Connection conn = DatabaseConnection.getConnection();
             List<Node> shortestPath = LogicManager.calculateRouteByCoordinates(x1, y1, x2, y2, "walk");
             distanceBetweenTwoZipCodes = LogicManager.calculateDistance(shortestPath);
-            if (distanceBetweenTwoZipCodes < 1) {
-                // If the distance is less than 1 km, it's considered a walking distance
-                GUI.createMap.drawPath(shortestPath, null);
-                TimeCalculator timeCalc = new AverageTimeCalculator(distanceBetweenTwoZipCodes);
-                GUI.mapFrame.updateDistanceField(distanceBetweenTwoZipCodes);
+            TimeCalculator timeCalc = new AverageTimeCalculator(distanceBetweenTwoZipCodes);
 
-                time = (int) (Math.round(timeCalc.getWalkingTime()));
-                GUI.mapFrame.updateTimeField(time);
+            time = (int) (Math.round(timeCalc.getWalkingTime()));
+            if (time <= 15) {
+                // If the distance is less than 1 km, it's considered a walking distance
+
+                GUI.createMap.drawPath(shortestPath);
+                DataManagers.LogicManager.time = time;
+                DataManagers.LogicManager.distance = distanceBetweenTwoZipCodes;
+                transferModule.addTransferModule("Walk", TimeCalculator.getCurrentTime().toString(),
+                        TimeCalculator.addMinutesToTime(TimeCalculator.getCurrentTime(), time).toString());
 
             } else {
-                bestTrip = processRoutes(conn, x1, y1, x2, y2);
 
-                if (bestTrip != null) {
+                directBestTrip = processRoutes(conn, x1, y1, x2, y2);
+                System.out.println("best direct trip is: " + directBestTrip);
 
-                    // Debugging print statements
-                    System.out.println("Best Trip: " + bestTrip);
-                    System.out.println("========================================");
-                    queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-                    System.out.println("========================================");
-
-                    queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-                    if (id2 == 0) {
-
-                        createMap.drawPath(stopNodes, bestTrip.getColor(bestTrip.getRouteId()));
-                        System.out.println("no shape");
+                if (directBestTrip != null) {
+                    directTripTime = TimeCalculator
+                            .calculateTripTime(TimeCalculator.getCurrentTime().toString(),
+                                    directBestTrip.getTimeOfArrDest());
+                    if (directTripTime < 30) {
+                        showDirectInfo(conn, directBestTrip);
                     } else {
-                        createMap.drawPath(tripNodes, stopNodes, bestTrip.getColor(bestTrip.getRouteId()));
+                        transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2,
+                                directBestTrip.getTimeOfArrDestINMs());
+                        if ((directBestTrip.getTimeOfArrDestINMs() <= transferBestTrip.getStartFromOriginInMs())) {
+                            showDirectInfo(conn, directBestTrip);
+                        } else {
+                            showTransferInfo(conn, transferBestTrip);
+                        }
+
                     }
-
-                    double totalDistance = calculateTotalDistance(tripNodes);
-                    if (totalDistance == 0)
-                        totalDistance = calculateTotalDistance(stopNodes);
-                    System.out.println("Total Distance: " + totalDistance + " km");
-
-                    DataManagers.LogicManager.time = bestTrip.getTripTime();
-                    DataManagers.LogicManager.distance = totalDistance;
-
-                    DataManagers.LogicManager.busInfo = new String[] {
-                            bestTrip.getBusName(),
-                            bestTrip.getBusNumber(),
-                            startBusStop,
-                            endBusStop,
-                            bestTrip.endArrivalTime,
-                            bestTrip.startDepartureTime };
                 } else {
-                    tempTransfer.processTransfers(x1, y1, x2, y2);
-                    String sqlGetEarliestArrTime = """
-                            SELECT tt.*
-                            FROM tempTransfer tt
-                            ORDER BY second_arrival_time ASC,distanceToFirstBusstop ASC
-                            LIMIT 1;
-                                                                           """;
-                    Statement stmtGetBesttrip = conn.createStatement();
-
-                    ResultSet rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
-                    if (rs.next()) {
-                        bestTrip = new TripInfo(
-                                rs.getString("first_route_id"),
-                                rs.getString("first_route_short_name"),
-                                rs.getString("first_trip_id"),
-                                rs.getString("first_start_bus_stop_id"),
-                                rs.getString("first_end_bus_stop_id"),
-                                rs.getString("first_departure_time"),
-                                rs.getString("first_arrival_time"),
-                                rs.getInt("first_trip_time"));
-                    }
-                    // Debugging print statements
-                    System.out.println("Best Trip: " + bestTrip);
-                    System.out.println("========================================");
-                    queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-                    System.out.println("========================================");
-                    queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-                    System.out.println("1st" + bestTrip.getColor(bestTrip.getRouteId()));
-
-                    if (id2 == 0) {
-                        createMap.drawPath(stopNodes, bestTrip.getColor(bestTrip.getRouteId()));
-                        System.out.println("no shape");
-                    } else {
-                        createMap.drawPath(tripNodes, stopNodes, bestTrip.getColor(bestTrip.getRouteId()));
-                    }
-
-                    double totalDistance = calculateTotalDistance(tripNodes);
-                    if (totalDistance == 0)
-                        totalDistance = calculateTotalDistance(stopNodes);
-                    System.out.println("Total Distance: " + totalDistance + " km");
-
-                    DataManagers.LogicManager.time = bestTrip.getTripTime();
-                    DataManagers.LogicManager.distance = totalDistance;
-
-                    DataManagers.LogicManager.busInfo = new String[] {
-                            "n",
-                            bestTrip.getBusNumber(),
-                            startBusStop,
-                            endBusStop,
-                            bestTrip.endArrivalTime,
-                            bestTrip.startDepartureTime };
-                    // for second trip
-                    bestTrip = null;
-                    id2 = 0;
-                    rs = stmtGetBesttrip.executeQuery(sqlGetEarliestArrTime);
-
-                    if (rs.next()) {
-                        bestTrip = new TripInfo(
-                                rs.getString("second_route_id"),
-                                rs.getString("second_route_short_name"),
-                                rs.getString("second_trip_id"),
-                                rs.getString("second_start_bus_stop_id"),
-                                rs.getString("second_end_bus_stop_id"),
-                                rs.getString("second_departure_time"),
-                                rs.getString("second_arrival_time"),
-                                rs.getInt("second_trip_time"));
-                    }
-                    // Debugging print statements
-                    System.out.println("Best Trip: " + bestTrip);
-                    System.out.println("========================================");
-                    queryShapeDetails(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-                    queryStopsBetween(conn, bestTrip.getTripId(), bestTrip.getStartStopId(), bestTrip.getEndStopId());
-                    System.out.println("2nd:" + bestTrip.getColor(bestTrip.getRouteId()));
-
-                    if (id2 == 0) {
-                        createMap.drawPath(stopNodes, bestTrip.getColor(bestTrip.getRouteId()));
-                        System.out.println("no shape");
-                    } else {
-                        createMap.drawPath(tripNodes, stopNodes, bestTrip.getColor(bestTrip.getRouteId()));
-                    }
-
-                    totalDistance += calculateTotalDistance(stopNodes);
-                    System.out.println("Total Distance: " + totalDistance + " km");
-
-                    DataManagers.LogicManager.time = bestTrip.getTripTime();
-                    DataManagers.LogicManager.distance = totalDistance;
-
-                    DataManagers.LogicManager.busInfo = new String[] {
-                            "n",
-                            bestTrip.getBusNumber(),
-                            startBusStop,
-                            endBusStop,
-                            bestTrip.endArrivalTime,
-                            bestTrip.startDepartureTime };
+                    transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2,
+                            100000);
+                    showTransferInfo(conn, transferBestTrip);
 
                 }
-            }
+                // transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2, 10000);
+                // showTransferInfo(conn, transferBestTrip);
 
+            }
         } catch (
 
         SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void showDirectInfo(Connection conn, TripInfo directBestTrip) throws SQLException {
+        System.out.println("Best Trip after if: " + directBestTrip);
+        queryShapeDetails(conn, directBestTrip.getTripId(), directBestTrip.getStartStopId(),
+                directBestTrip.getEndStopId());
+        queryStopsBetween(conn, directBestTrip.getTripId(), directBestTrip.getStartStopId(),
+                directBestTrip.getEndStopId());
+
+        if (number_shape_id == 0) {
+            createMap.drawPath(stopNodes, directBestTrip.getColor());
+        } else {
+            createMap.drawPath(tripNodes, stopNodes, directBestTrip.getColor());
+        }
+        double totalDistance = calculateTotalDistance(tripNodes);
+        if (totalDistance == 0) {
+            totalDistance = calculateTotalDistance(stopNodes);
+        }
+
+        DataManagers.LogicManager.time = TimeCalculator
+                .calculateTripTime(directBestTrip.getStartFromOrigin(), directBestTrip.getTimeOfArrDest());
+        System.out.println("best direct trip is: " + directBestTrip);
+        ;
+        DataManagers.LogicManager.distance = totalDistance;
+
+        transferModule.addTransferModule("Walk", directBestTrip.getStartFromOrigin(),
+                directBestTrip.getStartDepartureTime());
+        transferModule.addTransferModule("Bus", directBestTrip.getStartDepartureTime(),
+                directBestTrip.getEndArrivalTime(), directBestTrip.getBusNumber(),
+                directBestTrip.getStartStopName(),
+                directBestTrip.getEndStopName());
+        transferModule.addTransferModule("Walk", directBestTrip.getEndArrivalTime(),
+                directBestTrip.getTimeOfArrDest());
+    }
+
+    public static void showTransferInfo(Connection conn, TripInfo transferBestTrip) throws SQLException {
+        // when transfer is better
+        TripInfo firstTrip = Bus.tempTransfer.getFirstTrip();
+        System.out.println("First Best Trip: " + firstTrip);
+        System.out.println("========================================");
+
+        queryShapeDetails(conn, firstTrip.getTripId(), firstTrip.getStartStopId(),
+                firstTrip.getEndStopId());
+        queryStopsBetween(conn, firstTrip.getTripId(), firstTrip.getStartStopId(),
+                firstTrip.getEndStopId());
+        System.out.println("1st" + firstTrip.getColor());
+
+        double firstDistance = calculateTotalDistance(tripNodes);
+        if (firstDistance == 0) {
+            firstDistance = calculateTotalDistance(stopNodes);
+        }
+
+        // for second trip
+        int numberOfFirstTripNode = tripNodes.size();
+        number_shape_id = 0;
+
+        // Debugging print statements
+        System.out.println("Second Best Trip: " + transferBestTrip);
+        System.out.println("========================================");
+        queryShapeDetails(conn, transferBestTrip.getTripId(), transferBestTrip.getStartStopId(),
+                transferBestTrip.getEndStopId());
+        queryStopsBetween(conn, transferBestTrip.getTripId(), transferBestTrip.getStartStopId(),
+                transferBestTrip.getEndStopId());
+        System.out.println("2nd:" + transferBestTrip.getColor());
+
+        if (number_shape_id == 0) {
+            createMap.drawPath(stopNodes, numberOfFirstTripNode,
+                    firstTrip.getColor(),
+                    transferBestTrip.getColor());
+            System.out.println("no shape");
+        } else {
+            createMap.drawPath(tripNodes, stopNodes, numberOfFirstTripNode,
+                    firstTrip.getColor(),
+                    transferBestTrip.getColor());
+        }
+
+        double secondDistance = calculateTotalDistance(tripNodes);
+        if (secondDistance == 0) {
+            secondDistance = calculateTotalDistance(stopNodes);
+        }
+        double totalDistance = firstDistance + secondDistance;
+        System.out.println("Total Distance: " + totalDistance + " km");
+
+        DataManagers.LogicManager.time = TimeCalculator.calculateTripTime(
+                firstTrip.getStartFromOrigin(),
+                transferBestTrip.getStartFromOrigin());
+        DataManagers.LogicManager.distance = totalDistance;
+
+        transferModule.addTransferModule("Walk", firstTrip.getStartFromOrigin(),
+                firstTrip.getStartDepartureTime());
+        if (firstTrip.getBusNumber().equals(transferBestTrip.getBusNumber())) {
+            transferModule.addTransferModule("Bus", firstTrip.getStartDepartureTime(),
+                    transferBestTrip.getEndArrivalTime(), firstTrip.getBusNumber(),
+                    firstTrip.getStartStopName(),
+                    transferBestTrip.getEndStopName());
+
+        } else {
+            transferModule.addTransferModule("Bus", firstTrip.getStartDepartureTime(),
+                    firstTrip.getEndArrivalTime(), firstTrip.getBusNumber(),
+                    firstTrip.getStartStopName(),
+                    firstTrip.getEndStopName());
+            transferModule.addTransferModule("Bus", transferBestTrip.getStartDepartureTime(),
+                    transferBestTrip.getEndArrivalTime(), transferBestTrip.getBusNumber(),
+                    transferBestTrip.getStartStopName(),
+                    transferBestTrip.getEndStopName());
+        }
+
+        transferModule.addTransferModule("Walk", transferBestTrip.getEndArrivalTime(),
+                transferBestTrip.getStartFromOrigin());
     }
 
     /**
@@ -247,32 +232,23 @@ public class BusConnectionDev {
         setupNearestStops(conn, x1, y1, x2, y2);
         findPotentialRoutes(conn);
         RouteStopInfo routes = findRouteBusStops(conn);
-        TripInfo bestTrip = null;
+        bestTrip = null;
         if (routes != null) {
-            List<Node> shortestPath = LogicManager.calculateRouteByCoordinates(x1, y1,
+            // units in km
+            double distanceToBusstop = TimeCalculator.calculateDistanceIfNotCached(x1, y1,
                     getStopLocation(conn, routes.startStopId)[0],
-                    getStopLocation(conn, routes.startStopId)[1],
-                    "walk");
-            double distanceToBusstop = LogicManager.calculateDistance(shortestPath);
-
+                    getStopLocation(conn, routes.startStopId)[1]);
             TimeCalculator timeCalc = new AverageTimeCalculator(distanceToBusstop);
             time = (int) (Math.round(timeCalc.getWalkingTime()));
-            Calendar calendar = Calendar.getInstance();
 
-            // Resetting seconds and milliseconds to zero to make the time addition more
-            // predictable
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            Time currentTime = new Time(calendar.getTimeInMillis());
-
-            // Calculate the additional time in milliseconds
+            // Get the current time
+            Time currentTime = TimeCalculator.getCurrentTime();
+            // Calculate the walking time to start bus stop in milliseconds
             long additionalTimeInMs = time * 60 * 1000;
+            Time TimeOfArrStartBusStop = new Time(currentTime.getTime() + additionalTimeInMs);
 
-            // Creating a new Time object with the adjusted time
-            Time newTime = new Time(currentTime.getTime() + additionalTimeInMs);
-
-            bestTrip = printNextDepartureAndArrival(conn, routes.routeId, routes.startStopId, routes.endStopId,
-                    newTime);
+            bestTrip = getBestTrip(conn, routes.routeId, routes.startStopId, routes.endStopId,
+                    TimeOfArrStartBusStop, additionalTimeInMs, x2, y2);
         }
 
         return bestTrip;
@@ -296,7 +272,7 @@ public class BusConnectionDev {
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
                 FROM stops
                 where ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) < ?
-                ORDER BY distance LIMIT ?
+                ORDER BY distance LIMIT 20
                 ;""";
         String sqlDropEndStops = "DROP TABLE IF EXISTS nearest_end_stops;";
         String createNearestEndStops = """
@@ -304,7 +280,7 @@ public class BusConnectionDev {
                 SELECT stop_id, stop_name, ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) AS distance
                 FROM stops
                 where ST_Distance_Sphere(point(?, ?), point(stops.stop_lon, stops.stop_lat)) < ?
-                ORDER BY distance LIMIT ?
+                ORDER BY distance LIMIT 20
                 ;""";
 
         try (PreparedStatement pstmt1 = conn.prepareStatement(createNearestStartStops);
@@ -322,16 +298,9 @@ public class BusConnectionDev {
             pstmt2.setDouble(2, endLat);
             pstmt2.setDouble(3, endLon);
             pstmt2.setDouble(4, endLat);
-            if (distanceBetweenTwoZipCodes < 2) {
-                pstmt1.setInt(6, 10);
-                pstmt2.setInt(6, 10);
 
-            } else {
-                pstmt1.setInt(6, 20);
-                pstmt2.setInt(6, 20);
-            }
-            pstmt1.setDouble(5, distanceBetweenTwoZipCodes * 1000 / 2);
-            pstmt2.setDouble(5, distanceBetweenTwoZipCodes * 1000 / 2);
+            pstmt1.setDouble(5, distanceBetweenTwoZipCodes * 1000 / 1.3);
+            pstmt2.setDouble(5, distanceBetweenTwoZipCodes * 1000 / 1.3);
             pstmt1.executeUpdate();
             pstmt2.executeUpdate();
         }
@@ -450,37 +419,44 @@ public class BusConnectionDev {
      * @return a list of TripInfo objects with departure and arrival information
      * @throws SQLException if a database error occurs
      */
-    private static TripInfo printNextDepartureAndArrival(Connection conn, String routeId, String startStopId,
-            String endStopId, Time time) throws SQLException {
+    private static TripInfo getBestTrip(Connection conn, String routeId, String startStopId,
+            String endStopId, Time time, long additionalTimeInMs, double x2, double y2) throws SQLException {
         String sql = """
                 SELECT
-                    t.route_id,
-                    r.route_short_name,
-                    r.route_long_name,
-                    st1.trip_id,
-                    st1.departure_time AS start_departure_time,
-                    st2.arrival_time AS end_arrival_time,
-                    TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
-                FROM
-                    stop_times st1
-                JOIN
-                    stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
-                JOIN
-                    trips t ON t.trip_id = st1.trip_id
-                JOIN
-                    routes r ON t.route_id = r.route_id
-                WHERE
-                    st1.stop_id = ?
-                    AND st2.stop_id = ?
-                    AND t.route_id = ?
-                    AND st1.departure_time >= ?
-                ORDER BY
-                    CASE WHEN st1.departure_time >= CURRENT_TIME() THEN 0 ELSE 1 END,
-                    st1.departure_time ASC
-                LIMIT 1;
-                """;
+                        st1.stop_id AS start_stop_id,
+                        s1.stop_name AS start_stop_name,
+                        st2.stop_id AS end_stop_id,
+                        s2.stop_name AS end_stop_name,
+                        t.route_id,
+                        r.route_short_name,
+                        st1.trip_id,
+                        st1.departure_time AS start_departure_time,
+                        st2.arrival_time AS end_arrival_time,
+                        TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
+                    FROM
+                        stop_times st1
+                    JOIN
+                        stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
+                    JOIN
+                        trips t ON t.trip_id = st1.trip_id
+                    JOIN
+                        routes r ON t.route_id = r.route_id
+                    JOIN
+                        stops s1 on s1.stop_id = st1.stop_id
+                    JOIN
+                    	stops s2 on s2.stop_id = st2.stop_id
+                    WHERE
+                        st1.stop_id = ?
+                        AND st2.stop_id = ?
+                        AND t.route_id = ?
+                        AND st1.departure_time >= ?
+                    ORDER BY
+                        st1.departure_time ASC
+                    LIMIT 1;
+                        """;
 
         TripInfo trips = null;
+        Time bestTimeToDestination = null;
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, startStopId);
@@ -489,16 +465,39 @@ public class BusConnectionDev {
             pstmt.setTime(4, time);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                trips = (new TripInfo(
-                        rs.getString("route_id"),
-                        rs.getString("route_short_name"),
-                        rs.getString("route_long_name"),
-                        rs.getString("trip_id"),
-                        startStopId,
-                        endStopId,
-                        rs.getString("start_departure_time"),
-                        rs.getString("end_arrival_time"),
-                        rs.getInt("trip_time")));
+                Time startDepartureTime = rs.getTime("start_departure_time");
+                Time TimeOfArrStartBusStop = new Time(startDepartureTime.getTime() - additionalTimeInMs);
+
+                String endBusstopID = rs.getString(3);
+
+                double endStopLat = getStopLocation(conn, endBusstopID)[0];
+                double endStopLon = getStopLocation(conn, endBusstopID)[1];
+                double distanceToDest = TimeCalculator.calculateDistanceIfNotCached(endStopLat, endStopLon, x2, y2);
+                TimeCalculator timeCalc = new AverageTimeCalculator(distanceToDest);
+                int timeToDest = (int) (Math.round(timeCalc.getWalkingTime()));
+
+                // Get the current time
+                Time timeOfArrEndBusstop = rs.getTime("end_arrival_time");
+                // Calculate the walking time to start bus stop in milliseconds
+                long timeToDestInLong = timeToDest * 60 * 1000;
+                Time TimeToDestInTime = new Time(timeOfArrEndBusstop.getTime() + timeToDestInLong);
+                if (trips == null || TimeToDestInTime.before(bestTimeToDestination)) {
+                    bestTimeToDestination = TimeToDestInTime;
+                    trips = (new TripInfo(
+                            rs.getString("route_id"),
+                            rs.getString("route_short_name"), // route_id
+                            rs.getString("trip_id"),
+                            rs.getString("start_stop_id"),
+                            rs.getString("end_stop_id"),
+                            rs.getString("start_departure_time"),
+                            rs.getString("end_arrival_time"),
+                            rs.getInt("trip_time"),
+                            TimeOfArrStartBusStop.toString(),
+                            rs.getString("start_stop_name"),
+                            rs.getString("end_stop_name"),
+                            TimeToDestInTime.toString()));
+                }
+
             }
         }
         return trips;
@@ -583,8 +582,8 @@ public class BusConnectionDev {
                 double shapePtLat = rs.getDouble("shape_pt_lat");
                 double shapePtLon = rs.getDouble("shape_pt_lon");
 
-                tripNodes.add(new Node(id2, shapePtLat, shapePtLon));
-                id2++;
+                tripNodes.add(new Node(number_shape_id, shapePtLat, shapePtLon));
+                number_shape_id++;
             }
 
         }
@@ -618,21 +617,16 @@ public class BusConnectionDev {
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                String stopId = rs.getString("stop_id");
                 String stopName = rs.getString("stop_name");
-                if (id == 0)
+                if (number_stop_id == 0)
                     startBusStop = stopName;
                 endBusStop = stopName;
 
-                int stopSequence = rs.getInt("stop_sequence");
                 double stopLat = rs.getDouble("stop_lat");
                 double stopLon = rs.getDouble("stop_lon");
 
-                System.out.println("Trip ID: " + tripId + ", Stop ID: " + stopId + ", Stop Name: " + stopName +
-                        ", Stop Sequence: " + stopSequence + ", Latitude: " + stopLat + ", Longitude: " + stopLon);
-
-                stopNodes.add(new Node(id, stopLat, stopLon));
-                id++;
+                stopNodes.add(new Node(number_stop_id, stopLat, stopLon));
+                number_stop_id++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -655,4 +649,30 @@ public class BusConnectionDev {
         }
         return null; // Return null if no location found or if an exception occurred
     }
+
+    /**
+     * Resets the lists and IDs used for tracking stops and trips.
+     */
+    public static void resetLists() {
+        stopNodes = new ArrayList<>();
+        number_stop_id = 0;
+        tripNodes = new ArrayList<>();
+        number_shape_id = 0;
+    }
+
+    /**
+     * Calculates the total distance between a list of nodes using the Haversine
+     * formula.
+     * 
+     * @param nodes the list of nodes
+     * @return the total distance in kilometers
+     */
+    public static double calculateTotalDistance(List<Node> nodes) {
+        double totalDistance = 0.0;
+        for (int i = 0; i < nodes.size() - 1; i++) {
+            totalDistance += DistanceCalculatorHaversine.haversineDistance(nodes.get(i), nodes.get(i + 1));
+        }
+        return totalDistance;
+    }
+
 }

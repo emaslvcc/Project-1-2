@@ -55,7 +55,7 @@ public class DistanceCalculatorHaversine implements DistanceCalculator {
         return earthRadius * centralAngle;
     }
 
-    public static double calculate(double longitude1, double latitude1, double longitude2, double latitude2) {
+    public static double calculate(double latitude1, double longitude1, double latitude2, double longitude2) {
 
         // Radius of the earth in kilometers
         final int earthRadius = 6371;

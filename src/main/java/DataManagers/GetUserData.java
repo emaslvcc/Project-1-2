@@ -10,7 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * The GetUserData class extends DataBaseReader and provides functionality to get user input
+ * The GetUserData class extends DataBaseReader and provides functionality to
+ * get user input
  * for postal codes and create corresponding PostCode objects.
  */
 public class GetUserData {
@@ -20,7 +21,8 @@ public class GetUserData {
     protected PostCode startPostCode, endPostCode;
 
     /**
-     * Checks if the called zip code is in the hashMap, if not calls an API, then recursively checks again.
+     * Checks if the called zip code is in the hashMap, if not calls an API, then
+     * recursively checks again.
      *
      * @param zipCode The zip code to create a PostCode object for.
      * @return The PostCode object created based on the provided zip code.
@@ -43,8 +45,8 @@ public class GetUserData {
      */
     private boolean isInDatabase(String zipCode) {
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(
-                     "SELECT * FROM post_codes WHERE zipcode = ?")) {
+                PreparedStatement preparedStatement = conn.prepareStatement(
+                        "SELECT * FROM post_codes WHERE zipcode = ?")) {
 
             preparedStatement.setString(1, zipCode);
 
@@ -63,12 +65,12 @@ public class GetUserData {
      * @param zipCode The zip code to retrieve coordinates for.
      * @return A double array containing latitude and longitude.
      */
-    private double[] getCoorinates(String zipCode) {
+    public double[] getCoorinates(String zipCode) {
         double[] dataArr = new double[2];
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(
-                     "SELECT latitude, longitude FROM post_codes WHERE zipcode = ?")) {
+                PreparedStatement preparedStatement = conn.prepareStatement(
+                        "SELECT latitude, longitude FROM post_codes WHERE zipcode = ?")) {
 
             preparedStatement.setString(1, zipCode);
 
@@ -90,7 +92,7 @@ public class GetUserData {
     protected PostCode getStartZip(JTextField startCodeField) throws Exception {
         String startCode = startCodeField.getText().toUpperCase();
         String returnValue = validatePostcode(startCode);
-        if (!returnValue.isEmpty()) {      // if this returns a string then there was an error
+        if (!returnValue.isEmpty()) { // if this returns a string then there was an error
             JOptionPane.showMessageDialog(null, returnValue);
             throw new Exception(returnValue);
         }
@@ -101,7 +103,7 @@ public class GetUserData {
     protected PostCode getEndZip(JTextField endCodeField) throws Exception {
         String endCode = endCodeField.getText().toUpperCase();
         String returnValue = validatePostcode(endCode);
-        if (!returnValue.isEmpty()) {      // if this returns a string then there was an error
+        if (!returnValue.isEmpty()) { // if this returns a string then there was an error
             JOptionPane.showMessageDialog(null, returnValue);
             throw new Exception(returnValue);
         }
@@ -117,7 +119,8 @@ public class GetUserData {
             return "Postcode " + postcode + " is invalid: incorrect length.";
         } else if (Character.isDigit(postcode.charAt(4)) || Character.isDigit(postcode.charAt(5))) {
             return "Postcode " + postcode + " is invalid: incorrect format.";
-        } else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2' || (postcode.charAt(2) != '1' && postcode.charAt(2) != '2') || postcode.charAt(3) == '0') {
+        } else if (postcode.charAt(0) != '6' || postcode.charAt(1) != '2'
+                || (postcode.charAt(2) != '1' && postcode.charAt(2) != '2') || postcode.charAt(3) == '0') {
             return "Postcode " + postcode + " is invalid: not in Maastricht.";
         }
 

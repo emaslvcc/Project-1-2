@@ -13,8 +13,6 @@ import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -146,23 +144,19 @@ public class createMap {
         System.out.println("End Coord: " + endLatitude + ", " + endLongitude);
     }
 
-    /**
-     * Draws the path on the map.
-     *
-     * @param stops The list of stops along the path.
-     */
-    public static void drawPath(List<Node> stops, String color) {
+    public static void drawPath(List<Node> stops, String firstTripColor) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
-                    Color lineColor;
-                    if (color == "blue") {
-                        lineColor = Color.BLUE;
+                    Color firstLineColor;
+                    if ("blue".equals(firstTripColor) || firstTripColor == null) {
+                        firstLineColor = Color.BLUE;
                     } else {
-                        lineColor = hexToColor(color);
+                        firstLineColor = hexToColor(firstTripColor);
                     }
+
                     // Draw start and end markers
                     // createStartAndEndPoints(g, map);
                     createStartAndEndPointsForBus(g, map, stops);
@@ -182,12 +176,185 @@ public class createMap {
                         // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
                         if (i > 0) {
-
-                            g.setColor(lineColor);
+                            g.setColor(firstLineColor);
                             // Set the color for the lines
                             g.setStroke(new BasicStroke(3));
                             g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
                                     (int) pointMap.getY());
+                        }
+
+                        // Update pointMapPrev to the current stop for the next iteration
+                        pointMapPrev = pointMap;
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error in drawing path" + e);
+                    e.printStackTrace();
+                } finally {
+                    g.dispose();
+                }
+
+            }
+        };
+        // Set the new painter
+        jXMapViewer.setOverlayPainter(pathOverlay);
+    }
+
+    public static void drawPath(List<Node> stops) {
+
+        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
+                try {
+                    // Draw start and end markers
+                    createStartAndEndPoints(g, map);
+                    Point2D pointMapPrev = null; // Initialize a variable to hold the previous point
+
+                    for (int i = 0; i < stops.size(); i++) {
+                        Node node = stops.get(i);
+                        GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                        Point2D pointMap = map.convertGeoPositionToPoint(point);
+
+                        // If this is not the first stop, draw a green line from the previous stop to
+                        // the
+                        // current stop
+                        if (i > 0) {
+                            g.setColor(Color.GREEN); // Set the color for the lines
+                            g.setStroke(new BasicStroke(3));
+                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                    (int) pointMap.getY());
+                        }
+
+                        // Update pointMapPrev to the current stop for the next iteration
+                        pointMapPrev = pointMap;
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error in drawing path" + e);
+                    e.printStackTrace();
+                } finally {
+                    g.dispose();
+                }
+
+            }
+        };
+        jXMapViewer.setOverlayPainter(pathOverlay);
+
+    }
+
+    public static void drawPath(List<Node> path, List<Node> stops, String firstTripColor) {
+
+        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
+                try {
+                    Color firstLineColor;
+                    if ("blue".equals(firstTripColor)) {
+                        firstLineColor = Color.BLUE;
+                    } else {
+                        firstLineColor = hexToColor(firstTripColor);
+                    }
+
+                    g.setColor(firstLineColor);
+                    g.setStroke(new BasicStroke(3));
+
+                    for (int i = 0; i < path.size() - 1; i++) {
+
+                        Node startNode = path.get(i);
+                        Node endNode = path.get(i + 1);
+                        GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
+                        GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
+                        Point2D startP = map.convertGeoPositionToPoint(point1);
+                        Point2D endP = map.convertGeoPositionToPoint(point2);
+                        g.draw(new Line2D.Double(startP, endP));
+                    }
+
+                    if (stops != null) {
+                        createStartAndEndPointsForBus(g, map, stops);
+
+                        g.setColor(Color.RED);
+                        for (int i = 0; i < stops.size(); i++) {
+                            Node node = stops.get(i);
+                            GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                            Point2D pointMap = map.convertGeoPositionToPoint(point);
+                            Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(), pointMap.getY(), 10, 10);
+                            g.fill(circle);
+                        }
+                    } else {
+                        // Draw start and end markers
+                        createStartAndEndPoints(g, map);
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error in drawing path" + e);
+                    e.printStackTrace();
+                } finally {
+                    g.dispose();
+                }
+
+            }
+        };
+        // Set the new painter
+        jXMapViewer.setOverlayPainter(pathOverlay);
+
+    }
+
+    /**
+     * Draws the path on the map.
+     *
+     * @param stops The list of stops along the path.
+     */
+    public static void drawPath(List<Node> stops, int num, String firstTripColor, String secondTripColor) {
+
+        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
+                try {
+                    Color firstLineColor;
+                    if ("blue".equals(firstTripColor)) {
+                        firstLineColor = Color.BLUE;
+                    } else {
+                        firstLineColor = hexToColor(firstTripColor);
+                    }
+
+                    Color secondLineColor;
+                    if ("blue".equals(secondTripColor)) {
+                        secondLineColor = Color.BLUE;
+                    } else {
+                        secondLineColor = hexToColor(secondTripColor);
+                    }
+                    // Draw start and end markers
+                    // createStartAndEndPoints(g, map);
+                    createStartAndEndPointsForBus(g, map, stops);
+                    Point2D pointMapPrev = null; // Initialize a variable to hold the previous point
+
+                    for (int i = 0; i < stops.size(); i++) {
+                        Node node = stops.get(i);
+                        GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                        Point2D pointMap = map.convertGeoPositionToPoint(point);
+
+                        // Draw a red circle at each bus stop
+                        g.setColor(Color.RED); // Set the color for the bus stops
+                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10,
+                                10);
+                        g.fill(circle);
+
+                        // If this is not the first stop, draw a blue line from the previous stop to the
+                        // current stop
+
+                        g.setColor(firstLineColor);
+                        if (0 < i && i < num) {
+                            // Set the color for the lines
+                            g.setStroke(new BasicStroke(3));
+                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                    (int) pointMap.getY());
+
+                        } else if (i >= num) {
+                            g.setColor(secondLineColor);
+                            g.setStroke(new BasicStroke(3));
+                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                    (int) pointMap.getY());
+
                         }
 
                         // Update pointMapPrev to the current stop for the next iteration
@@ -214,23 +381,34 @@ public class createMap {
      * @param stops The list of stops along the path.
      * @param path  The list of paths.
      */
-    public static void drawPath(List<Node> path, List<Node> stops, String color) {
+    public static void drawPath(List<Node> path, List<Node> stops, int num, String firstTripColor,
+            String secondTripColor) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
-                    Color lineColor;
-                    if (color == "blue") {
-                        lineColor = Color.BLUE;
+                    Color firstLineColor;
+                    if ("blue".equals(firstTripColor)) {
+                        firstLineColor = Color.BLUE;
                     } else {
-                        lineColor = hexToColor(color);
+                        firstLineColor = hexToColor(firstTripColor);
                     }
 
-                    g.setColor(lineColor);
+                    Color secondLineColor;
+                    if ("blue".equals(secondTripColor)) {
+                        secondLineColor = Color.BLUE;
+                    } else {
+                        secondLineColor = hexToColor(secondTripColor);
+                    }
+
+                    g.setColor(firstLineColor);
                     g.setStroke(new BasicStroke(3));
 
                     for (int i = 0; i < path.size() - 1; i++) {
+                        if (i >= num) {
+                            g.setColor(secondLineColor);
+                        }
                         Node startNode = path.get(i);
                         Node endNode = path.get(i + 1);
                         GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
@@ -278,6 +456,7 @@ public class createMap {
     }
 
     private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
+
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
 
@@ -314,41 +493,62 @@ public class createMap {
         LogicManager logicManager = new LogicManager();
         logicManager.calculateRoute(startPostCode, startBus, "Walk");
         List<Node> path1 = logicManager.getShortestPath();
-        TimeCalculator timeCalc = new AverageTimeCalculator(logicManager.distance);
+        TimeCalculator timeCalc = new AverageTimeCalculator(LogicManager.distance);
         int time1 = (int) (Math.round(timeCalc.getWalkingTime()));
-        double distance1 = logicManager.distance;
+        double distance1 = LogicManager.distance;
 
         logicManager.calculateRoute(endBus, endPostCode, "Walk");
         List<Node> path2 = logicManager.getShortestPath();
-        TimeCalculator timeCalc2 = new AverageTimeCalculator(logicManager.distance);
+        TimeCalculator timeCalc2 = new AverageTimeCalculator(LogicManager.distance);
         int time2 = (int) (Math.round(timeCalc2.getWalkingTime()));
-        double distance2 = logicManager.distance;
+        double distance2 = LogicManager.distance;
 
         int totalTime = time1 + time2;
         double totalDistance = distance1 + distance2;
 
         List<List<Node>> paths = new java.util.ArrayList<>();
+        if (path1 == null || path1.isEmpty()) {
+            drawLineBetweenPoints(g, map, startPostCode, startBus);
+        } else {
+            paths.add(path1);
+        }
 
+        if (path2 == null || path2.isEmpty()) {
+            drawLineBetweenPoints(g, map, endPostCode, endBus);
+        } else {
+            paths.add(path2);
+        }
         paths.add(path1);
         paths.add(path2);
 
         drawPaths(paths, g, map);
     }
 
+    private static void drawLineBetweenPoints(Graphics2D g, JXMapViewer map, PostCode point1, PostCode point2) {
+        g.setColor(Color.GREEN);
+        GeoPosition geoPoint1 = new GeoPosition(point1.getLatitude(), point1.getLongitude());
+        GeoPosition geoPoint2 = new GeoPosition(point2.getLatitude(), point2.getLongitude());
+        Point2D mapPoint1 = map.convertGeoPositionToPoint(geoPoint1);
+        Point2D mapPoint2 = map.convertGeoPositionToPoint(geoPoint2);
+        g.draw(new Line2D.Double(mapPoint1, mapPoint2));
+    }
+
     public static void drawPaths(List<List<Node>> paths, Graphics2D g, JXMapViewer map) {
         g.setColor(Color.GREEN);
 
         for (List<Node> path : paths) {
-            for (int i = 0; i < path.size() - 1; i++) {
-                Node startNode = path.get(i);
-                Node endNode = path.get(i + 1);
-                GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
-                GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
-                Point2D startP = map.convertGeoPositionToPoint(point1);
-                Point2D endP = map.convertGeoPositionToPoint(point2);
-                // System.out.println("Start: " + startP + " End: " + endP);
-                g.draw(new Line2D.Double(startP, endP));
+            if (path != null) {
+                for (int i = 0; i < path.size() - 1; i++) {
+                    Node startNode = path.get(i);
+                    Node endNode = path.get(i + 1);
+                    GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
+                    GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
+                    Point2D startP = map.convertGeoPositionToPoint(point1);
+                    Point2D endP = map.convertGeoPositionToPoint(point2);
+                    g.draw(new Line2D.Double(startP, endP));
+                }
             }
+
         }
     }
 

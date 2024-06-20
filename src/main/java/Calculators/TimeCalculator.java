@@ -1,6 +1,8 @@
 package Calculators;
 
 import java.sql.Time;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
 
@@ -16,6 +18,10 @@ public abstract class TimeCalculator {
 
     double walkingTime;
     double cyclingTime;
+
+    public static String hour;
+    public static String minute;
+    public static Time sqlTime;
 
     /**
      * Calculates the time required to cover a certain distance at a given speed.
@@ -76,6 +82,7 @@ public abstract class TimeCalculator {
     public static Time calculateTime(double startLat, double startLon, double endLat, double endLon) {
 
         double distanceToStartBusstop = calculateDistanceIfNotCached(startLat, startLon, endLat, endLon);
+
         Time baseTime = getCurrentTime();
         TimeCalculator timeCalc = new AverageTimeCalculator(distanceToStartBusstop);
         int time = (int) (Math.round(timeCalc.getWalkingTime()));
@@ -104,11 +111,12 @@ public abstract class TimeCalculator {
     }
 
     public static Time getCurrentTime() {
-        // Calendar calendar = Calendar.getInstance();
-        // calendar.set(Calendar.SECOND, 0);
-        // calendar.set(Calendar.MILLISECOND, 0);
-        // Time currentTime = new Time(calendar.getTimeInMillis());
-        Time currentTime = Time.valueOf("10:20:00");
+        String timeString = hour + ":" + minute + ":00";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalTime localTime = LocalTime.parse(timeString, formatter);
+        sqlTime = Time.valueOf(localTime);
+
+        Time currentTime = sqlTime;
         return currentTime;
     }
 

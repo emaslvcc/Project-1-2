@@ -78,7 +78,7 @@ public class BusConnectionDev {
                     directTripTime = TimeCalculator
                             .calculateTripTime(TimeCalculator.getCurrentTime().toString(),
                                     directBestTrip.getTimeOfArrDest());
-                    if (directTripTime < 40) {
+                    if (directTripTime < 30) {
                         showDirectInfo(conn, directBestTrip);
                     } else {
                         transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2,

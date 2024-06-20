@@ -113,7 +113,7 @@ public class tempTransfer {
                 JOIN stops s1 ON s1.stop_id = tt.first_start_bus_stop_id
                 JOIN stops s2 ON s2.stop_id = tt.first_end_bus_stop_id
                 WHERE tt.timeOfArrDestination = (
-                    SELECT MIN(timeOfArrDestination) FROM tempTransfer WHERE first_route_id = second_route_id
+                    SELECT MIN(timeOfArrDestination) FROM tempTransfer
                 ) AND tt.first_route_id = tt.second_route_id
                 LIMIT 1;
                 """;
@@ -167,8 +167,8 @@ public class tempTransfer {
                 JOIN stops s1 ON s1.stop_id = tt.second_start_bus_stop_id
                 JOIN stops s2 ON s2.stop_id = tt.second_end_bus_stop_id
                 WHERE tt.timeOfArrDestination = (
-                    SELECT MIN(timeOfArrDestination) FROM tempTransfer WHERE first_route_id = second_route_id
-                ) AND tt.first_route_id = tt.second_route_id
+                    SELECT MIN(timeOfArrDestination) FROM tempTransfer)
+                AND tt.first_route_id = tt.second_route_id
                 LIMIT 1;
                 """;
 

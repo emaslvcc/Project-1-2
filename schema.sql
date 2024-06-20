@@ -193,6 +193,9 @@ CREATE TABLE transfers (
 
 LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/transfers.txt' INTO TABLE transfers FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
+
+
+-- below is for phase 3
 DROP TABLE IF EXISTS post_codes;
 
 CREATE TABLE post_codes(
@@ -202,12 +205,11 @@ CREATE TABLE post_codes(
 );
 
 LOAD DATA LOCAL INFILE  '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/MassZipLatLon.csv' INTO TABLE post_codes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+
 INSERT into post_codes values(
 '6212xp','50.831516', '5.69584');
-
+       
                
-               
-
 
 CREATE TABLE post_codes_join_table AS
 SELECT 
@@ -238,6 +240,7 @@ CREATE table AllTransferStops (
     `stop_2_id` varchar(255),
   PRIMARY KEY (`route_id_1`,`stop_1_id`,`route_id_2`,`stop_2_id`)
 );
+
 
 
 TRUNCATE table AllTransferStops ; 
@@ -276,8 +279,8 @@ JOIN (
       AND r.route_short_name NOT LIKE '%trein%'
 ) b 
 ON (a.stop_id = b.stop_id OR ST_Distance_Sphere(point(a.stop_lon, a.stop_lat), point(b.stop_lon, b.stop_lat)) < 80)
-AND a.route_id <> b.route_id
 ORDER BY a.route_id, b.route_id);
+
 
 
 
@@ -304,47 +307,10 @@ drop table if exists tempTransfer;
     timeOfDepart Time
                 );
                
-   CREATE TABLE `preComputedTripDetails` (
-  `start_stop_id` varchar(40) DEFAULT NULL,
-  `end_stop_id` varchar(40) DEFAULT NULL,
-  `route_id` varchar(255) DEFAULT NULL,
-  `route_short_name` varchar(255) DEFAULT NULL,
-  `route_long_name` varchar(255) DEFAULT NULL,
-  `trip_id` int DEFAULT NULL,
-  `start_departure_time` time DEFAULT NULL,
-  `end_arrival_time` time DEFAULT NULL,
-  `trip_time` int DEFAULT NULL,
-  KEY `idx_trip_details_query` (`start_stop_id`,`end_stop_id`,`route_id`,`start_departure_time`)
-) ;
 
 
-                   
-               
-  INSERT into preComputedTripDetails(                        
-               SELECT
-    st1.stop_id AS start_stop_id,
-    st2.stop_id AS end_stop_id,
-    t.route_id,
-    r.route_short_name,
-    r.route_long_name,
-    st1.trip_id,
-    st1.departure_time AS start_departure_time,
-    st2.arrival_time AS end_arrival_time,
-    TIMESTAMPDIFF(MINUTE, st1.departure_time, st2.arrival_time) AS trip_time
-FROM
-    stop_times st1
-JOIN
-    stop_times st2 ON st1.trip_id = st2.trip_id AND st1.stop_sequence < st2.stop_sequence
-JOIN
-    trips t ON t.trip_id = st1.trip_id
-JOIN
-    routes r ON t.route_id = r.route_id);
 
--- Index to speed up subsequent queries
-CREATE INDEX idx_start_stop_id ON PrecomputedTrips(start_stop_id);
-CREATE INDEX idx_end_stop_id ON PrecomputedTrips(end_stop_id);
-CREATE INDEX idx_route_id ON PrecomputedTrips(route_id);
-CREATE INDEX idx_trip_details ON preComputedTripDetails (start_stop_id, end_stop_id, route_id, start_departure_time);
+
 
    
 -- test (not need now)

@@ -156,7 +156,7 @@ public class BusConnectionDev {
         if (firstDistance == 0) {
             firstDistance = calculateTotalDistance(stopNodes);
         }
-
+        int first_number_shape = number_shape_id;
         // for second trip
         int numberOfFirstTripNode = tripNodes.size();
         number_shape_id = 0;
@@ -170,7 +170,7 @@ public class BusConnectionDev {
                 transferBestTrip.getEndStopId());
         System.out.println("2nd:" + transferBestTrip.getColor());
 
-        if (number_shape_id == 0) {
+        if (number_shape_id == 0 || first_number_shape == 0) {
             createMap.drawPath(stopNodes, numberOfFirstTripNode,
                     firstTrip.getColor(),
                     transferBestTrip.getColor());

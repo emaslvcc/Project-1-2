@@ -170,7 +170,7 @@ public class LogicManager extends GetUserData {
      */
     public static double calculateDistance(List<Node> path) {
         if (path == null) {
-            return 0;
+            return 1000;
         }
         double distance = 0;
         for (int i = 0; i < path.size() - 1; i++) {

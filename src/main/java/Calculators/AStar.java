@@ -38,14 +38,9 @@ public class AStar {
         frontier.add(start);
         cameFrom.put(start, null);
         costSoFar.put(start, 0.0);
-        // long startTime = System.currentTimeMillis(); // Start time
-        // long timeLimit = 2000; // Time limit in milliseconds
 
         while (!frontier.isEmpty()) {
-            // System.out.println(System.currentTimeMillis() - startTime);
-            // if (System.currentTimeMillis() - startTime > timeLimit) {
-            // break;
-            // }
+
             Node current = frontier.poll();
 
             if (current.equals(goal)) {

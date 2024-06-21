@@ -341,20 +341,30 @@ public class createMap {
 
                         // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
+                        if (num != 0) {
+                            g.setColor(firstLineColor);
+                            if (0 < i && i < num) {
+                                // Set the color for the lines
+                                g.setStroke(new BasicStroke(3));
+                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                        (int) pointMap.getY());
 
-                        g.setColor(firstLineColor);
-                        if (0 < i && i < num) {
-                            // Set the color for the lines
-                            g.setStroke(new BasicStroke(3));
-                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
-                                    (int) pointMap.getY());
+                            } else if (i >= num) {
+                                g.setColor(secondLineColor);
+                                g.setStroke(new BasicStroke(3));
+                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                        (int) pointMap.getY());
 
-                        } else if (i >= num) {
-                            g.setColor(secondLineColor);
-                            g.setStroke(new BasicStroke(3));
-                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
-                                    (int) pointMap.getY());
+                            }
+                        } else {
+                            g.setColor(firstLineColor);
+                            if (0 < i) {
+                                // Set the color for the lines
+                                g.setStroke(new BasicStroke(3));
+                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                        (int) pointMap.getY());
 
+                            }
                         }
 
                         // Update pointMapPrev to the current stop for the next iteration

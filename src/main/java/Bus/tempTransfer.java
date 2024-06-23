@@ -7,6 +7,7 @@ import Calculators.*;
 
 public class tempTransfer {
     static boolean stop = false;
+    static Time newTime;
 
     public static TripInfo processTransfers(double x1, double y1, double x2, double y2, long directTripToDest)
             throws SQLException {
@@ -69,7 +70,7 @@ public class tempTransfer {
                         int time = (int) (Math.round(timeCalc.getWalkingTime()));
                         long walkingTimeToStartBusstop = time * 60 * 1000;
 
-                        Time newTime = new Time(currentTime.getTime() + walkingTimeToStartBusstop);
+                        newTime = new Time(currentTime.getTime() + walkingTimeToStartBusstop);
                         firstTrip = fetchTripDetails(con, firstTripQuery, startStopId, stop1ID,
                                 startRouteId, newTime);
 
@@ -370,6 +371,7 @@ public class tempTransfer {
                     AND t.route_id = ?
                     AND st1.departure_time >= ?
                 ORDER BY
+                    CASE WHEN st1.departure_time >= ? THEN 0 ELSE 1 END,
                     st1.departure_time ASC
                 LIMIT 1;
                                 """;
@@ -401,6 +403,7 @@ public class tempTransfer {
                     AND t.route_id = ?
                     AND st1.departure_time >= ?
                 ORDER BY
+                    CASE WHEN st1.departure_time >= ? THEN 0 ELSE 1 END,
                     st1.departure_time ASC
                 LIMIT 1;
                                 """;
@@ -412,6 +415,7 @@ public class tempTransfer {
                 pstmt.setObject(i + 1, params[i]); // Simplified setting parameters
 
             }
+            pstmt.setTime(5, newTime);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {

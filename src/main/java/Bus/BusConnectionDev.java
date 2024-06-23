@@ -12,6 +12,9 @@ import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
 import GUI.transferModule;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 
 /**
  * Manages the logic behind bus trips.
@@ -42,6 +45,11 @@ public class BusConnectionDev {
     static int directTripTime = 0;
     static double distanceBetweenTwoZipCodes;
 
+    public static String hour;
+    public static String minute;
+    public static Time sqlTime;
+
+
     /**
      * Finds and processes the best bus route between two coordinates.
      * 
@@ -55,6 +63,13 @@ public class BusConnectionDev {
     public static void busLogic(double x1, double y1, double x2, double y2) throws Exception {
         try {
             Connection conn = DatabaseConnection.getConnection();
+
+            String timeString = hour + ":" + minute + ":00";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            LocalTime localTime = LocalTime.parse(timeString, formatter);
+            sqlTime = Time.valueOf(localTime);
+
+
             List<Node> shortestPath = LogicManager.calculateRouteByCoordinates(x1, y1, x2, y2, "walk");
             distanceBetweenTwoZipCodes = LogicManager.calculateDistance(shortestPath);
             TimeCalculator timeCalc = new AverageTimeCalculator(distanceBetweenTwoZipCodes);
@@ -313,7 +328,7 @@ public class BusConnectionDev {
      * @throws SQLException if a database error occurs
      */
     public static void findPotentialRoutes(Connection conn) throws SQLException {
-        String sqlDropPotentialToutes = "DROP TABLE IF EXISTS potential_routes;";
+        String sqlDropPotentialRoutes = "DROP TABLE IF EXISTS potential_routes;";
         String sql = """
                     CREATE TEMPORARY TABLE IF NOT EXISTS potential_routes AS
                     SELECT DISTINCT
@@ -346,16 +361,19 @@ public class BusConnectionDev {
                     JOIN
                         nearest_end_stops nes ON st2.stop_id = nes.stop_id
                     WHERE
-                        st1.departure_time >= CURRENT_TIME()
+                        st1.departure_time >= ?
                     GROUP BY
                         t.route_id, st1.trip_id
                     ORDER BY
                         earliest_departure_time ASC;
                 """;
-        try (Statement stmt = conn.createStatement();) {
-            stmt.execute(sqlDropPotentialToutes);
-            stmt.execute(sql);
+        try (PreparedStatement stmtDrop = conn.prepareStatement(sqlDropPotentialRoutes);
+             PreparedStatement stmtCreate = conn.prepareStatement(sql);) {
+            stmtDrop.execute();
+            stmtCreate.setTime(1, sqlTime);
+            stmtCreate.execute();
         }
+
     }
 
     /**
@@ -385,17 +403,19 @@ public class BusConnectionDev {
                     JOIN
                         stop_times st2 ON pr.end_stop_id = st2.stop_id AND pr.trip_id = st2.trip_id
                     WHERE
-                        st1.departure_time >= CURRENT_TIME()
+                        st1.departure_time >= ?
                     GROUP BY
                         pr.route_id, pr.start_stop_id, pr.end_stop_id
                     ORDER BY
                         earliest_arrival_time ASC
                     LIMIT 1;
                 """;
-        try (Statement stmt = conn.createStatement()) {
-            stmt.execute(setGroupConcatMaxLen); // Extend group_concat_max_len for large datasets
-            stmt.execute(sqlDropRouteBusStops);
-            stmt.execute(sqlRoute);
+        try (Statement stmt = conn.createStatement();
+             PreparedStatement pstmt = conn.prepareStatement(sqlRoute)) {
+            stmt.executeUpdate(setGroupConcatMaxLen);
+            stmt.executeUpdate(sqlDropRouteBusStops);
+            pstmt.setTime(1, sqlTime);
+            pstmt.executeUpdate();
 
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {

@@ -32,7 +32,7 @@ public class LogicManager extends GetUserData {
      * @param modeBox        Option of walking or cycling.
      * @throws Exception
      */
-    public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox)
+    public void calculateLogic(JTextField startCodeField, JTextField endCodeField, JComboBox<String> modeBox, JComboBox<String> startHour, JComboBox<String> startMinute)
             throws Exception {
 
         try {
@@ -50,6 +50,10 @@ public class LogicManager extends GetUserData {
         GUI.createMap.updateCoord(startPostCode, endPostCode);
 
         if ((mode).equals("Bus")) {
+            BusConnectionDev.hour = (String) startHour.getSelectedItem();
+            BusConnectionDev.minute = (String) startMinute.getSelectedItem();
+            TimeCalculator.hour = (String) startHour.getSelectedItem();
+            TimeCalculator.minute = (String) startMinute.getSelectedItem();
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude());
             // GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3],

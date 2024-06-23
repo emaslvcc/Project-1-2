@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -25,7 +26,8 @@ public class mapFrame extends JFrame {
         private static JLabel timeNumberLabel;
         private JLabel timeTextLabel;
         private static JPanel busInfoPanel;
-
+        private static JComboBox<String> startHour;
+        private static JComboBox<String> startMinute;
         /**
          * Calls the component initializer.
          */
@@ -53,6 +55,9 @@ public class mapFrame extends JFrame {
                 timeTextLabel = new JLabel();
                 timeNumberLabel = new JLabel();
                 busInfoPanel = new JPanel();
+                startHour = new javax.swing.JComboBox<>();
+                startMinute = new javax.swing.JComboBox<>();
+
 
                 setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 setName("mapFrame");
@@ -139,6 +144,38 @@ public class mapFrame extends JFrame {
                 destinationCodeLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 destinationCodeLabel.setText("Destination Zipcode:");
 
+                String[] hours = new String[25];
+                for (int i = 0; i <= 24; i++) {
+                        hours[i] = String.format("%02d", i);
+                }
+
+                String[] minutes = new String[60];
+                for (int i = 0; i <= 59; i++) {
+                        minutes[i] = String.format("%02d", i);
+                }
+
+                startHour.setOpaque(false);
+                startHour.setBackground(new Color(170, 211, 223));
+                startHour.setFont(new Font("Segoe UI", 1, 12)); // NOI18N
+                startHour.setForeground(new Color(255, 255, 255));
+                startHour.setModel(new DefaultComboBoxModel<>(hours));
+                startHour.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                startMinute.setOpaque(false);
+                startMinute.setBackground(new Color(170, 211, 223));
+                startMinute.setFont(new Font("Segoe UI", 1, 12)); // NOI18N
+                startMinute.setForeground(new Color(255, 255, 255));
+                startMinute.setModel(new DefaultComboBoxModel<>(minutes));
+                startMinute.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                int currentHour = LocalTime.now().getHour();
+                String currentHourString = String.format("%02d", currentHour);
+                startHour.setSelectedItem(currentHourString);
+
+                int currentMinute = LocalTime.now().getMinute();
+                String currentMinuteString = String.format("%02d", currentMinute);
+                startMinute.setSelectedItem(currentMinuteString);
+
                 startCodeField.setForeground(new Color(0, 0, 0));
 
                 destinationCodeField.setForeground(new Color(0, 0, 0));
@@ -153,200 +190,114 @@ public class mapFrame extends JFrame {
                 timeNumberLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 timeNumberLabel.setText("0 min");
 
-                GroupLayout backPanelLayout = new GroupLayout(backPanel);
+                javax.swing.GroupLayout backPanelLayout = new javax.swing.GroupLayout(backPanel);
                 backPanel.setLayout(backPanelLayout);
                 backPanelLayout.setHorizontalGroup(
-                                backPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(backPanelLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addContainerGap())
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
+                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addGroup(backPanelLayout.createSequentialGroup()
-                                                                .addContainerGap()
-                                                                .addComponent(mapPanel,
-                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                Short.MAX_VALUE)
-                                                                .addContainerGap())
-                                                .addGroup(GroupLayout.Alignment.TRAILING, backPanelLayout
-                                                                .createSequentialGroup()
-                                                                .addGroup(backPanelLayout.createParallelGroup(
-                                                                                GroupLayout.Alignment.LEADING)
-                                                                                .addGroup(backPanelLayout
-                                                                                                .createSequentialGroup()
-                                                                                                .addGap(135, 135, 135)
-                                                                                                .addGroup(backPanelLayout
-                                                                                                                .createParallelGroup(
-                                                                                                                                GroupLayout.Alignment.TRAILING)
-                                                                                                                .addComponent(distanceTextLabel,
-                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                78,
-                                                                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                                                                .addComponent(distanceNumberLabel,
-                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                72,
-                                                                                                                                GroupLayout.PREFERRED_SIZE))
-                                                                                                .addPreferredGap(
-                                                                                                                LayoutStyle.ComponentPlacement.RELATED,
-                                                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                                                Short.MAX_VALUE))
-                                                                                .addGroup(backPanelLayout
-                                                                                                .createSequentialGroup()
-                                                                                                .addGroup(backPanelLayout
-                                                                                                                .createParallelGroup(
-                                                                                                                                GroupLayout.Alignment.LEADING)
-                                                                                                                .addGroup(backPanelLayout
-                                                                                                                                .createSequentialGroup()
-                                                                                                                                .addGap(41, 41, 41)
-                                                                                                                                .addComponent(startCodeField,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                                201,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE))
-                                                                                                                .addGroup(backPanelLayout
-                                                                                                                                .createSequentialGroup()
-                                                                                                                                .addGap(93, 93, 93)
-                                                                                                                                .addComponent(startCodeLabel)))
-                                                                                                .addGroup(backPanelLayout
-                                                                                                                .createParallelGroup(
-                                                                                                                                GroupLayout.Alignment.LEADING)
-                                                                                                                .addGroup(backPanelLayout
-                                                                                                                                .createSequentialGroup()
-                                                                                                                                .addGap(169, 169,
-                                                                                                                                                169)
-                                                                                                                                .addComponent(modeBox,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE))
-                                                                                                                .addGroup(GroupLayout.Alignment.TRAILING,
-                                                                                                                                backPanelLayout.createSequentialGroup()
-                                                                                                                                                .addPreferredGap(
-                                                                                                                                                                LayoutStyle.ComponentPlacement.RELATED,
-                                                                                                                                                                116,
-                                                                                                                                                                Short.MAX_VALUE)
-                                                                                                                                                .addComponent(calculateButton,
-                                                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                                                173,
-                                                                                                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                                                                                                .addGap(121, 121,
-                                                                                                                                                                121)))))
-                                                                .addGroup(backPanelLayout.createParallelGroup(
-                                                                                GroupLayout.Alignment.LEADING)
-                                                                                .addGroup(GroupLayout.Alignment.TRAILING,
-                                                                                                backPanelLayout
-                                                                                                                .createSequentialGroup()
-                                                                                                                .addGroup(backPanelLayout
-                                                                                                                                .createParallelGroup(
-                                                                                                                                                GroupLayout.Alignment.LEADING)
-                                                                                                                                .addComponent(timeTextLabel,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                                78,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                                                                                .addComponent(timeNumberLabel,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                                72,
-                                                                                                                                                GroupLayout.PREFERRED_SIZE))
-                                                                                                                .addGap(154, 154,
-                                                                                                                                154))
-                                                                                .addGroup(GroupLayout.Alignment.TRAILING,
-                                                                                                backPanelLayout.createSequentialGroup()
-                                                                                                                .addComponent(destinationCodeLabel)
-                                                                                                                .addGap(42, 42, 42)
-                                                                                                                .addComponent(minimizeButton)
-                                                                                                                .addPreferredGap(
-                                                                                                                                LayoutStyle.ComponentPlacement.RELATED)
-                                                                                                                .addComponent(exitButton)
-                                                                                                                .addGap(15, 15, 15))
-                                                                                .addGroup(GroupLayout.Alignment.TRAILING,
-                                                                                                backPanelLayout.createSequentialGroup()
-                                                                                                                .addComponent(destinationCodeField,
-                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                197,
-                                                                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                                                                .addGap(49, 49, 49)))));
+                                                        .addGap(135, 135, 135)
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                .addComponent(distanceTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(distanceNumberLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGap(154, 154, 154)
+                                                        .addComponent(startHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(18, 18, 18)
+                                                        .addComponent(startMinute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                                        .addGap(41, 41, 41)
+                                                                        .addComponent(startCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                                        .addGap(93, 93, 93)
+                                                                        .addComponent(startCodeLabel)))
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                                        .addGap(169, 169, 169)
+                                                                        .addComponent(modeBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 116, Short.MAX_VALUE)
+                                                                        .addComponent(calculateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addGap(121, 121, 121)))))
+                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addComponent(timeTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(timeNumberLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGap(154, 154, 154))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
+                                                        .addComponent(destinationCodeLabel)
+                                                        .addGap(42, 42, 42)
+                                                        .addComponent(minimizeButton)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(exitButton)
+                                                        .addGap(15, 15, 15))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
+                                                        .addComponent(destinationCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(49, 49, 49))))
+                );
                 backPanelLayout.setVerticalGroup(
-                                backPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(backPanelLayout.createSequentialGroup()
+                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                                 .addGroup(backPanelLayout.createSequentialGroup()
-                                                                .addGroup(backPanelLayout
-                                                                                .createParallelGroup(
-                                                                                                GroupLayout.Alignment.TRAILING)
-                                                                                .addGroup(backPanelLayout
-                                                                                                .createSequentialGroup()
-                                                                                                .addGroup(backPanelLayout
-                                                                                                                .createParallelGroup(
-                                                                                                                                GroupLayout.Alignment.LEADING)
-                                                                                                                .addGroup(backPanelLayout
-                                                                                                                                .createParallelGroup(
-                                                                                                                                                GroupLayout.Alignment.LEADING)
-                                                                                                                                .addGroup(GroupLayout.Alignment.TRAILING,
-                                                                                                                                                backPanelLayout.createSequentialGroup()
-                                                                                                                                                                .addGap(17, 17, 17)
-                                                                                                                                                                .addComponent(startCodeLabel))
-                                                                                                                                .addGroup(backPanelLayout
-                                                                                                                                                .createSequentialGroup()
-                                                                                                                                                .addContainerGap()
-                                                                                                                                                .addGroup(backPanelLayout
-                                                                                                                                                                .createParallelGroup(
-                                                                                                                                                                                GroupLayout.Alignment.BASELINE)
-                                                                                                                                                                .addComponent(exitButton)
-                                                                                                                                                                .addComponent(minimizeButton))))
-                                                                                                                .addComponent(destinationCodeLabel,
-                                                                                                                                GroupLayout.Alignment.TRAILING))
-                                                                                                .addPreferredGap(
-                                                                                                                LayoutStyle.ComponentPlacement.RELATED)
-                                                                                                .addGroup(backPanelLayout
-                                                                                                                .createParallelGroup(
-                                                                                                                                GroupLayout.Alignment.BASELINE)
-                                                                                                                .addComponent(destinationCodeField,
-                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                                                                .addComponent(startCodeField,
-                                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                                                                GroupLayout.PREFERRED_SIZE))
-                                                                                                .addGap(18, 18, 18))
-                                                                                .addGroup(backPanelLayout
-                                                                                                .createSequentialGroup()
-                                                                                                .addComponent(calculateButton)
-                                                                                                .addPreferredGap(
-                                                                                                                LayoutStyle.ComponentPlacement.RELATED)
-                                                                                                .addComponent(modeBox,
-                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                                                .addGap(8, 8, 8)))
-                                                                .addComponent(mapPanel,
-                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                GroupLayout.DEFAULT_SIZE,
-                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                .addPreferredGap(
-                                                                                LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addGroup(
-                                                                                backPanelLayout.createParallelGroup(
-                                                                                                GroupLayout.Alignment.BASELINE)
-                                                                                                .addComponent(timeTextLabel,
-                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                14,
-                                                                                                                GroupLayout.PREFERRED_SIZE)
-                                                                                                .addComponent(distanceTextLabel,
-                                                                                                                GroupLayout.PREFERRED_SIZE,
-                                                                                                                14,
-                                                                                                                GroupLayout.PREFERRED_SIZE))
-                                                                .addPreferredGap(
-                                                                                LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addGroup(
-                                                                                backPanelLayout.createParallelGroup(
-                                                                                                GroupLayout.Alignment.BASELINE)
-                                                                                                .addComponent(timeNumberLabel)
-                                                                                                .addComponent(distanceNumberLabel))
-                                                                .addGap(15, 15, 15)));
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backPanelLayout.createSequentialGroup()
+                                                                                .addGap(17, 17, 17)
+                                                                                .addComponent(startCodeLabel))
+                                                                        .addGroup(backPanelLayout.createSequentialGroup()
+                                                                                .addContainerGap()
+                                                                                .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                                        .addComponent(exitButton)
+                                                                                        .addComponent(minimizeButton))))
+                                                                .addComponent(destinationCodeLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(destinationCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(startCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGap(18, 18, 18))
+                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                        .addComponent(calculateButton)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(modeBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(8, 8, 8)))
+                                        .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(timeTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(distanceTextLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(timeNumberLabel)
+                                                                .addComponent(distanceNumberLabel)))
+                                                .addGroup(backPanelLayout.createSequentialGroup()
+                                                        .addGap(18, 18, 18)
+                                                        .addGroup(backPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(startMinute, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(startHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addGap(15, 15, 15))
+                );
 
-                GroupLayout layout = new GroupLayout(getContentPane());
+                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                .addComponent(backPanel, GroupLayout.DEFAULT_SIZE,
-                                                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(backPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                );
                 layout.setVerticalGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                .addComponent(backPanel, GroupLayout.DEFAULT_SIZE,
-                                                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(backPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                );
 
                 setSize(new Dimension(900, 598));
                 setLocationRelativeTo(null);
@@ -381,7 +332,9 @@ public class mapFrame extends JFrame {
                         return;
                 }
                 LogicManager logicManager = new LogicManager();
-                logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox);
+                logicManager.calculateLogic(startCodeField, destinationCodeField, modeBox, startHour, startMinute);
+                Calculators.TimeCalculator.hour = (String) startHour.getSelectedItem();
+                Calculators.TimeCalculator.minute = (String) startMinute.getSelectedItem();
 
                 showBusInfo(transferModule.getTransfers());
 

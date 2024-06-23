@@ -3,6 +3,7 @@ package GUI;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
 import DataManagers.LogicManager;
+import DataManagers.Node;
 import DataManagers.PostCode;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
@@ -17,6 +18,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Ellipse2D;
@@ -25,8 +28,6 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-
-import DataManagers.Node;
 
 /**
  * Manages the creation and display of the map.
@@ -45,12 +46,33 @@ public class createMap {
      */
     public static JPanel createMapPanel() {
         jXMapViewer = new JXMapViewer();
-        jXMapViewer.setPreferredSize(new Dimension(200, 440));
+        jXMapViewer.setPreferredSize(new Dimension(900, 440));
         init();
+
+        JCheckBox showAccessibilityBox = new JCheckBox("Show Accessibility");
+        showAccessibilityBox.setFont(new Font("Segoe UI", 1, 12));
+        showAccessibilityBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    System.out.println("check");
+                } else {
+                    System.out.println("unchecked");
+                }
+            }
+        });
+
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(900, 440));
+
+        jXMapViewer.setBounds(0, 0, 900, 440);
+        layeredPane.add(jXMapViewer, Integer.valueOf(0));
+
+        showAccessibilityBox.setBounds(10, 10, 130, 20);
+        layeredPane.add(showAccessibilityBox, Integer.valueOf(1));
 
         JPanel Center = new JPanel();
         Center.setLayout(new BorderLayout());
-        Center.add(jXMapViewer, BorderLayout.CENTER);
+        Center.add(layeredPane, BorderLayout.CENTER);
 
         Center.validate();
         Center.repaint();
@@ -215,8 +237,7 @@ public class createMap {
                         GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
                         Point2D pointMap = map.convertGeoPositionToPoint(point);
 
-                        // If this is not the first stop, draw a green line from the previous stop to
-                        // the
+                        // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
                         if (i > 0) {
                             g.setColor(Color.GREEN); // Set the color for the lines
@@ -341,30 +362,20 @@ public class createMap {
 
                         // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
-                        if (num != 0) {
-                            g.setColor(firstLineColor);
-                            if (0 < i && i < num) {
-                                // Set the color for the lines
-                                g.setStroke(new BasicStroke(3));
-                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
-                                        (int) pointMap.getY());
 
-                            } else if (i >= num) {
-                                g.setColor(secondLineColor);
-                                g.setStroke(new BasicStroke(3));
-                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
-                                        (int) pointMap.getY());
+                        g.setColor(firstLineColor);
+                        if (0 < i && i < num) {
+                            // Set the color for the lines
+                            g.setStroke(new BasicStroke(3));
+                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                    (int) pointMap.getY());
 
-                            }
-                        } else {
-                            g.setColor(firstLineColor);
-                            if (0 < i) {
-                                // Set the color for the lines
-                                g.setStroke(new BasicStroke(3));
-                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
-                                        (int) pointMap.getY());
+                        } else if (i >= num) {
+                            g.setColor(secondLineColor);
+                            g.setStroke(new BasicStroke(3));
+                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                    (int) pointMap.getY());
 
-                            }
                         }
 
                         // Update pointMapPrev to the current stop for the next iteration
@@ -392,7 +403,7 @@ public class createMap {
      * @param path  The list of paths.
      */
     public static void drawPath(List<Node> path, List<Node> stops, int num, String firstTripColor,
-            String secondTripColor) {
+                                String secondTripColor) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
@@ -466,34 +477,17 @@ public class createMap {
     }
 
     private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
-
-        GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
-        GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
-
-        GeoPosition startBusStop = new GeoPosition(stops.get(0).getLat(), stops.get(0).getLon());
+       GeoPosition startBusStop = new GeoPosition(stops.get(0).getLat(), stops.get(0).getLon());
         GeoPosition endBusStop = new GeoPosition(stops.get(stops.size() - 1).getLat(),
                 stops.get(stops.size() - 1).getLon());
         drawWalkingPath(g, startBusStop.getLatitude(), startBusStop.getLongitude(), endBusStop.getLatitude(),
                 endBusStop.getLongitude(), map);
         System.out.println("Start Bus Stop: " + startBusStop + " End Bus Stop: " + endBusStop);
-
-        Image PointerImage = returnPointerImage();
-
-        g = (Graphics2D) g.create();
-        Point2D start = map.convertGeoPositionToPoint(startPos);
-        Point2D end = map.convertGeoPositionToPoint(endPos);
-
-        assert PointerImage != null;
-        int imgX = PointerImage.getWidth(null);
-        int imgY = PointerImage.getHeight(null);
-
-        g.drawImage(PointerImage, (int) start.getX() - imgX / 2, (int) start.getY() - imgY, null);
-        g.drawImage(PointerImage, (int) end.getX() - imgX / 2, (int) end.getY() - imgY, null);
-
+        createStartAndEndPoints(g, map);
     }
 
     private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat,
-            double endBusLong, JXMapViewer map) {
+                                        double endBusLong, JXMapViewer map) {
         PostCode startPostCode = new PostCode("Start", startLatitude, startLongitude);
         PostCode endPostCode = new PostCode("End", endLatitude, endLongitude);
 
@@ -528,14 +522,10 @@ public class createMap {
         } else {
             paths.add(path2);
         }
-        paths.add(path1);
-        paths.add(path2);
-
         drawPaths(paths, g, map);
     }
 
     private static void drawLineBetweenPoints(Graphics2D g, JXMapViewer map, PostCode point1, PostCode point2) {
-        g.setColor(Color.GREEN);
         GeoPosition geoPoint1 = new GeoPosition(point1.getLatitude(), point1.getLongitude());
         GeoPosition geoPoint2 = new GeoPosition(point2.getLatitude(), point2.getLongitude());
         Point2D mapPoint1 = map.convertGeoPositionToPoint(geoPoint1);
@@ -546,8 +536,8 @@ public class createMap {
     public static void drawPaths(List<List<Node>> paths, Graphics2D g, JXMapViewer map) {
         g.setColor(Color.GREEN);
 
-        for (List<Node> path : paths) {
-            if (path != null) {
+        if (paths != null) {
+            for (List<Node> path : paths) {
                 for (int i = 0; i < path.size() - 1; i++) {
                     Node startNode = path.get(i);
                     Node endNode = path.get(i + 1);
@@ -558,8 +548,8 @@ public class createMap {
                     g.draw(new Line2D.Double(startP, endP));
                 }
             }
-
         }
+
     }
 
     /**
@@ -572,30 +562,38 @@ public class createMap {
         GeoPosition startPos = new GeoPosition(startLatitude, startLongitude);
         GeoPosition endPos = new GeoPosition(endLatitude, endLongitude);
 
-        Image PointerImage = returnPointerImage();
+        Image PointerImage = returnImage("/Images/pointer.png");
+        Image PersonImage = returnImage("/Images/Person.png");
 
         g = (Graphics2D) g.create();
         Point2D start = map.convertGeoPositionToPoint(startPos);
         Point2D end = map.convertGeoPositionToPoint(endPos);
 
         assert PointerImage != null;
-        int imgX = PointerImage.getWidth(null);
-        int imgY = PointerImage.getHeight(null);
+        assert PersonImage != null;
 
-        g.drawImage(PointerImage, (int) start.getX() - imgX / 2, (int) start.getY() - imgY, null);
-        g.drawImage(PointerImage, (int) end.getX() - imgX / 2, (int) end.getY() - imgY, null);
+        int PointX = PointerImage.getWidth(null);
+        int PointY = PointerImage.getHeight(null);
+        int PersonX = PersonImage.getWidth(null);
+        int PersonY = PersonImage.getHeight(null);
+
+
+        g.drawImage(PersonImage, (int) start.getX() - PersonX / 2, (int) start.getY() - PersonY, null);
+        g.drawImage(PointerImage, (int) end.getX() - PointX / 2, (int) end.getY() - PointY, null);
 
     }
+
+
 
     /**
      * Creates and returns an image for the start and end points.
      *
      * @return The image for the start and end points.
      */
-    public static Image returnPointerImage() {
+    public static Image returnImage(String path) {
         Image pointerImage;
         try {
-            URL imageUrl = createMap.class.getResource("/Images/pointer.png");
+            URL imageUrl = createMap.class.getResource(path);
             assert imageUrl != null;
             pointerImage = ImageIO.read(imageUrl);
             pointerImage = pointerImage.getScaledInstance(25, 25, Image.SCALE_SMOOTH);
@@ -605,6 +603,7 @@ public class createMap {
         }
         return pointerImage;
     }
+
 
     /**
      * Clear the map.

@@ -8,6 +8,7 @@ import DataManagers.Graph;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
+import GUI.transferModule;
 
 import java.sql.*;
 import java.time.LocalTime;
@@ -56,7 +57,7 @@ WHERE
                 double distance = getDistance(walkingNodes);
                 double minsToWalk = getWalkingTime(distance);
 
-                nearbyStops.add(new StopTime(stopId, startTime.plusMinutes((long) minsToWalk)));
+                nearbyStops.add(new StopTime(stopId, startTime.plusMinutes((long) minsToWalk), startTime));
             }
         }
         return nearbyStops;
@@ -104,7 +105,7 @@ WHERE
 
         for(StopTime stop : startingStations){
             busStopsToCheckForTrips.add(stop);   // aka mark Ps
-            stopArrivalTime.put(stop.getStopID(), new DepartureAndArrival(stop.getTime(), stop.getTime()));
+            stopArrivalTime.put(stop.getStopID(), new DepartureAndArrival(stop.getStartTime(), stop.getTime()));
         }
 
 
@@ -187,8 +188,8 @@ WHERE
 
             StringBuilder builder = new StringBuilder();
             builder.insert(0,"Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() + " ");
-            List<Node> nodeList = new ArrayList<>();
-            List<Node> stopList = new ArrayList<>();
+            List<Node> nodeList;
+            List<Node> stopList;
             while(routeTracker.containsKey(answer)){
                 builder.insert(0,"Departing at: " + stopArrivalTime.get(answer).getDep() + " taking bus: "+routeTracker.get(answer)[1]+"  tripID: "+routeTracker.get(answer)[2]+"  --> \n");
 
@@ -198,11 +199,36 @@ WHERE
                 startStation = answer;
                 builder.insert(0,"Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() +" ");
 
+                //transferModule.addTransferModule("Bus","", "", "", "No idea",getStopName(conn,answer));
+
                 // from answer to old answer
                 nodeList = queryShapeDetails(conn, routeTracker.get(oldAnswer)[2],answer, oldAnswer);
                 stopList =  getBusStopsBetween(conn,answer, oldAnswer, routeTracker.get(oldAnswer)[2]);
                 createMap.drawPath(nodeList, stopList, "blue" );   //getColor(routeTracker.get(oldAnswer)[2]));
             }
+
+
+            answer= endStation;
+        System.out.println();
+        System.out.println("very simple output");
+        while(routeTracker.containsKey(answer)){
+            LocalTime departed = stopArrivalTime.get(answer).getDep();
+            LocalTime arrived = stopArrivalTime.get(answer).getArrival();
+            String buss =  routeTracker.get(answer)[1];
+            String endStation = getStopName(conn,answer);
+
+
+            System.out.println("Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() +"  "+"Departed at: " + stopArrivalTime.get(answer).getDep() + " taking bus: "+routeTracker.get(answer)[1]+"  tripID: "+routeTracker.get(answer)[2]+"  --> \n");
+
+            answer = routeTracker.get(answer)[0];
+            String startStation = getStopName(conn,answer);
+
+            transferModule.addTransferModule("Bus",departed.toString(), arrived.toString(), buss, startStation,endStation);
+        }
+
+        transferModule.addTransferModule("Walking", stopArrivalTime.get(answer).getDep().toString(), stopArrivalTime.get(answer).getArrival().toString());
+
+        System.out.println("Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() +"  "+"Departed at: " + stopArrivalTime.get(answer).getDep() + " --> \n");
 
 
         System.out.println("Taking the Bus from station: "+ getStopName(conn,startStation)+ " to: " + getStopName(conn, endStation));
@@ -229,6 +255,8 @@ WHERE
 
     public String fastestEnd(Map<String, DepartureAndArrival> times, List<StopTime> options, double lat, double lon, Connection conn) {
         String fastest = "";
+        LocalTime startTime = LocalTime.NOON;
+        LocalTime endTime = LocalTime.NOON;
         LocalTime fastestTime = LocalTime.MAX;
 
         for(StopTime stop : options){
@@ -242,9 +270,15 @@ WHERE
                 if(times.get(stop.getStopID()).getArrival().plusMinutes(minsToWalk).isBefore(fastestTime)){
                     fastest = stop.getStopID();
                     fastestTime = times.getOrDefault(stop.getStopID(), new DepartureAndArrival(LocalTime.MAX, LocalTime.MAX)).getArrival().plusMinutes(minsToWalk);
+                    endTime = fastestTime;
+                    startTime = times.getOrDefault(stop.getStopID(), new DepartureAndArrival(LocalTime.MAX, LocalTime.MAX)).getArrival();
                 }
             }
+
         }
+
+        transferModule.addTransferModule("Walk",startTime.toString(), endTime.toString());
+
         return fastest;
     }
 
@@ -276,7 +310,7 @@ WHERE
 
     public LocalTime getDepartedTime(Connection conn, String stop, String trip){
         String queryToGetDepartedTime = """
-                SELECT st.arrival_time
+                SELECT st.departure_time
                 FROM stop_times st
                 WHERE st.trip_id = ?
                 AND st.stop_id = ?
@@ -289,7 +323,7 @@ WHERE
 
             ResultSet rs = pstmt.executeQuery();
             if(rs.next()){
-                return rs.getTime("arrival_time").toLocalTime();
+                return rs.getTime("departure_time").toLocalTime();
             }
         } catch (SQLException e) {
             e.printStackTrace();

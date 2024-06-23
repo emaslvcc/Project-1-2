@@ -1,7 +1,7 @@
 package DataManagers;
 
 import Bus.BusConnectionDev;
-import Bus.Raptor;
+import busjoris.Raptor;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
 import com.graphhopper.GraphHopper;
@@ -52,15 +52,15 @@ public class LogicManager extends GetUserData {
         GUI.createMap.updateCoord(startPostCode, endPostCode);
 
         if ((mode).equals("Bus")) {
-            Raptor tRex = new Raptor();
+            Raptor tRex = new Raptor(graph);
             System.out.println(tRex.dino(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude(), LocalTime.now()));
 
 
 
 
-            BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
-                    endPostCode.getLatitude(), endPostCode.getLongitude());
+            //BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
+            //       endPostCode.getLatitude(), endPostCode.getLongitude());
             // GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3],
             // busInfo[4], busInfo[5]);
         } else {

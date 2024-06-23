@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a6d3b755-c5c9-459c-ae7c-cdcc97eb31a0" name="Changes" comment="fixes postal code validation">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+    <list default="true" id="a6d3b755-c5c9-459c-ae7c-cdcc97eb31a0" name="Changes" comment="stuff">
+      <change afterPath="$PROJECT_DIR$/src/main/java/busjoris/GettingRoutes.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Bus/DepartureAndArrival.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/busjoris/DepartureAndArrival.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Bus/Raptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/busjoris/Raptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Bus/StopTime.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/busjoris/StopTime.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Bus/Transfer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/busjoris/Transfer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Database/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Database/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DataManagers/LogicManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DataManagers/LogicManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/busjoris/Raptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/busjoris/Raptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/busjoris/StopTime.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/busjoris/StopTime.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +160,9 @@
       <workItem from="1716047819504" duration="746000" />
       <workItem from="1716118344548" duration="22110000" />
       <workItem from="1716281556054" duration="7421000" />
-      <workItem from="1718874478951" duration="3162000" />
+      <workItem from="1718874478951" duration="7549000" />
+      <workItem from="1718980827149" duration="5982000" />
+      <workItem from="1719130556730" duration="1658000" />
     </task>
     <task id="LOCAL-00001" summary="makes the direct connection query more efficient">
       <option name="closed" value="true" />
@@ -181,7 +180,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716048173597</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="stuff">
+      <option name="closed" value="true" />
+      <created>1718877672592</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1718877672592</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -202,6 +209,7 @@
     <MESSAGE value="makes the direct connection query more efficient" />
     <MESSAGE value="fixes postal code validation" />
     <MESSAGE value="upload transfer test files" />
-    <option name="LAST_COMMIT_MESSAGE" value="upload transfer test files" />
+    <MESSAGE value="stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="stuff" />
   </component>
 </project>

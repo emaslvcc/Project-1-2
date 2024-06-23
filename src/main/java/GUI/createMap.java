@@ -56,7 +56,7 @@ public class createMap {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     System.out.println("check");
                 } else {
-                    System.out.println("unchecked");
+                    System.out.println("uncheck");
                 }
             }
         });
@@ -477,14 +477,22 @@ public class createMap {
     }
 
     private static void createStartAndEndPointsForBus(Graphics2D g, JXMapViewer map, List<Node> stops) {
-       GeoPosition startBusStop = new GeoPosition(stops.get(0).getLat(), stops.get(0).getLon());
+        GeoPosition startBusStop = new GeoPosition(stops.get(0).getLat(), stops.get(0).getLon());
         GeoPosition endBusStop = new GeoPosition(stops.get(stops.size() - 1).getLat(),
                 stops.get(stops.size() - 1).getLon());
         drawWalkingPath(g, startBusStop.getLatitude(), startBusStop.getLongitude(), endBusStop.getLatitude(),
                 endBusStop.getLongitude(), map);
-        System.out.println("Start Bus Stop: " + startBusStop + " End Bus Stop: " + endBusStop);
         createStartAndEndPoints(g, map);
     }
+
+
+    private static List<Node> cachedPath1 = null;
+    private static List<Node> cachedPath2 = null;
+    private static PostCode cachedStartPostCode = null;
+    private static PostCode cachedEndPostCode = null;
+    private static PostCode cachedStartBus = null;
+    private static PostCode cachedEndBus = null;
+
 
     private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat,
                                         double endBusLong, JXMapViewer map) {
@@ -493,23 +501,35 @@ public class createMap {
 
         PostCode startBus = new PostCode("Start Bus", startBusLat, startBusLong);
         PostCode endBus = new PostCode("End Bus", endBusLat, endBusLong);
+        List<Node> path1;
+        List<Node> path2;
 
         LogicManager logicManager = new LogicManager();
-        logicManager.calculateRoute(startPostCode, startBus, "Walk");
-        List<Node> path1 = logicManager.getShortestPath();
-        TimeCalculator timeCalc = new AverageTimeCalculator(LogicManager.distance);
-        int time1 = (int) (Math.round(timeCalc.getWalkingTime()));
-        double distance1 = LogicManager.distance;
+        if (cachedPath1 != null && cachedStartPostCode.getLatitude() == startPostCode.getLatitude()
+                && cachedStartPostCode.getLongitude() == startPostCode.getLongitude()
+                && cachedEndBus.getLatitude() == endBus.getLatitude()
+                && cachedEndBus.getLongitude() == endBus.getLongitude()) {
+            path1 = cachedPath1;
+        } else {
+            logicManager.calculateRoute(startPostCode, startBus, "Walk");
+            path1 = logicManager.getShortestPath();
+            cachedPath1 = path1;
+            cachedStartPostCode = startPostCode;
+            cachedEndBus = endBus;
+        }
 
-        logicManager.calculateRoute(endBus, endPostCode, "Walk");
-        List<Node> path2 = logicManager.getShortestPath();
-        TimeCalculator timeCalc2 = new AverageTimeCalculator(LogicManager.distance);
-        int time2 = (int) (Math.round(timeCalc2.getWalkingTime()));
-        double distance2 = LogicManager.distance;
-
-        int totalTime = time1 + time2;
-        double totalDistance = distance1 + distance2;
-
+        if (cachedPath2 != null && cachedStartBus.getLatitude() == startBus.getLatitude()
+                && cachedStartBus.getLongitude() == startBus.getLongitude()
+                && cachedEndPostCode.getLatitude() == endPostCode.getLatitude()
+                && cachedEndPostCode.getLongitude() == endPostCode.getLongitude()) {
+            path2 = cachedPath2;
+        } else {
+            logicManager.calculateRoute(endBus, endPostCode, "Walk");
+            path2 = logicManager.getShortestPath();
+            cachedPath2 = path2;
+            cachedStartBus = startBus;
+            cachedEndPostCode = endPostCode;
+        }
         List<List<Node>> paths = new java.util.ArrayList<>();
         if (path1 == null || path1.isEmpty()) {
             drawLineBetweenPoints(g, map, startPostCode, startBus);
@@ -582,7 +602,6 @@ public class createMap {
         g.drawImage(PointerImage, (int) end.getX() - PointX / 2, (int) end.getY() - PointY, null);
 
     }
-
 
 
     /**

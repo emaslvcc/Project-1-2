@@ -3,14 +3,17 @@ package DataManagers;
 import Bus.BusConnectionDev;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
+import busjoris.Raptor;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.config.Profile;
 import com.graphhopper.util.*;
 
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.*;
 
 /**
@@ -56,6 +59,8 @@ public class LogicManager extends GetUserData {
             TimeCalculator.minute = (String) startMinute.getSelectedItem();
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude());
+//            Raptor trex = new Raptor(graph);
+//            trex.dino(startPostCode.getLatitude(), startPostCode.getLongitude(), endPostCode.getLatitude(), endPostCode.getLongitude(), LocalTime.of(Integer.parseInt(Objects.requireNonNull(startHour.getSelectedItem()).toString()), Integer.parseInt(Objects.requireNonNull(startMinute.getSelectedItem()).toString())));
             // GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3],
             // busInfo[4], busInfo[5]);
         } else {

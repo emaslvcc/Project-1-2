@@ -158,7 +158,8 @@ public class createMap {
         });
     }
 
-    private static void drawAccessibility(ArrayList<PostCode> list) {
+     private static void drawAccessibility(ArrayList<PostCode> list) {
+        PostCode.sortScores();
         accessibilityPainter = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
@@ -169,9 +170,9 @@ public class createMap {
                         GeoPosition point = new GeoPosition(postCode.getLatitude(), postCode.getLongitude());
                         Point2D pointMap = map.convertGeoPositionToPoint(point);
                         double score = postCode.getScore();
-                        if (score < 0.5) {
+                        if (score <= PostCode.getFirstThird()) {
                             g.setColor(Color.GREEN);
-                        } else if (score < 1) {
+                        } else if (score <= PostCode.getSecondThird()) {
                             g.setColor(Color.YELLOW);
                         } else {
                             g.setColor(Color.RED);

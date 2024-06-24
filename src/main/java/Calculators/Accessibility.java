@@ -320,30 +320,42 @@ public class Accessibility {
 
     public ArrayList<PostCode> returnAccessibilityScores() {
         ArrayList<PostCode> postCodes = new ArrayList<>();
-        GetUserData GetUserData = new GetUserData();
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String query = "SELECT * FROM gtfs.weighted_accessibility_scores";
-            PreparedStatement stmt = conn.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                String zipcode = rs.getString("zipcode");
-                double total_weighted_score = rs.getDouble("total_weighted_score");
-                //System.out.println("Zipcode: " + zipcode + ", Total Weighted Score: " + total_weighted_score);
+            List<String> zipCodes = getZipCodes(conn);
 
-                PostCode postCode = GetUserData.createPostCode(zipcode);
-                postCode.setScore(total_weighted_score);
+            zipCodes.parallelStream().forEach(zipCode -> {
+                double[] coords = getCoords(conn, zipCode);
+                PostCode postCode = new PostCode(zipCode, coords[0], coords[1]);
+                double score = returnScore(conn, zipCode);
+                postCode.setScore(score);
                 postCodes.add(postCode);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+            });
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to establish database connection", e);
         }
 
         return postCodes;
     }
 
+    private double returnScore(Connection conn, String zipCode) {
+        double score = 0;
+        String sqlStatement = "SELECT total_weighted_score FROM gtfs.weighted_accessibility_scores WHERE zipcode = ?";
 
+        try (PreparedStatement pstmt = conn.prepareStatement(sqlStatement)) {
+            pstmt.setString(1, zipCode);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    score = rs.getDouble("total_weighted_score");
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving score for zip code: " + zipCode, e);
+        }
 
+        return score;
+    }
 
 
     // Main method for recalculating the whole accessibility if needed

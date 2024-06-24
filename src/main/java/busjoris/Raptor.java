@@ -76,18 +76,18 @@ WHERE
         try {
             conn = DatabaseConnection.getConnection();
             endingStations.addAll(setupNearestStops(conn, endLat, endLon, startTime, 500));
-            startingStations.addAll(setupNearestStops(conn, startLat, startLon, startTime, 900));
+            startingStations.addAll(setupNearestStops(conn, startLat, startLon, startTime, 500));
 
-            System.out.println("starting stations");
-            for(StopTime lol: startingStations){
-                System.out.println(lol.getStopID() + "  "+ lol.getTime());
-            }
-            System.out.println();
-
-            System.out.println("ending stations");
-            for(StopTime lol: endingStations){
-                System.out.println(lol.getStopID() + "  "+ lol.getTime());
-            }
+//            System.out.println("starting stations");
+//            for(StopTime lol: startingStations){
+//                System.out.println(lol.getStopID() + "  "+ lol.getTime());
+//            }
+//            System.out.println();
+//
+//            System.out.println("ending stations");
+//            for(StopTime lol: endingStations){
+//                System.out.println(lol.getStopID() + "  "+ lol.getTime());
+//            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -127,10 +127,8 @@ WHERE
                 for (String route : routes){                            // for each route served by stop
                     Transfer tr = getNextTripID(conn, route, stop.getStopID(), stop.getTime());    // here we get the next trip based on a bus station.
                     if(tr == null){
-                        System.out.println("here");
                         continue;
                     }
-                    System.out.println("added trip: " +tr.getTripID());
                     if(!checkedTripIDs.contains(tr.getTripID())){
                         transferToCheck.add(tr);
                         checkedTripIDs.add(tr.getTripID());
@@ -184,10 +182,8 @@ WHERE
 
 
                         LocalTime currentArrivalTime = stopArrivalTime.getOrDefault(stopId, new DepartureAndArrival(LocalTime.MAX, LocalTime.MAX)).getArrival();
-                        System.out.println("Found time: " +time + " Versus old time of: "+ currentArrivalTime);
                         // the second and checks that the times are not further than 10 hours apart which should prevent rollover
                         if(!stopArrivalTime.containsKey(stopId) || (time.isBefore(currentArrivalTime) && Math.abs(currentArrivalTime.minusHours(time.getHour()).toSecondOfDay())  <  LocalTime.of(6,0).toSecondOfDay())){     // if our new found time is earlier or we have not visited this one before then update
-                            System.out.println("updating");
                             stopArrivalTime.put(stopId, new DepartureAndArrival(departedTime, time));        // departed time is the time where the bus departed from the stop from before
 
                             busStopsToCheckForTrips.add(new StopTime(stopId, time));   // Add the bus stop to be checked in the next loop
@@ -211,36 +207,15 @@ WHERE
 
         endStation = fastestEnd(stopArrivalTime, endingStations, endLat, endLon,conn);
 
-        for(StopTime station: endingStations){
-            if(stopArrivalTime.containsKey(station.getStopID())){
-                System.out.println(stopArrivalTime.get(station.getStopID()).getArrival());
-            }
-            System.out.println("No time found for :"+ station.getStopID());
-        }
+//        for(StopTime station: endingStations){
+//            if(stopArrivalTime.containsKey(station.getStopID())){
+//                System.out.println(stopArrivalTime.get(station.getStopID()).getArrival());
+//            }
+//        }
 
 
         String answer = endStation;
 
-        StringBuilder builder = new StringBuilder();
-        builder.insert(0,"Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() + " ");
-        while(routeTracker.containsKey(answer)){
-            builder.insert(0,"Departing at: " + stopArrivalTime.get(answer).getDep() + " taking bus: "+routeTracker.get(answer)[1]+"  tripID: "+routeTracker.get(answer)[2]+"  --> \n");
-
-            String oldAnswer = answer;
-
-            answer = routeTracker.get(answer)[0];
-            startStation = answer;
-            builder.insert(0,"Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() +" ");
-
-            //transferModule.addTransferModule("Bus","", "", "", "No idea",getStopName(conn,answer));
-
-            // from answer to old answer
-        }
-
-
-        answer= endStation;
-        System.out.println();
-        System.out.println("very simple output");
 
         List<Node> nodeList = new ArrayList<>();
         List<Node> stopList = new ArrayList<>();
@@ -279,9 +254,8 @@ WHERE
         System.out.println("Taking the Bus from station: "+ getStopName(conn,startStation)+ " to: " + getStopName(conn, endStation));
 
 
-        System.out.println(builder);
 
-        double[] latlon = getStationCoordinates(conn,endStation);
+        //double[] latlon = getStationCoordinates(conn,endStation);
 
 //        List<Node> walkPath = getAndDrawWalking(endLat, endLon, latlon[0], latlon[1], conn);
 //        System.out.println(endLat + " "+ endLon + " "+ latlon[0]+ " "+ latlon[1]);
@@ -697,7 +671,6 @@ ORDER BY
 
 
                 tripNodes.add(new Node(nodeCount, shapePtLat, shapePtLon));
-                System.out.println(nodeCount);
                 nodeCount++;
             }
         }

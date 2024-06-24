@@ -4,6 +4,8 @@ import java.sql.*;
 
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 import Calculators.AverageTimeCalculator;
 import Calculators.DistanceCalculatorHaversine;
 import Calculators.TimeCalculator;
@@ -14,7 +16,6 @@ import GUI.createMap;
 import GUI.transferModule;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-
 
 /**
  * Manages the logic behind bus trips.
@@ -49,7 +50,6 @@ public class BusConnectionDev {
     public static String minute;
     public static Time sqlTime;
 
-
     /**
      * Finds and processes the best bus route between two coordinates.
      * 
@@ -68,7 +68,6 @@ public class BusConnectionDev {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             LocalTime localTime = LocalTime.parse(timeString, formatter);
             sqlTime = Time.valueOf(localTime);
-
 
             List<Node> shortestPath = LogicManager.calculateRouteByCoordinates(x1, y1, x2, y2, "walk");
             distanceBetweenTwoZipCodes = LogicManager.calculateDistance(shortestPath);
@@ -98,17 +97,25 @@ public class BusConnectionDev {
                     } else {
                         transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2,
                                 directBestTrip.getTimeOfArrDestINMs());
-                        if ((directBestTrip.getTimeOfArrDestINMs() <= transferBestTrip.getStartFromOriginInMs())) {
-                            showDirectInfo(conn, directBestTrip);
+                        if (transferBestTrip == null) {
+                            JOptionPane.showMessageDialog(null, "Bus service between these two areas is unavailable");
                         } else {
-                            showTransferInfo(conn, transferBestTrip);
+                            if ((directBestTrip.getTimeOfArrDestINMs() <= transferBestTrip.getStartFromOriginInMs())) {
+                                showDirectInfo(conn, directBestTrip);
+                            } else {
+                                showTransferInfo(conn, transferBestTrip);
+                            }
                         }
 
                     }
                 } else {
                     transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2,
                             100000);
-                    showTransferInfo(conn, transferBestTrip);
+                    if (transferBestTrip == null) {
+                        JOptionPane.showMessageDialog(null, "Bus service between these two areas is unavailable");
+                    } else {
+                        showTransferInfo(conn, transferBestTrip);
+                    }
 
                 }
                 // transferBestTrip = tempTransfer.processTransfers(x1, y1, x2, y2, 10000);
@@ -158,6 +165,7 @@ public class BusConnectionDev {
     public static void showTransferInfo(Connection conn, TripInfo transferBestTrip) throws SQLException {
         // when transfer is better
         TripInfo firstTrip = Bus.tempTransfer.getFirstTrip();
+
         System.out.println("First Best Trip: " + firstTrip);
         System.out.println("========================================");
 
@@ -368,7 +376,7 @@ public class BusConnectionDev {
                         earliest_departure_time ASC;
                 """;
         try (PreparedStatement stmtDrop = conn.prepareStatement(sqlDropPotentialRoutes);
-             PreparedStatement stmtCreate = conn.prepareStatement(sql);) {
+                PreparedStatement stmtCreate = conn.prepareStatement(sql);) {
             stmtDrop.execute();
             stmtCreate.setTime(1, sqlTime);
             stmtCreate.execute();
@@ -411,7 +419,7 @@ public class BusConnectionDev {
                     LIMIT 1;
                 """;
         try (Statement stmt = conn.createStatement();
-             PreparedStatement pstmt = conn.prepareStatement(sqlRoute)) {
+                PreparedStatement pstmt = conn.prepareStatement(sqlRoute)) {
             stmt.executeUpdate(setGroupConcatMaxLen);
             stmt.executeUpdate(sqlDropRouteBusStops);
             pstmt.setTime(1, sqlTime);

@@ -479,6 +479,58 @@ public class createMap {
 
     }
 
+    public static void drawPath(List<List<Node>> paths, List<Node> stops, List<String> colour) {
+
+        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
+                try {
+                    g.setStroke(new BasicStroke(3));
+                    int pathCount = 0;
+                    for(List<Node> path: paths){
+                        g.setColor(hexToColor(colour.get(pathCount)));
+                        for (int i = 0; i < path.size() - 1; i++) {
+                            Node startNode = path.get(i);
+                            Node endNode = path.get(i + 1);
+                            GeoPosition point1 = new GeoPosition(startNode.getLat(), startNode.getLon());
+                            GeoPosition point2 = new GeoPosition(endNode.getLat(), endNode.getLon());
+                            Point2D startP = map.convertGeoPositionToPoint(point1);
+                            Point2D endP = map.convertGeoPositionToPoint(point2);
+                            g.draw(new Line2D.Double(startP, endP));
+                        }
+                        pathCount++;
+                    }
+
+                    if (stops != null) {
+                        createStartAndEndPointsForBus(g, map, stops);
+
+                        g.setColor(Color.RED);
+                        for (int i = 0; i < stops.size(); i++) {
+                            Node node = stops.get(i);
+                            GeoPosition point = new GeoPosition(node.getLat(), node.getLon());
+                            Point2D pointMap = map.convertGeoPositionToPoint(point);
+                            Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX(), pointMap.getY(), 10, 10);
+                            g.fill(circle);
+                        }
+                    } else {
+                        // Draw start and end markers
+                        createStartAndEndPoints(g, map);
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error in drawing path" + e);
+                    e.printStackTrace();
+                } finally {
+                    g.dispose();
+                }
+
+            }
+        };
+        // Set the new painter
+        jXMapViewer.setOverlayPainter(pathOverlay);
+
+    }
+
     private static Color hexToColor(String colorStr) {
         if (!colorStr.startsWith("#")) {
             colorStr = "#" + colorStr; // Ensure the string starts with "#"

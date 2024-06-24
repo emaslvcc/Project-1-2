@@ -8,6 +8,7 @@ import DataManagers.Graph;
 import DataManagers.Node;
 import Database.DatabaseConnection;
 import GUI.createMap;
+import GUI.mapFrame;
 import GUI.transferModule;
 
 import java.sql.*;
@@ -24,6 +25,7 @@ public class Raptor {
     Graph graph;
     Stack<transferModule> transferInfoStack = new Stack<>();
     LocalTime endTime;
+    double totalDist = 0;
 
     public Raptor(Graph g){
         this.graph = g;
@@ -74,7 +76,7 @@ WHERE
         try {
             conn = DatabaseConnection.getConnection();
             endingStations.addAll(setupNearestStops(conn, endLat, endLon, startTime, 500));
-            startingStations.addAll(setupNearestStops(conn, startLat, startLon, startTime, 500));
+            startingStations.addAll(setupNearestStops(conn, startLat, startLon, startTime, 900));
 
             System.out.println("starting stations");
             for(StopTime lol: startingStations){
@@ -115,7 +117,7 @@ WHERE
 
 
         routeTracker.put(startNode, new String[]{"","",""});
-        while(transfers < 3){
+        while(transfers < 2){
             //System.out.println("transfer:   "+ transfers);
 
             // This first block is just for getting all the trips based on the stops that we accumulated
@@ -125,8 +127,10 @@ WHERE
                 for (String route : routes){                            // for each route served by stop
                     Transfer tr = getNextTripID(conn, route, stop.getStopID(), stop.getTime());    // here we get the next trip based on a bus station.
                     if(tr == null){
+                        System.out.println("here");
                         continue;
                     }
+                    System.out.println("added trip: " +tr.getTripID());
                     if(!checkedTripIDs.contains(tr.getTripID())){
                         transferToCheck.add(tr);
                         checkedTripIDs.add(tr.getTripID());
@@ -219,8 +223,6 @@ WHERE
 
         StringBuilder builder = new StringBuilder();
         builder.insert(0,"Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() + " ");
-        List<Node> nodeList = new ArrayList<>();
-        List<Node> stopList = new ArrayList<>();
         while(routeTracker.containsKey(answer)){
             builder.insert(0,"Departing at: " + stopArrivalTime.get(answer).getDep() + " taking bus: "+routeTracker.get(answer)[1]+"  tripID: "+routeTracker.get(answer)[2]+"  --> \n");
 
@@ -233,30 +235,41 @@ WHERE
             //transferModule.addTransferModule("Bus","", "", "", "No idea",getStopName(conn,answer));
 
             // from answer to old answer
-            nodeList = queryShapeDetails(conn, routeTracker.get(oldAnswer)[2],answer, oldAnswer);
-            stopList =  getBusStopsBetween(conn,answer, oldAnswer, routeTracker.get(oldAnswer)[2]);
         }
-        createMap.drawPath(nodeList, stopList, "blue" );   //getColor(routeTracker.get(oldAnswer)[2]));
 
 
         answer= endStation;
         System.out.println();
         System.out.println("very simple output");
+
+        List<Node> nodeList = new ArrayList<>();
+        List<Node> stopList = new ArrayList<>();
+        List<List<Node>> shapeList = new ArrayList<>();
+        List<String> colourList = new ArrayList<>();
         while(routeTracker.containsKey(answer)){
             LocalTime departed = stopArrivalTime.get(answer).getDep();
             LocalTime arrived = stopArrivalTime.get(answer).getArrival();
             String buss =  routeTracker.get(answer)[1];
             String endStation = getStopName(conn,answer);
+            String endStationId = answer;
+            String tripID = routeTracker.get(answer)[2];
 
-
-            System.out.println("Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() +"  "+"Departed at: " + stopArrivalTime.get(answer).getDep() + " taking bus: "+routeTracker.get(answer)[1]+"  tripID: "+routeTracker.get(answer)[2]+"  --> \n");
+            System.out.println("Arriving at stop: " + endStation+   " at "+ arrived +"  "+"Departed at: " + departed + " taking bus: "+buss+"  tripID: "+tripID+"  --> \n");
 
             answer = routeTracker.get(answer)[0];
             String startStation = getStopName(conn,answer);
+            String startStationID = answer;
+
+            nodeList = queryShapeDetails(conn, tripID, startStationID, endStationId);
+            shapeList.add(nodeList);
+            colourList.add(getColor(tripID));
+            totalDist += getDistance(nodeList);
+            stopList.addAll(getBusStopsBetween(conn, startStationID, endStationId, tripID));
 
             transferInfoStack.add(new transferModule("Bus",departed.toString(), arrived.toString(), buss, startStation,endStation));
             //transferModule.addTransferModule("Bus",departed.toString(), arrived.toString(), buss, startStation,endStation);
         }
+        createMap.drawPath(shapeList, stopList, colourList);   //getColor(routeTracker.get(oldAnswer)[2]));
 
         transferInfoStack.add(new transferModule("Walking", stopArrivalTime.get(answer).getDep().toString(), stopArrivalTime.get(answer).getArrival().toString()));
 
@@ -280,7 +293,7 @@ WHERE
             transferModule.getTransfers().add(transferInfoStack.pop());
         }
 
-        GUI.mapFrame.updateTimeField(Duration.between(startTime, endTime).toMinutesPart());
+        mapFrame.updateTimeField(Duration.between(startTime, endTime).toMinutesPart());
         return endTime;
     }
     // while less reps than the set max of transfers maybe smth like 2
@@ -325,7 +338,7 @@ WHERE
         Node endNode = graph.getNodeByLatLon(lat2, lon2);
 
         // Find the shortest path
-        Calculators.AStar aStar = new Calculators.AStar(graph);
+        AStar aStar = new AStar(graph);
 
 
         // todo draw the walking
@@ -496,8 +509,35 @@ LIMIT 1;
             if(rs.next()){
                 tripId = rs.getString(1);
             }
-            if(tripId.isEmpty()){
-                return null;
+            if(tripId.isEmpty() && transferTime.isAfter(LocalTime.of(23,0))){  // When we are not able to find a trip later in the day get the earliest one
+                String query2 = """
+SELECT
+    t.trip_id,
+    st.departure_time
+FROM
+    trips t
+JOIN
+    stop_times st ON t.trip_id = st.trip_id
+WHERE
+    t.route_id = ?
+    AND st.stop_id = ?
+ORDER BY
+    st.departure_time ASC
+LIMIT 1;
+""";
+                try (PreparedStatement pstmt2 = conn.prepareStatement(query2)) {
+                    pstmt2.setString(1, route);
+                    pstmt2.setString(2, stopID);
+
+                    ResultSet rs2 = pstmt2.executeQuery();
+                    if (rs2.next()) {
+                        tripId = rs2.getString(1);
+                    }
+                    if(tripId.isEmpty()){
+                        return null;
+                    }
+                }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -657,6 +697,7 @@ ORDER BY
 
 
                 tripNodes.add(new Node(nodeCount, shapePtLat, shapePtLon));
+                System.out.println(nodeCount);
                 nodeCount++;
             }
         }

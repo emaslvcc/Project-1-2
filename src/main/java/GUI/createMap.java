@@ -363,23 +363,33 @@ public class createMap {
                         // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
 
-                        g.setColor(firstLineColor);
-                        if (0 < i && i < num) {
-                            // Set the color for the lines
-                            g.setStroke(new BasicStroke(3));
-                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
-                                    (int) pointMap.getY());
+                        if (num != 0) {
+                            g.setColor(firstLineColor);
+                            if (0 < i && i < num) {
+                                // Set the color for the lines
+                                g.setStroke(new BasicStroke(3));
+                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                        (int) pointMap.getY());
 
-                        } else if (i >= num) {
-                            g.setColor(secondLineColor);
-                            g.setStroke(new BasicStroke(3));
-                            g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
-                                    (int) pointMap.getY());
+                            } else if (i >= num) {
+                                g.setColor(secondLineColor);
+                                g.setStroke(new BasicStroke(3));
+                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                        (int) pointMap.getY());
 
+                            }
+                        } else {
+                            g.setColor(firstLineColor);
+                            if (0 < i) {
+                                // Set the color for the lines
+                                g.setStroke(new BasicStroke(3));
+                                g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
+                                        (int) pointMap.getY());
+
+                                // Update pointMapPrev to the current stop for the next iteration
+                                pointMapPrev = pointMap;
+                            }
                         }
-
-                        // Update pointMapPrev to the current stop for the next iteration
-                        pointMapPrev = pointMap;
                     }
 
                 } catch (Exception e) {
@@ -403,7 +413,7 @@ public class createMap {
      * @param path  The list of paths.
      */
     public static void drawPath(List<Node> path, List<Node> stops, int num, String firstTripColor,
-                                String secondTripColor) {
+            String secondTripColor) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
             @Override
@@ -485,7 +495,6 @@ public class createMap {
         createStartAndEndPoints(g, map);
     }
 
-
     private static List<Node> cachedPath1 = null;
     private static List<Node> cachedPath2 = null;
     private static PostCode cachedStartPostCode = null;
@@ -493,9 +502,8 @@ public class createMap {
     private static PostCode cachedStartBus = null;
     private static PostCode cachedEndBus = null;
 
-
     private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat,
-                                        double endBusLong, JXMapViewer map) {
+            double endBusLong, JXMapViewer map) {
         PostCode startPostCode = new PostCode("Start", startLatitude, startLongitude);
         PostCode endPostCode = new PostCode("End", endLatitude, endLongitude);
 
@@ -597,12 +605,10 @@ public class createMap {
         int PersonX = PersonImage.getWidth(null);
         int PersonY = PersonImage.getHeight(null);
 
-
         g.drawImage(PersonImage, (int) start.getX() - PersonX / 2, (int) start.getY() - PersonY, null);
         g.drawImage(PointerImage, (int) end.getX() - PointX / 2, (int) end.getY() - PointY, null);
 
     }
-
 
     /**
      * Creates and returns an image for the start and end points.
@@ -622,7 +628,6 @@ public class createMap {
         }
         return pointerImage;
     }
-
 
     /**
      * Clear the map.

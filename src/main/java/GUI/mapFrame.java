@@ -448,7 +448,9 @@ public class mapFrame extends JFrame {
                 Calculators.TimeCalculator.hour = (String) startHour.getSelectedItem();
                 Calculators.TimeCalculator.minute = (String) startMinute.getSelectedItem();
 
-                showBusInfo(transferModule.getTransfers());
+                if (busMode) {
+                        showBusInfo(transferModule.getTransfers());
+                }
 
         }
 

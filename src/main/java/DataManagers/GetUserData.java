@@ -27,7 +27,7 @@ public class GetUserData {
      * @param zipCode The zip code to create a PostCode object for.
      * @return The PostCode object created based on the provided zip code.
      */
-    private PostCode createPostCode(String zipCode) {
+    public PostCode createPostCode(String zipCode) {
         if (isInDatabase(zipCode)) {
             double[] dataArr = getCoorinates(zipCode);
             return new PostCode(zipCode, dataArr[0], dataArr[1]);

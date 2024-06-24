@@ -430,7 +430,7 @@ public class mapFrame extends JFrame {
                         transferModule.clearTransfers();
                 }
                 if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
-                        createMap.clearMap();
+                        createMap.clearMapRoute();
                         addPanelForBusInfo(frame);
                         busMode = true;
                 } else if (!Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && busMode) {

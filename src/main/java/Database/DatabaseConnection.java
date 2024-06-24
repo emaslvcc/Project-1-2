@@ -8,8 +8,8 @@ import java.sql.*;
  */
 public class DatabaseConnection {
     static String URL = "jdbc:mysql://localhost:3306/gtfs";
-    static String USER = "joris";
-    static String PASSWORD = "joris";
+    static String USER = "BCS1600";
+    static String PASSWORD = "BCS1600";
 
     /**
      * Establishes and returns a connection to the database.

@@ -1,5 +1,6 @@
 package GUI;
 
+import Calculators.Accessibility;
 import Calculators.AverageTimeCalculator;
 import Calculators.TimeCalculator;
 import DataManagers.LogicManager;
@@ -9,6 +10,7 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.PanMouseInputListener;
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter;
+import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
@@ -27,6 +29,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +41,8 @@ public class createMap {
     private static double startLongitude = 0;
     private static double endLatitude = 0;
     private static double endLongitude = 0;
+    private static Painter<JXMapViewer> accessibilityPainter;
+    private static Painter<JXMapViewer> routePainter;
 
     /**
      * Creates a JPanel containing the map.
@@ -54,9 +59,12 @@ public class createMap {
         showAccessibilityBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    System.out.println("check");
+                    Accessibility accessibility = new Accessibility();
+                    ArrayList<PostCode> list = accessibility.returnAccessibilityScores();
+                    drawAccessibility(list);
                 } else {
-                    System.out.println("uncheck");
+                    accessibilityPainter = null;
+                    updateOverlayPainter();
                 }
             }
         });
@@ -150,6 +158,39 @@ public class createMap {
         });
     }
 
+    private static void drawAccessibility(ArrayList<PostCode> list) {
+        accessibilityPainter = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
+                try {
+                    for (int i = 0; i < list.size(); i++) {
+                        PostCode postCode = list.get(i);
+
+                        GeoPosition point = new GeoPosition(postCode.getLatitude(), postCode.getLongitude());
+                        Point2D pointMap = map.convertGeoPositionToPoint(point);
+                        double score = postCode.getScore();
+                        if (score < 0.5) {
+                            g.setColor(Color.GREEN);
+                        } else if (score < 1) {
+                            g.setColor(Color.YELLOW);
+                        } else {
+                            g.setColor(Color.RED);
+                        }
+                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10, 10);
+                        g.fill(circle);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error in drawing path" + e);
+                    e.printStackTrace();
+                } finally {
+                    g.dispose();
+                }
+
+            }
+        };
+        updateOverlayPainter();
+    }
+
     /**
      * Updates the start and end coordinates for drawing on the map.
      *
@@ -168,7 +209,7 @@ public class createMap {
 
     public static void drawPath(List<Node> stops, String firstTripColor) {
 
-        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+        routePainter = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
@@ -218,13 +259,12 @@ public class createMap {
 
             }
         };
-        // Set the new painter
-        jXMapViewer.setOverlayPainter(pathOverlay);
+        updateOverlayPainter();
     }
 
     public static void drawPath(List<Node> stops) {
 
-        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+        routePainter = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
@@ -259,13 +299,13 @@ public class createMap {
 
             }
         };
-        jXMapViewer.setOverlayPainter(pathOverlay);
+        updateOverlayPainter();
 
     }
 
     public static void drawPath(List<Node> path, List<Node> stops, String firstTripColor) {
 
-        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+        routePainter = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
@@ -315,9 +355,7 @@ public class createMap {
 
             }
         };
-        // Set the new painter
-        jXMapViewer.setOverlayPainter(pathOverlay);
-
+        updateOverlayPainter();
     }
 
     /**
@@ -327,7 +365,7 @@ public class createMap {
      */
     public static void drawPath(List<Node> stops, int num, String firstTripColor, String secondTripColor) {
 
-        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+        routePainter = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
@@ -401,9 +439,7 @@ public class createMap {
 
             }
         };
-        // Set the new painter
-        jXMapViewer.setOverlayPainter(pathOverlay);
-
+        updateOverlayPainter();
     }
 
     /**
@@ -415,7 +451,7 @@ public class createMap {
     public static void drawPath(List<Node> path, List<Node> stops, int num, String firstTripColor,
             String secondTripColor) {
 
-        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+        routePainter = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
@@ -474,9 +510,7 @@ public class createMap {
 
             }
         };
-        // Set the new painter
-        jXMapViewer.setOverlayPainter(pathOverlay);
-
+       updateOverlayPainter();
     }
 
     private static Color hexToColor(String colorStr) {
@@ -630,13 +664,25 @@ public class createMap {
     }
 
     /**
-     * Clear the map.
+     * Clear the routes on map.
      */
-    public static void clearMap() {
-        jXMapViewer.setOverlayPainter(null);
+    public static void clearMapRoute() {
+        routePainter = null;
+        updateOverlayPainter();
         startLatitude = Double.NaN;
         startLongitude = Double.NaN;
         endLatitude = Double.NaN;
         endLongitude = Double.NaN;
+    }
+
+    private static void updateOverlayPainter() {
+        List<Painter<JXMapViewer>> painters = new ArrayList<>();
+        if (accessibilityPainter != null) {
+            painters.add(accessibilityPainter);
+        }
+        if (routePainter != null) {
+            painters.add(routePainter);
+        }
+        jXMapViewer.setOverlayPainter(new CompoundPainter<>(painters));
     }
 }

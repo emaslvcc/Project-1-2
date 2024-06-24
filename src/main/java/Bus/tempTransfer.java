@@ -76,22 +76,25 @@ public class tempTransfer {
 
                         String secondTripQuery = getSecondTripQuery();
                         TripInfo secondTrip = null;
-                        secondTrip = fetchTripDetails(con, secondTripQuery, stop2ID, endStopId,
-                                endRouteId, firstTrip.getEndArrivalTime());
+                        if (firstTrip != null) {
+                            secondTrip = fetchTripDetails(con, secondTripQuery, stop2ID, endStopId,
+                                    endRouteId, firstTrip.getEndArrivalTime());
 
-                        // Step 3: Insert the result of secondTrip into tempTransfer
-                        if (secondTrip != null) {
+                            // Step 3: Insert the result of secondTrip into tempTransfer
+                            if (secondTrip != null) {
 
-                            double distanceToDest = TimeCalculator.calculateDistanceIfNotCached(endStopLat,
-                                    endStopLon,
-                                    x2, y2);
-                            timeCalc = new AverageTimeCalculator(distanceToDest);
+                                double distanceToDest = TimeCalculator.calculateDistanceIfNotCached(endStopLat,
+                                        endStopLon,
+                                        x2, y2);
+                                timeCalc = new AverageTimeCalculator(distanceToDest);
 
-                            int timeToDestination = (int) (Math.round(timeCalc.getWalkingTime()));
-                            insertIntoTempTransfer(con, firstTrip, secondTrip, timeToDestination,
-                                    distanceToStartBusstop, walkingTimeToStartBusstop, directTripToDest);
-                            insertTime++;
-                            System.out.println(insertTime);
+                                int timeToDestination = (int) (Math.round(timeCalc.getWalkingTime()));
+                                insertIntoTempTransfer(con, firstTrip, secondTrip, timeToDestination,
+                                        distanceToStartBusstop, walkingTimeToStartBusstop, directTripToDest);
+                                insertTime++;
+                                System.out.println(insertTime);
+
+                            }
 
                         }
 

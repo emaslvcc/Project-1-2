@@ -67,16 +67,18 @@ public abstract class TimeCalculator {
     public static int calculateTripTime(String startTime, String endTime) {
 
         // Convert the String to a Time object
-        Time startTime1 = Time.valueOf(startTime);
-        Time startTime2 = Time.valueOf(endTime);
+        Time start = Time.valueOf(startTime);
+        Time end = Time.valueOf(endTime);
 
-        // Calculate the difference in milliseconds
-        long differenceInMilliseconds = Math.abs(startTime1.getTime() - startTime2.getTime());
-
-        // Convert milliseconds to minutes
-        int differenceInMinutes = (int) differenceInMilliseconds / (1000 * 60);
-
-        return differenceInMinutes;
+        if (end.before(start)) {
+            // End time is on the next day
+            long startMs = start.getTime();
+            long endMs = end.getTime() + 24 * 3600 * 1000; // Add 24 hours to end time
+            return (int) ((endMs - startMs) / (1000 * 60));
+        } else {
+            // Both times are on the same day
+            return (int) ((end.getTime() - start.getTime()) / (1000 * 60));
+        }
     }
 
     public static Time calculateTime(double startLat, double startLon, double endLat, double endLon) {

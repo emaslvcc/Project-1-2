@@ -10,6 +10,7 @@ import Database.DatabaseConnection;
 import GUI.createMap;
 import GUI.mapFrame;
 import GUI.transferModule;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 import java.sql.*;
 import java.time.Duration;
@@ -266,8 +267,21 @@ WHERE
         while(!transferInfoStack.isEmpty()){
             transferModule.getTransfers().add(transferInfoStack.pop());
         }
+        // setup time and distance in gui
 
         mapFrame.updateTimeField(Duration.between(startTime, endTime).toMinutesPart());
+        int timediff;
+        if(endTime.isBefore(startTime)){     // if there has been a overflow
+            timediff = LocalTime.MAX.toSecondOfDay() - startTime.toSecondOfDay();
+            timediff += endTime.toSecondOfDay();
+        }else {
+            timediff = endTime.toSecondOfDay() - startTime.toSecondOfDay();
+        }
+        timediff /= 60;
+
+        mapFrame.updateDistanceField(totalDist);
+        mapFrame.updateTimeField(timediff);
+
         return endTime;
     }
     // while less reps than the set max of transfers maybe smth like 2
@@ -278,29 +292,31 @@ WHERE
 
     public String fastestEnd(Map<String, DepartureAndArrival> times, List<StopTime> options, double lat, double lon, Connection conn) {
         String fastest = "";
+        double shortestDist = 0;
         LocalTime startTime = LocalTime.NOON;
         LocalTime endTime = LocalTime.NOON;
         LocalTime fastestTime = LocalTime.MAX;
 
-        for(StopTime stop : options){
+        for(StopTime stop : options) {
             double[] latlon = getStationCoordinates(conn, stop.getStopID());
             List<Node> nodes = getAndDrawWalking(lat, lon, latlon[0], latlon[1], conn);
 
             double distance = getDistance(nodes);
             int minsToWalk = (int) getWalkingTime(distance);
 
-            if(times.containsKey(stop.getStopID())){
-                if(times.get(stop.getStopID()).getArrival().plusMinutes(minsToWalk).isBefore(fastestTime)){
+            if (times.containsKey(stop.getStopID())) {
+                if (times.get(stop.getStopID()).getArrival().plusMinutes(minsToWalk).isBefore(fastestTime)) {
                     fastest = stop.getStopID();
                     fastestTime = times.getOrDefault(stop.getStopID(), new DepartureAndArrival(LocalTime.MAX, LocalTime.MAX)).getArrival().plusMinutes(minsToWalk);
                     endTime = fastestTime;
                     startTime = times.getOrDefault(stop.getStopID(), new DepartureAndArrival(LocalTime.MAX, LocalTime.MAX)).getArrival();
                 }
             }
-
         }
+
         this.endTime = endTime;
         transferInfoStack.add(new transferModule("Walk",startTime.toString(), endTime.toString()));
+        totalDist += shortestDist;
 
         return fastest;
     }

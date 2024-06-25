@@ -190,6 +190,7 @@ public class createMap {
                 try {
                     for (int i = 0; i < list.size(); i++) {
                         PostCode postCode = list.get(i);
+                        System.out.println(" Score: "+ postCode.getScore());
 
                         GeoPosition point = new GeoPosition(postCode.getLatitude(), postCode.getLongitude());
                         Point2D pointMap = map.convertGeoPositionToPoint(point);

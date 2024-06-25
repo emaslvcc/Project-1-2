@@ -121,7 +121,7 @@ public class mapFrame extends JFrame {
         modeBox.setBackground(new Color(170, 211, 223));
         modeBox.setFont(new Font("Segoe UI", 1, 12)); // NOI18N
         modeBox.setForeground(new Color(255, 255, 255));
-        modeBox.setModel(new DefaultComboBoxModel<>(new String[]{"Walk", "Bike", "Bus"}));
+        modeBox.setModel(new DefaultComboBoxModel<>(new String[]{"Walk", "Bike", "Bus", "Bus v2"}));
         modeBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         startCodeLabel.setFont(new Font("Segoe UI", 1, 14)); // NOI18N
@@ -144,8 +144,8 @@ public class mapFrame extends JFrame {
         destinationCodeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         destinationCodeLabel.setText("Destination Zipcode:");
 
-        String[] hours = new String[22];
-        for (int i = 0; i < 22; i++) {
+        String[] hours = new String[24];
+        for (int i = 0; i < 24; i++) {
             hours[i] = String.format("%02d", i);
         }
 
@@ -429,11 +429,12 @@ public class mapFrame extends JFrame {
         if (busMode) {
             transferModule.clearTransfers();
         }
-        if (Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && !busMode) {
+        String selectedItem = Objects.requireNonNull(modeBox.getSelectedItem()).toString();
+        if ( (selectedItem.equals("Bus") || selectedItem.equals("Bus v2")) && !busMode) {
             createMap.clearMapRoute();
             addPanelForBusInfo(frame);
             busMode = true;
-        } else if (!Objects.requireNonNull(modeBox.getSelectedItem()).toString().equals("Bus") && busMode) {
+        } else if (!(selectedItem.equals("Bus") || selectedItem.equals("Bus v2")) && busMode) {
             removePanelForBusInfo(frame);
             busMode = false;
         }

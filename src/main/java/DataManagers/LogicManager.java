@@ -59,26 +59,29 @@ public class LogicManager extends GetUserData {
             TimeCalculator.minute = (String) startMinute.getSelectedItem();
             BusConnectionDev.busLogic(startPostCode.getLatitude(), startPostCode.getLongitude(),
                     endPostCode.getLatitude(), endPostCode.getLongitude());
-//            Raptor trex = new Raptor(graph);
-//            trex.dino(startPostCode.getLatitude(), startPostCode.getLongitude(), endPostCode.getLatitude(), endPostCode.getLongitude(), LocalTime.of(Integer.parseInt(Objects.requireNonNull(startHour.getSelectedItem()).toString()), Integer.parseInt(Objects.requireNonNull(startMinute.getSelectedItem()).toString())));
             // GUI.mapFrame.setBusInfo(busInfo[0], busInfo[1], busInfo[2], busInfo[3],
             // busInfo[4], busInfo[5]);
+        }else if((mode).equals("Bus v2")){
+            Raptor trex = new Raptor(graph);
+            trex.dino(startPostCode.getLatitude(), startPostCode.getLongitude(), endPostCode.getLatitude(), endPostCode.getLongitude(), LocalTime.of(Integer.parseInt(Objects.requireNonNull(startHour.getSelectedItem()).toString()), Integer.parseInt(Objects.requireNonNull(startMinute.getSelectedItem()).toString())));
+
         } else {
             calculateRoute(startPostCode, endPostCode, mode);
             // Display the shortest path on the map
 
             GUI.createMap.drawPath(shortestPath);
+
+            TimeCalculator timeCalc = new AverageTimeCalculator(distance);
+            GUI.mapFrame.updateDistanceField(distance);
+
+            if ((mode).equals("Walk")) {
+                time = (int) (Math.round(timeCalc.getWalkingTime()));
+            } else if ((mode).equals("Bike")) {
+                time = (int) (Math.round(timeCalc.getCyclingTime()));
+            }
+            GUI.mapFrame.updateTimeField(time);
         }
 
-        TimeCalculator timeCalc = new AverageTimeCalculator(distance);
-        GUI.mapFrame.updateDistanceField(distance);
-
-        if ((mode).equals("Walk")) {
-            time = (int) (Math.round(timeCalc.getWalkingTime()));
-        } else if ((mode).equals("Bike")) {
-            time = (int) (Math.round(timeCalc.getCyclingTime()));
-        }
-        GUI.mapFrame.updateTimeField(time);
     }
 
     /**

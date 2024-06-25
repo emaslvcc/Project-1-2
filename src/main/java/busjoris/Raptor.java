@@ -27,6 +27,7 @@ public class Raptor {
     Stack<transferModule> transferInfoStack = new Stack<>();
     LocalTime endTime;
     double totalDist = 0;
+    Map<String, List<Node>> stopWalks = new HashMap<>();
 
     public Raptor(Graph g){
         this.graph = g;
@@ -59,9 +60,10 @@ WHERE
                 double stopLat = res.getDouble(2);
                 double stopLon = res.getDouble(3);
 
-                List<Node> walkingNodes = getAndDrawWalking(lat, lon, stopLat, stopLon, conn);
+                List<Node> walkingNodes = getWalking(lat, lon, stopLat, stopLon, conn);
                 double distance = getDistance(walkingNodes);
                 double minsToWalk = getWalkingTime(distance);
+                stopWalks.put(stopId, walkingNodes);
 
                 nearbyStops.add(new StopTime(stopId, startTime.plusMinutes((long) minsToWalk), startTime));
             }
@@ -218,10 +220,15 @@ WHERE
         String answer = endStation;
 
 
+
         List<Node> nodeList = new ArrayList<>();
         List<Node> stopList = new ArrayList<>();
         List<List<Node>> shapeList = new ArrayList<>();
         List<String> colourList = new ArrayList<>();
+
+        shapeList.add(stopWalks.get(answer));
+        colourList.add("#138421");
+
         while(routeTracker.containsKey(answer)){
             LocalTime departed = stopArrivalTime.get(answer).getDep();
             LocalTime arrived = stopArrivalTime.get(answer).getArrival();
@@ -245,9 +252,15 @@ WHERE
             transferInfoStack.add(new transferModule("Bus",departed.toString(), arrived.toString(), buss, startStation,endStation));
             //transferModule.addTransferModule("Bus",departed.toString(), arrived.toString(), buss, startStation,endStation);
         }
+
+        shapeList.add(stopWalks.get(answer));
+        colourList.add("#138421");
+
         createMap.drawPath(shapeList, stopList, colourList);   //getColor(routeTracker.get(oldAnswer)[2]));
 
         transferInfoStack.add(new transferModule("Walking", stopArrivalTime.get(answer).getDep().toString(), stopArrivalTime.get(answer).getArrival().toString()));
+
+        //createMap.drawPath(stopWalks.get(answer));
 
         System.out.println("Arriving at stop: " + getStopName(conn,answer)+   " at "+ stopArrivalTime.get(answer).getArrival() +"  "+"Departed at: " + stopArrivalTime.get(answer).getDep() + " --> \n");
 
@@ -256,12 +269,6 @@ WHERE
 
 
 
-        //double[] latlon = getStationCoordinates(conn,endStation);
-
-//        List<Node> walkPath = getAndDrawWalking(endLat, endLon, latlon[0], latlon[1], conn);
-//        System.out.println(endLat + " "+ endLon + " "+ latlon[0]+ " "+ latlon[1]);
-//        double distance = getDistance(walkPath);
-//        double time = getWalkingTime(distance);
 
         //System.out.println("Walking to destination for "+ time +" minutes");
         while(!transferInfoStack.isEmpty()){
@@ -299,7 +306,7 @@ WHERE
 
         for(StopTime stop : options) {
             double[] latlon = getStationCoordinates(conn, stop.getStopID());
-            List<Node> nodes = getAndDrawWalking(lat, lon, latlon[0], latlon[1], conn);
+            List<Node> nodes = getWalking(lat, lon, latlon[0], latlon[1], conn);
 
             double distance = getDistance(nodes);
             int minsToWalk = (int) getWalkingTime(distance);
@@ -321,7 +328,7 @@ WHERE
         return fastest;
     }
 
-    public List<Node> getAndDrawWalking(double lat1, double lon1, double lat2, double lon2, Connection conn){
+    public List<Node> getWalking(double lat1, double lon1, double lat2, double lon2, Connection conn){
 
         // Find the start and end nodes
         Node startNode = graph.getNodeByLatLon(lat1, lon1);
@@ -330,8 +337,6 @@ WHERE
         // Find the shortest path
         AStar aStar = new AStar(graph);
 
-
-        // todo draw the walking
         return aStar.findShortestPath(startNode, endNode);
     }
 

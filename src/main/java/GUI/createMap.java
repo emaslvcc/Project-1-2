@@ -584,7 +584,8 @@ public class createMap {
                     }
 
                     if (stops != null) {
-                        createStartAndEndPointsForBus(g, map, stops);
+
+                        createStartAndEndPoints(g, map);
 
                         g.setColor(Color.RED);
                         for (int i = 0; i < stops.size(); i++) {

@@ -270,7 +270,7 @@ public class createMap {
 
                         // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
-                        if (i > 0) {
+                        if (i > 0 ) {
                             g.setColor(firstLineColor);
                             // Set the color for the lines
                             g.setStroke(new BasicStroke(3));
@@ -451,7 +451,7 @@ public class createMap {
                                 g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
                                         (int) pointMap.getY());
 
-                            } else if (i >= num) {
+                            } else if (i >= num && pointMapPrev != null) {
                                 g.setColor(secondLineColor);
                                 g.setStroke(new BasicStroke(3));
                                 g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
@@ -563,7 +563,7 @@ public class createMap {
      */
     public static void drawPath(List<List<Node>> paths, List<Node> stops, List<String> colour) {
 
-        Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
+        routePainter = new Painter<JXMapViewer>() {
             @Override
             public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
                 try {
@@ -610,7 +610,7 @@ public class createMap {
             }
         };
         // Set the new painter
-        jXMapViewer.setOverlayPainter(pathOverlay);
+        jXMapViewer.setOverlayPainter(routePainter);
 
     }
 

@@ -1,5 +1,9 @@
 USE gtfs;
 
+-- Enable local infile for data loading
+SET GLOBAL local_infile=1;
+
+
 DROP TABLE IF EXISTS agency;
 
 CREATE TABLE agency (
@@ -9,8 +13,7 @@ CREATE TABLE agency (
   agency_timezone VARCHAR(100) ,
   agency_phone VARCHAR(100) 
 );
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/agency.txt' INTO TABLE agency FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
-
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/agency.txt' INTO TABLE agency FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 
 DROP TABLE IF EXISTS calendar_dates;
@@ -24,7 +27,7 @@ CREATE TABLE calendar_dates (
 
 
 
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/calendar_dates.txt' INTO TABLE calendar_dates FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/calendar_dates.txt' INTO TABLE calendar_dates FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 /*SELECT count(*)
 from calendar_dates cd  ;*/
 
@@ -39,7 +42,7 @@ CREATE TABLE feed_info (
     feed_end_date DATE,        
     feed_version CHAR(4) 
 );
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/feed_info.txt' INTO TABLE feed_info FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/feed_info.txt' INTO TABLE feed_info FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
  
 
@@ -64,7 +67,7 @@ CREATE TABLE routes (
 
 
 
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/routes.txt' INTO TABLE routes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/routes.txt' INTO TABLE routes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 
 
@@ -87,7 +90,7 @@ CREATE INDEX idx_shape_pt_sequence ON shapes (shape_pt_sequence);
 
 
 
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/shapes.txt' INTO TABLE shapes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/shapes.txt' INTO TABLE shapes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 
 DROP TABLE IF EXISTS stops;
@@ -106,7 +109,7 @@ CREATE TABLE stops (
   zone_id VARCHAR(16) 
 );
 
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/stops.txt' INTO TABLE stops FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/stops.txt' INTO TABLE stops FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 DROP TABLE IF EXISTS trips;
 
@@ -132,7 +135,7 @@ CREATE TABLE trips (
 
 
 
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/trips.txt' INTO TABLE trips FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/trips.txt' INTO TABLE trips FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 SELECT count(*)
 from trips t ;
@@ -169,7 +172,7 @@ select count(*)
 from stop_times st;
 
 
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/stop_times.txt' INTO TABLE stop_times FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/stop_times.txt' INTO TABLE stop_times FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 
 
@@ -191,7 +194,7 @@ CREATE TABLE transfers (
 );
 
 
-LOAD DATA LOCAL INFILE '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/transfers.txt' INTO TABLE transfers FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/gtfs/transfers.txt' INTO TABLE transfers FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 
 
@@ -204,7 +207,7 @@ CREATE TABLE post_codes(
 	longitude DECIMAL(11,7)
 );
 
-LOAD DATA LOCAL INFILE  '/Users/Carrey/Desktop/UM/Year\ 1/Project/Project\ 1-2/phase2/gtfs/MassZipLatLon.csv' INTO TABLE post_codes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE  '/Users/joeld/Downloads/project_1-2_18/DatabaseFiles/MassZipLatLon.csv' INTO TABLE post_codes FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' IGNORE 1 LINES;
 
 INSERT into post_codes values(
 '6212xp','50.831516', '5.69584');
@@ -232,12 +235,12 @@ where ST_Distance_Sphere(POINT(pc.latitude,
 
 
 CREATE table AllTransferStops (
-  `route_id_1` varchar(255) NOT NULL,
-  `route_short_name_1` varchar(255) DEFAULT NULL,
-  `stop_1_id` varchar(255),
-  `route_id_2` varchar(255) NOT NULL,
-  `route_short_name_2` varchar(255) DEFAULT NULL,
-    `stop_2_id` varchar(255),
+  `route_id_1` varchar(100) NOT NULL,
+  `route_short_name_1` varchar(100) DEFAULT NULL,
+  `stop_1_id` varchar(100),
+  `route_id_2` varchar(100) NOT NULL,
+  `route_short_name_2` varchar(100) DEFAULT NULL,
+    `stop_2_id` varchar(100),
   PRIMARY KEY (`route_id_1`,`stop_1_id`,`route_id_2`,`stop_2_id`)
 );
 
@@ -307,11 +310,6 @@ drop table if exists tempTransfer;
     timeOfDepart Time
                 );
                
-
-
-
-
-
    
 -- test (not need now)
 
@@ -327,7 +325,285 @@ CREATE table distanceToBusstop(
 );
 
 
+-- Drop existing table if exists and create the postal codes table
+DROP TABLE IF EXISTS post_codes;
 
+CREATE TABLE post_codes (
+    zipcode CHAR(6) PRIMARY KEY,
+    latitude DECIMAL(11, 7),
+    longitude DECIMAL(11, 7)
+);
+
+-- Load data into post_codes table
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/project_1-2_18/DatabaseFiles/MassZipLatLon.csv' 
+INTO TABLE post_codes 
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"' 
+IGNORE 1 LINES;
+
+-- Drop existing table if exists and create the tourism table
+DROP TABLE IF EXISTS tourism;
+
+CREATE TABLE tourism (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(228) DEFAULT NULL,
+    amenity VARCHAR(100),
+    longitude DECIMAL(11, 7),
+    latitude DECIMAL(11, 7)
+);
+
+-- Load data into tourism table
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/project_1-2_18/DatabaseFiles/tourism1.csv' 
+INTO TABLE tourism 
+FIELDS TERMINATED BY ';' 
+IGNORE 2 LINES;
+
+-- Drop existing table if exists and create the tourism_accessibility table
+DROP TABLE IF EXISTS tourism_accessibility;
+
+CREATE TABLE tourism_accessibility (
+    zipcode CHAR(6) PRIMARY KEY,
+    tourism INT
+);
+
+-- Insert postal codes into tourism_accessibility
+INSERT INTO tourism_accessibility (zipcode)
+SELECT zipcode
+FROM post_codes;
+
+-- Drop existing table if exists and create the shops table
+DROP TABLE IF EXISTS shops;
+
+CREATE TABLE shops (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(228),
+    brand VARCHAR(200),
+    amenity VARCHAR(150),
+    longitude DECIMAL(11, 7),
+    latitude DECIMAL(11, 7)
+);
+
+-- Load data into shops table
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/project_1-2_18/DatabaseFiles/shop1.csv' 
+INTO TABLE shops 
+FIELDS TERMINATED BY ';' 
+OPTIONALLY ENCLOSED BY '"' 
+IGNORE 2 LINES;
+
+-- Drop existing table if exists and create the shops_accessibility table
+DROP TABLE IF EXISTS shops_accessibility;
+
+CREATE TABLE shops_accessibility (
+    zipcode CHAR(6) PRIMARY KEY,
+    supermarket DECIMAL(11, 5),
+    personal_care DECIMAL(11, 5),
+    speciality_store DECIMAL(11, 5),
+    service DECIMAL(11, 5)
+);
+
+-- Insert postal codes into shops_accessibility
+INSERT INTO shops_accessibility (zipcode)
+SELECT zipcode
+FROM post_codes;
+
+-- Drop existing table if exists and create the amenities table
+DROP TABLE IF EXISTS amenities;
+
+CREATE TABLE amenities (
+    id BIGINT PRIMARY KEY,
+    amenity VARCHAR(228),
+    longitude DECIMAL(11, 7),
+    latitude DECIMAL(11, 7)
+);
+
+-- Load data into amenities table
+LOAD DATA LOCAL INFILE '/Users/joeld/Downloads/project_1-2_18/DatabaseFiles/amenities12.csv' 
+INTO TABLE amenities 
+FIELDS TERMINATED BY ';' 
+OPTIONALLY ENCLOSED BY '"' 
+IGNORE 2 LINES;
+
+-- Drop existing table if exists and create the amenities_accessibility table
+DROP TABLE IF EXISTS amenities_accessibility;
+
+CREATE TABLE amenities_accessibility (
+    zipcode CHAR(6) PRIMARY KEY,
+    Utilities DECIMAL(11, 5),
+    Transportation DECIMAL(11, 5), 
+    Recreation_and_Entertainment DECIMAL(11, 5), 
+    Public_Services DECIMAL(11, 5), 
+    Financial_Services DECIMAL(11, 5),
+    Miscellaneous DECIMAL(11, 5),
+    Public_Transport DECIMAL(11, 5) DEFAULT NULL
+);
+
+-- Insert postal codes into amenities_accessibility
+INSERT INTO amenities_accessibility (zipcode)
+SELECT zipcode
+FROM post_codes;
+
+-- Add foreign key constraints
+ALTER TABLE shops_accessibility
+ADD CONSTRAINT fk_shops_postcodes
+FOREIGN KEY (zipcode)
+REFERENCES post_codes(zipcode)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE amenities_accessibility
+ADD CONSTRAINT fk_amenities_postcodes
+FOREIGN KEY (zipcode)
+REFERENCES post_codes(zipcode)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE tourism_accessibility
+ADD CONSTRAINT fk_tourism_postcodes
+FOREIGN KEY (zipcode)
+REFERENCES post_codes(zipcode)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+-- Add category columns to shops, amenities, and tourism tables
+ALTER TABLE shops 
+ADD COLUMN category VARCHAR(255) DEFAULT NULL;
+
+ALTER TABLE amenities  
+ADD COLUMN category VARCHAR(255) DEFAULT NULL;
+
+ALTER TABLE tourism  
+ADD COLUMN category VARCHAR(255) DEFAULT 'tourism';
+
+-- Update category fields for shops
+UPDATE shops
+SET category = 'supermarket'
+WHERE amenity IN ('Supermarket', 'Convenience', 'Bakery', 'Butcher', 'Greengrocer', 'Wine', 
+                  'Deli', 'Ice_cream', 'Confectionery', 'Pastry', 'Soft_drugs', 'Tobacco', 
+                  'Market');
+
+UPDATE shops
+SET category = 'personal_care'
+WHERE amenity IN ('Chemist', 'Optician', 'Hearing_aids', 'Pharmacy', 'Medical_supply', 
+                  'Nutrition_supplements', 'Hairdresser', 'Beauty', 'Massage', 
+                  'Hairdresser_supply', 'Cosmetics', 'Perfumery', 'Clothes', 'Shoes', 
+                  'Bag', 'Jewelry', 'Accessories', 'Watches');
+
+UPDATE shops
+SET category = 'speciality_store'
+WHERE amenity IN ('Furniture', 'Curtain', 'Kitchen', 'Garden_centre', 'Houseware',
+                  'Interior_decoration', 'Carpet', 'Bed', 'Electronics', 'Music',
+                  'Computer', 'HiFi', 'Mobile_phone', 'Sports', 'Bicycle', 'Outdoor',
+                  'Toys', 'Books', 'Party', 'Craft', 'Doityourself', 'Paint', 'Mall',
+                  'Department_store', 'Chocolate', 'Antiques', 'Stationery', 'Photo',
+                  'Gift', 'Florist', 'Art', 'car', 'newsagent', 'pet', 'baby_goods', 'fabric');
+
+UPDATE shops
+SET category = 'service'
+WHERE amenity IN ('Dry_cleaning', 'Laundry', 'Storage_rental', 'Ticket', 'Pawnbroker',
+                  'Car_repair', 'Car_parts', 'Second_hand', 'Wholesale', 'Coffee', 'Tea',
+                  'Beverages', 'Variety_store', 'Kiosk', 'Charity', 'Erotic', 'Cannabis',
+                  'Drugs_paraphernalia', 'Tobacco');
+
+-- Update category fields for amenities
+UPDATE amenities
+SET category = 'Public_Services'
+WHERE amenity IN ('police', 'courthouse', 'fire_station', 'hospital', 'clinic', 'pharmacy',
+                  'veterinary', 'shelter', 'childcare', 'dentist', 'nursing_home', 'doctors',
+                  'prep_school', 'college', 'social_facility', 'townhall', 'school', 'community_centre');
+
+UPDATE amenities
+SET category = 'Transportation'
+WHERE amenity IN ('post_box', 'parking_entrance', 'parking', 'bicycle_parking', 'moped_parking',
+                  'car_wash', 'car_rental', 'taxi', 'charging_station', 'bicycle_rental',
+                  'parking_space');
+
+UPDATE amenities
+SET category = 'Financial_Services'
+WHERE amenity IN ('bank', 'atm', 'bureau_de_change');
+
+UPDATE amenities
+SET category = 'Recreation_and_Entertainment'
+WHERE amenity IN ('library', 'place_of_worship', 'fountain', 'university', 'resthouse', 'park',
+                  'cinema', 'restaurant', 'fast_food', 'pub', 'cafe', 'bar', 'ice_cream',
+                  'arts_centre', 'theatre', 'nightclub', 'casino');
+
+UPDATE amenities
+SET category = 'Utilities'
+WHERE amenity IN ('recycling', 'fuel', 'drinking_water', 'water_point', 'sanitary_dump_station',
+                  'toilets', 'shower');
+
+UPDATE amenities
+SET category = 'Miscellaneous'
+WHERE amenity IN ('post_office', 'information', 'waste_basket', 'clock', 'bench',
+                  'vending_machine', 'public_bookcase', 'binoculars', 'luggage_locker',
+                  'marketplace', 'photo_booth', 'food_court', 'hunting_stand', 'brothel');
+
+-- Create and populate the amenity_weights table
+CREATE TABLE amenity_weights (
+    category VARCHAR(100),
+    weight DECIMAL(3, 2),
+    PRIMARY KEY (category)
+);
+
+INSERT INTO amenity_weights (category, weight)
+VALUES
+    ('Utilities', 0.04),
+    ('Transportation', 0.10),
+    ('Recreation_and_Entertainment', 0.08),
+    ('Public_Services', 0.09),
+    ('Financial_Services', 0.07),
+    ('Miscellaneous', 0.04),
+    ('Public_Transport', 0.17),
+    ('Supermarket', 0.10),
+    ('Personal_Care', 0.07),
+    ('Speciality_Store', 0.06),
+    ('Service', 0.05),
+    ('Tourism', 0.03);
+
+-- Create the weighted_accessibility_scores view
+CREATE OR REPLACE VIEW weighted_accessibility_scores AS
+SELECT 
+    aa.zipcode,
+    (
+        COALESCE(sa.supermarket, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Supermarket'), 0) +
+        COALESCE(sa.personal_care, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Personal_Care'), 0) +
+        COALESCE(sa.speciality_store, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Speciality_Store'), 0) +
+        COALESCE(sa.service, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Service'), 0) +
+        COALESCE(aa.Public_Services, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Public_Services'), 0) +
+        COALESCE(aa.Financial_Services, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Financial_Services'), 0) +
+        COALESCE(aa.Miscellaneous, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Miscellaneous'), 0) +
+        COALESCE(aa.Transportation, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Transportation'), 0) +
+        COALESCE(aa.Recreation_and_Entertainment, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Recreation_and_Entertainment'), 0) +
+        COALESCE(aa.Utilities, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Utilities'), 0) +
+        COALESCE(aa.Public_Transport, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Public_Transport'), 0) +
+        COALESCE(t.tourism, 0) * COALESCE((SELECT weight FROM amenity_weights WHERE category = 'Tourism'), 0)
+    ) AS total_weighted_score
+FROM 
+    amenities_accessibility aa
+    LEFT JOIN shops_accessibility sa ON aa.zipcode = sa.zipcode
+    LEFT JOIN tourism_accessibility t ON aa.zipcode = t.zipcode;
+
+-- Create a trigger to automatically insert into accessibility tables after a new postcode is added
+DELIMITER //
+
+CREATE TRIGGER after_insert_postcode
+AFTER INSERT ON post_codes
+FOR EACH ROW
+BEGIN
+    -- Insert into shops_accessibility
+    INSERT INTO shops_accessibility (zipcode, supermarket, personal_care, speciality_store, service)
+    VALUES (NEW.zipcode, NULL, NULL, NULL, NULL);
+    
+    -- Insert into amenities_accessibility
+    INSERT INTO amenities_accessibility (zipcode, Utilities, Transportation, Recreation_and_Entertainment, Public_Services, Financial_Services, Miscellaneous, Public_Transport)
+    VALUES (NEW.zipcode, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    
+    -- Insert into tourism_accessibility
+    INSERT INTO tourism_accessibility (zipcode, tourism)
+    VALUES (NEW.zipcode, NULL);
+END //
+
+DELIMITER ;
 
 
 

@@ -113,7 +113,8 @@ public class createMap {
         MouseInputListener mm = new PanMouseInputListener(jXMapViewer) {
             private GeoPosition lastPosition;
 
-            //The mouse pressed and dragged methods allow the user to pan the map, but forces them to stay within the boundaries of Maastricht
+            // The mouse pressed and dragged methods allow the user to pan the map, but
+            // forces them to stay within the boundaries of Maastricht
             @Override
             public void mousePressed(MouseEvent e) {
                 lastPosition = jXMapViewer.getCenterPosition();
@@ -137,16 +138,19 @@ public class createMap {
                 }
             }
 
-            //The mouse moved method allows the user to hover over a post code and see its score viewing Maastricht's accessibilites
+            // The mouse moved method allows the user to hover over a post code and see its
+            // score viewing Maastricht's accessibilites
             @Override
             public void mouseMoved(MouseEvent e) {
                 if (accessibilityPostCodes != null) {
                     for (PostCode postCode : accessibilityPostCodes) {
                         GeoPosition point = new GeoPosition(postCode.getLatitude(), postCode.getLongitude());
                         Point2D pointMap = jXMapViewer.convertGeoPositionToPoint(point);
-                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10, 10);
+                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10,
+                                10);
                         if (circle.contains(e.getPoint())) {
-                            jXMapViewer.setToolTipText("<html>Post Code: " + postCode.postCode + "<br>Score: " + postCode.getScore() + "</html>");
+                            jXMapViewer.setToolTipText("<html>Post Code: " + postCode.postCode + "<br>Score: "
+                                    + postCode.getScore() + "</html>");
                             return;
                         }
                     }
@@ -177,8 +181,10 @@ public class createMap {
     }
 
     /**
-     * Draws the accessibility scores on the map. It assigns a color to them based on their score.
-     * Green for scores in the first third, yellow for scores in the second third, and red for scores in the last third.
+     * Draws the accessibility scores on the map. It assigns a color to them based
+     * on their score.
+     * Green for scores in the first third, yellow for scores in the second third,
+     * and red for scores in the last third.
      *
      * @param list The list of post codes with their accessibility scores.
      */
@@ -190,7 +196,7 @@ public class createMap {
                 try {
                     for (int i = 0; i < list.size(); i++) {
                         PostCode postCode = list.get(i);
-                        System.out.println(" Score: "+ postCode.getScore());
+                        System.out.println(" Score: " + postCode.getScore());
 
                         GeoPosition point = new GeoPosition(postCode.getLatitude(), postCode.getLongitude());
                         Point2D pointMap = map.convertGeoPositionToPoint(point);
@@ -202,7 +208,8 @@ public class createMap {
                         } else {
                             g.setColor(Color.RED);
                         }
-                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10, 10);
+                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10,
+                                10);
                         g.fill(circle);
                     }
                 } catch (Exception e) {
@@ -270,7 +277,7 @@ public class createMap {
 
                         // If this is not the first stop, draw a blue line from the previous stop to the
                         // current stop
-                        if (i > 0 ) {
+                        if (i > 0) {
                             g.setColor(firstLineColor);
                             // Set the color for the lines
                             g.setStroke(new BasicStroke(3));
@@ -451,7 +458,7 @@ public class createMap {
                                 g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
                                         (int) pointMap.getY());
 
-                            } else if (i >= num && pointMapPrev != null) {
+                            } else if (i >= num) {
                                 g.setColor(secondLineColor);
                                 g.setStroke(new BasicStroke(3));
                                 g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
@@ -467,9 +474,10 @@ public class createMap {
                                         (int) pointMap.getY());
 
                                 // Update pointMapPrev to the current stop for the next iteration
-                                pointMapPrev = pointMap;
+
                             }
                         }
+                        pointMapPrev = pointMap;
                     }
 
                 } catch (Exception e) {
@@ -491,7 +499,7 @@ public class createMap {
      * @param path  The list of paths.
      */
     public static void drawPath(List<Node> path, List<Node> stops, int num, String firstTripColor,
-                                String secondTripColor) {
+            String secondTripColor) {
 
         routePainter = new Painter<JXMapViewer>() {
             @Override
@@ -656,7 +664,7 @@ public class createMap {
      * @param map          The map on which the path will be drawn.
      */
     private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat,
-                                        double endBusLong, JXMapViewer map) {
+            double endBusLong, JXMapViewer map) {
         PostCode startPostCode = new PostCode("Start", startLatitude, startLongitude);
         PostCode endPostCode = new PostCode("End", endLatitude, endLongitude);
 
@@ -708,7 +716,8 @@ public class createMap {
 
     /**
      * Draws a line between two points on the map.
-     * This is only used when two points are too close to each other to use the A star algorithm.
+     * This is only used when two points are too close to each other to use the A
+     * star algorithm.
      *
      * @param g      The graphics context used for drawing.
      * @param map    The map on which the line will be drawn.
@@ -811,7 +820,8 @@ public class createMap {
     }
 
     /**
-     * This method is used to update the overlay painter when a new painter is added or removed.
+     * This method is used to update the overlay painter when a new painter is added
+     * or removed.
      */
     private static void updateOverlayPainter() {
         List<Painter<JXMapViewer>> painters = new ArrayList<>();

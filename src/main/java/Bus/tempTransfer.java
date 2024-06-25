@@ -42,7 +42,7 @@ public class tempTransfer {
                 // Create the tempTransfer table
                 stmt1.executeUpdate("TRUNCATE table tempTransfer; ");
                 long startTime = System.currentTimeMillis(); // Start time
-                long timeLimit = 20000; // 20s Time limit in milliseconds
+                long timeLimit = 19000; // 19s Time limit in milliseconds
 
                 while (rs.next() && !stop && (System.currentTimeMillis() - startTime < timeLimit) && insertTime < 450) {
                     String startRouteId = rs.getString("start_route_id");

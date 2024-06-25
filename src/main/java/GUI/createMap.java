@@ -41,6 +41,7 @@ public class createMap {
     private static double endLongitude = 0;
     private static Painter<JXMapViewer> accessibilityPainter;
     private static Painter<JXMapViewer> routePainter;
+    private static ArrayList<PostCode> accessibilityPostCodes;
 
     /**
      * Creates a JPanel containing the map.
@@ -59,9 +60,11 @@ public class createMap {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Accessibility accessibility = new Accessibility();
                     ArrayList<PostCode> list = accessibility.returnAccessibilityScores();
+                    accessibilityPostCodes = list;
                     drawAccessibility(list);
                 } else {
                     accessibilityPainter = null;
+                    accessibilityPostCodes = null;
                     updateOverlayPainter();
                 }
             }
@@ -111,6 +114,7 @@ public class createMap {
         MouseInputListener mm = new PanMouseInputListener(jXMapViewer) {
             private GeoPosition lastPosition;
 
+            //The mouse pressed and dragged methods allow the user to pan the map, but forces them to stay within the boundaries of Maastricht
             @Override
             public void mousePressed(MouseEvent e) {
                 lastPosition = jXMapViewer.getCenterPosition();
@@ -131,6 +135,23 @@ public class createMap {
                 } else {
                     // If yes, update the last position
                     lastPosition = newPosition;
+                }
+            }
+
+            //The mouse moved method allows the user to hover over a post code and see its score viewing Maastricht's accessibilites
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (accessibilityPostCodes != null) {
+                    for (PostCode postCode : accessibilityPostCodes) {
+                        GeoPosition point = new GeoPosition(postCode.getLatitude(), postCode.getLongitude());
+                        Point2D pointMap = jXMapViewer.convertGeoPositionToPoint(point);
+                        Ellipse2D.Double circle = new Ellipse2D.Double(pointMap.getX() - 5, pointMap.getY() - 5, 10, 10);
+                        if (circle.contains(e.getPoint())) {
+                            jXMapViewer.setToolTipText("<html>Post Code: " + postCode.postCode + "<br>Score: " + postCode.getScore() + "</html>");
+                            return;
+                        }
+                    }
+                    jXMapViewer.setToolTipText(null);
                 }
             }
         };

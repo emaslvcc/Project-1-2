@@ -351,7 +351,7 @@ public class Accessibility {
      */
     private double returnScore(Connection conn, String zipCode) {
         double score = 0;
-        String sqlStatement = "SELECT total_weighted_score FROM gtfs.weighted_accessibility_scores WHERE zipcode = ?";
+        String sqlStatement = "SELECT total_weighted_score FROM weighted_accessibility_scores WHERE zipcode = ?";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sqlStatement)) {
             pstmt.setString(1, zipCode);

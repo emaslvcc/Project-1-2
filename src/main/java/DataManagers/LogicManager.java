@@ -73,7 +73,16 @@ public class LogicManager extends GetUserData {
             // Display the shortest path on the map
 
             GUI.createMap.drawPath(shortestPath);
+            TimeCalculator timeCalc = new AverageTimeCalculator(distance);
+            GUI.mapFrame.updateDistanceField(distance);
 
+            if ((mode).equals("Walk")) {
+                time = (int) (Math.round(timeCalc.getWalkingTime()));
+            } else if ((mode).equals("Bike")) {
+                time = (int) (Math.round(timeCalc.getCyclingTime()));
+            }
+
+            GUI.mapFrame.updateTimeField(time);
         }
 
     }

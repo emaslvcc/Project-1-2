@@ -12,6 +12,7 @@ import GUI.mapFrame;
 import GUI.transferModule;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 
+import javax.swing.*;
 import java.sql.*;
 import java.time.Duration;
 import java.time.LocalTime;
@@ -216,8 +217,11 @@ WHERE
 //            }
 //        }
 
-
         String answer = endStation;
+        if(answer.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Could not find a connection between the bus stops try the other algorithm");
+            return LocalTime.MAX;
+        }
 
 
 

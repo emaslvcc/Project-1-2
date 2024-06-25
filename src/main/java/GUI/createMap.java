@@ -1,8 +1,6 @@
 package GUI;
 
 import Calculators.Accessibility;
-import Calculators.AverageTimeCalculator;
-import Calculators.TimeCalculator;
 import DataManagers.LogicManager;
 import DataManagers.Node;
 import DataManagers.PostCode;
@@ -158,7 +156,13 @@ public class createMap {
         });
     }
 
-     private static void drawAccessibility(ArrayList<PostCode> list) {
+    /**
+     * Draws the accessibility scores on the map. It assigns a color to them based on their score.
+     * Green for scores in the first third, yellow for scores in the second third, and red for scores in the last third.
+     *
+     * @param list The list of post codes with their accessibility scores.
+     */
+    private static void drawAccessibility(ArrayList<PostCode> list) {
         PostCode.sortScores();
         accessibilityPainter = new Painter<JXMapViewer>() {
             @Override
@@ -208,6 +212,12 @@ public class createMap {
         System.out.println("End Coord: " + endLatitude + ", " + endLongitude);
     }
 
+    /**
+     * Draws the path on the map.
+     *
+     * @param stops          The list of stops along the path.
+     * @param firstTripColor The color of the first trip.
+     */
     public static void drawPath(List<Node> stops, String firstTripColor) {
 
         routePainter = new Painter<JXMapViewer>() {
@@ -263,6 +273,11 @@ public class createMap {
         updateOverlayPainter();
     }
 
+    /**
+     * Draws the path on the map.
+     *
+     * @param stops The list of stops along the path.
+     */
     public static void drawPath(List<Node> stops) {
 
         routePainter = new Painter<JXMapViewer>() {
@@ -304,6 +319,11 @@ public class createMap {
 
     }
 
+    /**
+     * Draws the path on the map.
+     *
+     * @param path The list of paths to be drawn.
+     */
     public static void drawPath(List<Node> path, List<Node> stops, String firstTripColor) {
 
         routePainter = new Painter<JXMapViewer>() {
@@ -450,7 +470,7 @@ public class createMap {
      * @param path  The list of paths.
      */
     public static void drawPath(List<Node> path, List<Node> stops, int num, String firstTripColor,
-            String secondTripColor) {
+                                String secondTripColor) {
 
         routePainter = new Painter<JXMapViewer>() {
             @Override
@@ -511,9 +531,15 @@ public class createMap {
 
             }
         };
-       updateOverlayPainter();
+        updateOverlayPainter();
     }
 
+    /**
+     * Draws the path on the map.
+     *
+     * @param paths The list of paths to be drawn.
+     * @param stops The list of stops along the path.
+     */
     public static void drawPath(List<List<Node>> paths, List<Node> stops, List<String> colour) {
 
         Painter<JXMapViewer> pathOverlay = new Painter<JXMapViewer>() {
@@ -522,7 +548,7 @@ public class createMap {
                 try {
                     g.setStroke(new BasicStroke(3));
                     int pathCount = 0;
-                    for(List<Node> path: paths){
+                    for (List<Node> path : paths) {
                         g.setColor(hexToColor(colour.get(pathCount)));
                         for (int i = 0; i < path.size() - 1; i++) {
                             Node startNode = path.get(i);
@@ -566,6 +592,13 @@ public class createMap {
 
     }
 
+    /**
+     * Converts a hex color string to a Color object.
+     * It is used to give bus routes different colors.
+     *
+     * @param colorStr The hex color string.
+     * @return The Color object.
+     */
     private static Color hexToColor(String colorStr) {
         if (!colorStr.startsWith("#")) {
             colorStr = "#" + colorStr; // Ensure the string starts with "#"
@@ -582,6 +615,7 @@ public class createMap {
         createStartAndEndPoints(g, map);
     }
 
+    // Caching the path to avoid recalculating the same path
     private static List<Node> cachedPath1 = null;
     private static List<Node> cachedPath2 = null;
     private static PostCode cachedStartPostCode = null;
@@ -589,8 +623,18 @@ public class createMap {
     private static PostCode cachedStartBus = null;
     private static PostCode cachedEndBus = null;
 
+    /**
+     * Draws the walking path on the map.
+     *
+     * @param g            The graphics context used for drawing.
+     * @param startBusLat  The latitude of the starting bus stop.
+     * @param startBusLong The longitude of the starting bus stop.
+     * @param endBusLat    The latitude of the ending bus stop.
+     * @param endBusLong   The longitude of the ending bus stop.
+     * @param map          The map on which the path will be drawn.
+     */
     private static void drawWalkingPath(Graphics2D g, double startBusLat, double startBusLong, double endBusLat,
-            double endBusLong, JXMapViewer map) {
+                                        double endBusLong, JXMapViewer map) {
         PostCode startPostCode = new PostCode("Start", startLatitude, startLongitude);
         PostCode endPostCode = new PostCode("End", endLatitude, endLongitude);
 
@@ -640,6 +684,15 @@ public class createMap {
         drawPaths(paths, g, map);
     }
 
+    /**
+     * Draws a line between two points on the map.
+     * This is only used when two points are too close to each other to use the A star algorithm.
+     *
+     * @param g      The graphics context used for drawing.
+     * @param map    The map on which the line will be drawn.
+     * @param point1 The first point.
+     * @param point2 The second point.
+     */
     private static void drawLineBetweenPoints(Graphics2D g, JXMapViewer map, PostCode point1, PostCode point2) {
         GeoPosition geoPoint1 = new GeoPosition(point1.getLatitude(), point1.getLongitude());
         GeoPosition geoPoint2 = new GeoPosition(point2.getLatitude(), point2.getLongitude());
@@ -648,6 +701,13 @@ public class createMap {
         g.draw(new Line2D.Double(mapPoint1, mapPoint2));
     }
 
+    /**
+     * Draws the paths on the map.
+     *
+     * @param paths The list of paths to be drawn.
+     * @param g     The graphics context used for drawing.
+     * @param map   The map on which the paths will be drawn.
+     */
     public static void drawPaths(List<List<Node>> paths, Graphics2D g, JXMapViewer map) {
         g.setColor(Color.GREEN);
 
@@ -728,6 +788,9 @@ public class createMap {
         endLongitude = Double.NaN;
     }
 
+    /**
+     * This method is used to update the overlay painter when a new painter is added or removed.
+     */
     private static void updateOverlayPainter() {
         List<Painter<JXMapViewer>> painters = new ArrayList<>();
         if (accessibilityPainter != null) {

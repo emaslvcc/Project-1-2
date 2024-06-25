@@ -7,6 +7,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+/**
+ * This class provides a method to create a JPanel that displays
+ * information about a transfer between two locations. Each module can be either a bus transfer or a walking transfer.
+ * These panels are then displayed on the busInfoPanel
+ */
 public class transferModule {
     private String mode;
     private String startTime;
@@ -16,33 +21,75 @@ public class transferModule {
     private String endBusStop;
     private static ArrayList<transferModule> transfers = new ArrayList<>();
 
+    /**
+     * This method creates a new bus transfer module and adds it to the list of transfers.
+     *
+     * @param mode         the mode of transport (in our case, it will always bus mode)
+     * @param startTime    the start time of the transfer
+     * @param endTime      the end time of the transfer
+     * @param busNumber    the bus number
+     * @param startBusStop the start bus stop
+     * @param endBusStop   the end bus stop
+     */
     public static void addTransferModule(String mode, String startTime, String endTime, String busNumber,
-            String startBusStop, String endBusStop) {
+                                         String startBusStop, String endBusStop) {
         transferModule newTransfer = new transferModule(mode, startTime, endTime, busNumber, startBusStop, endBusStop);
         transfers.add(newTransfer);
     }
 
+    /**
+     * This method creates a new walking transfer module and adds it to the list of transfers.
+     *
+     * @param mode      the mode of transport (in our case, it will always be walk mode)
+     * @param startTime the start time of the transfer
+     * @param endTime   the end time of the transfer
+     */
     public static void addTransferModule(String mode, String startTime, String endTime) {
         transferModule newTransfer = new transferModule(mode, startTime, endTime);
         transfers.add(newTransfer);
     }
 
+    /**
+     * This method returns the list of transfers.
+     *
+     * @return the list of transfers
+     */
     public static ArrayList<transferModule> getTransfers() {
         return transfers;
     }
 
+    /**
+     * This method clears the list of transfers.
+     */
     public static void clearTransfers() {
         transfers.clear();
     }
 
+    /**
+     * This constructor creates a new walking transfer module.
+     *
+     * @param mode      the mode of transport (in our case, it will always be walk mode)
+     * @param startTime the start time of the transfer
+     * @param endTime   the end time of the transfer
+     */
     public transferModule(String mode, String startTime, String endTime) {
         this.mode = mode;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
+    /**
+     * This constructor creates a new bus transfer module.
+     *
+     * @param mode         the mode of transport (in our case, it will always be bus mode)
+     * @param startTime    the start time of the transfer
+     * @param endTime      the end time of the transfer
+     * @param busNum       the bus number
+     * @param startBusStop the start bus stop
+     * @param endBusStop   the end bus stop
+     */
     public transferModule(String mode, String startTime, String endTime, String busNum,
-            String startBusStop, String endBusStop) {
+                          String startBusStop, String endBusStop) {
         this.mode = mode;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -52,10 +99,20 @@ public class transferModule {
         this.endBusStop = endBusStop;
     }
 
+    /**
+     * This method returns the mode of transport (bus or walk).
+     *
+     * @return the mode of transport
+     */
     public String getMode() {
         return mode;
     }
 
+    /**
+     * This method creates and returns the panel that displays the transfer information.
+     *
+     * @return the panel that displays the transfer information
+     */
     public JPanel getTransferPanel() {
 
         JPanel transferPanel = new JPanel();

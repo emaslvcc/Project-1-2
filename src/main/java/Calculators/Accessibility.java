@@ -1,6 +1,5 @@
 package Calculators;
 
-import DataManagers.GetUserData;
 import DataManagers.PostCode;
 import Database.DatabaseConnection;
 
@@ -318,6 +317,11 @@ public class Accessibility {
         }
     }
 
+    /**
+     * Returns the post codes and assigns their scores to them.
+     *
+     * @return List of PostCode objects containing zip code, latitude, longitude, and accessibility score
+     */
     public ArrayList<PostCode> returnAccessibilityScores() {
         ArrayList<PostCode> postCodes = new ArrayList<>();
 
@@ -339,6 +343,12 @@ public class Accessibility {
         return postCodes;
     }
 
+    /**
+     * Returns the accessibility score for a specific zip code.
+     *
+     * @param zipCode Zip code
+     * @return Accessibility score
+     */
     private double returnScore(Connection conn, String zipCode) {
         double score = 0;
         String sqlStatement = "SELECT total_weighted_score FROM gtfs.weighted_accessibility_scores WHERE zipcode = ?";

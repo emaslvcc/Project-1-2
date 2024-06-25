@@ -13,7 +13,7 @@ This application utilizes the General Transit Feed Specification (GTFS) dataset 
 
 ### Database Setup
 
-1. Import the GTFS data into a relational database using the provided SQL scripts found in `sql/load_gtfs.sql`.
+1. Import the GTFS data into a relational database using the provided SQL scripts found in `schema.sql`.
 2. Configure your database with appropriate indexes to optimize the performance of query operations.
 3. Calculate the accessibility scores by navigating to the `src` directory and running:
    ```bash

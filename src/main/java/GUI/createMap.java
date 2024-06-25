@@ -59,12 +59,11 @@ public class createMap {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Accessibility accessibility = new Accessibility();
-                    ArrayList<PostCode> list = accessibility.returnAccessibilityScores();
-                    accessibilityPostCodes = list;
-                    drawAccessibility(list);
+                    accessibilityPostCodes = accessibility.returnAccessibilityScores();
+                    drawAccessibility(accessibilityPostCodes);
                 } else {
-                    accessibilityPainter = null;
                     accessibilityPostCodes = null;
+                    accessibilityPainter = null;
                     updateOverlayPainter();
                 }
             }

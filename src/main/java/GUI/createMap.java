@@ -451,7 +451,7 @@ public class createMap {
                                 g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),
                                         (int) pointMap.getY());
 
-                            } else if (i >= num && pointMapPrev != null) {
+                            } else if (i >= num) {
                                 g.setColor(secondLineColor);
                                 g.setStroke(new BasicStroke(3));
                                 g.drawLine((int) pointMapPrev.getX(), (int) pointMapPrev.getY(), (int) pointMap.getX(),

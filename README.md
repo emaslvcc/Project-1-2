@@ -10,15 +10,15 @@ This application utilizes the General Transit Feed Specification (GTFS) dataset 
 
 1. Ensure you have Java installed (Java 17+ recommended).
 2. Compile the application using your favorite IDE or the Java command line compiler.
-3. Before viewing accessiblity, you must calculate the accessibility scores in the database by navigating to the `src` directory and running:
-   ```bash
-   java Calculators/Accessiblity.java
-   ```
 
 ### Database Setup
 
 1. Import the GTFS data into a relational database using the provided SQL scripts found in `sql/load_gtfs.sql`.
 2. Configure your database with appropriate indexes to optimize the performance of query operations.
+3. Calculate the accessibility scores by navigating to the `src` directory and running:
+   ```bash
+   java Calculators/Accessiblity.java
+   ```
 
 ### Usage
 

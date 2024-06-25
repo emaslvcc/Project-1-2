@@ -4,12 +4,16 @@
 
 ## Public Transport Routing Application for Maastricht
 
-This application utilizes the General Transit Feed Specification (GTFS) dataset for The Netherlands to provide efficient public transport routing options in Maastricht, focusing solely on bus services. It shows the bus info and calculates the distance and time between two postal codes using direct bus connections.
+This application utilizes the General Transit Feed Specification (GTFS) dataset for The Netherlands to provide efficient public transport routing options in Maastricht, focusing solely on bus services. It shows the bus info and calculates the distance and time between two postal codes using direct and tranfer bus connections.
 
 ### Installation
 
 1. Ensure you have Java installed (Java 17+ recommended).
 2. Compile the application using your favorite IDE or the Java command line compiler.
+3. Before viewing accessiblity, you must calculate the accessibility scores in the database by navigating to the `src` directory and running:
+   ```bash
+   java Calculators/Accessiblity.java
+   ```
 
 ### Database Setup
 
@@ -22,14 +26,16 @@ This application utilizes the General Transit Feed Specification (GTFS) dataset 
    ```bash
    java GUI/mapFrame.java
    ```
-2. Enter the start and destination postal codes into the GUI.
-3. Select the mode of transportation: `walk`, `bike`, or `bus`.
-4. Click 'Calculate' to get the route information.
+2. To view the Accessibility scores, click on the check mark labeled 'Show Accessiblity'
+3. To view a route, enter the start and destination postal codes into the GUI.
+4. Select the mode of transportation: `Walk`, `Bike`, `Bus`, or `Bus v2`.
+5. Click 'Calculate' to get the route information.
+
 
 ### Features
 
-- **Efficient Route Calculation**: Calculates the shortest direct route using bus connections. If no direct bus route exists, the application will inform the user accordingly.
-- **Interactive Map Visualization**: Displays bus routes on a map, highlighting the recommended route based on the user's input.
+- **Efficient Route Calculation**: Calculates the shortest route using bus connections. If no bus route exists, the application will inform the user accordingly.
+- **Interactive Map Visualization**: Displays bus routes on a map, highlighting the recommended route based on the user's input. Additionally, displays a heat map that shows the accessiblity scores of all the postal codes in Maastricht. 
 - **Optimized Database**: Features a well-structured relational database optimized with indexes for quick query responses.
 
 ### Running Tests
@@ -38,9 +44,10 @@ This application utilizes the General Transit Feed Specification (GTFS) dataset 
 
 ### Requirements
 
-- GTFS data must be stored in a relational database.
-- SQL queries should be optimized for fast performance.
-- The GUI must display all bus routes and indicate which bus route the user should take based on their input.
+- All previous requirements must be applied.
+- The case where a postal code does not have access to a bus route must be handled.
+- If the user must wait between a bus transfer, that time must be considered a part of the travel time.
+- The accessibility measure for all postal codes in Maastricht must be efficiently calculated.
 
 ### Troubleshooting
 

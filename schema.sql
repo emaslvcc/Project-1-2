@@ -311,19 +311,6 @@ drop table if exists tempTransfer;
                 );
                
    
--- test (not need now)
-
-CREATE table distanceToBusstop(
-	start_latitude DECIMAL(11,7),
-	start_longitude DECIMAL(11,7),
-	end_latitude DECIMAL(11,7),
-	end_longitude DECIMAL(11,7),
-	distance INT,
-	primary key(start_latitude,start_longitude,
-	end_latitude ,
-	end_longitude)
-);
-
 
 -- Drop existing table if exists and create the postal codes table
 DROP TABLE IF EXISTS post_codes;

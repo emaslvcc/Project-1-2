@@ -1,6 +1,7 @@
 
 package DataManagers;
 
+import Calculators.Accessibility;
 import Database.DatabaseConnection;
 
 import java.io.*;
@@ -18,7 +19,7 @@ public class DataBaseReader extends APICaller {
     /**
      * Saves a new postal code and its coordinates to the CSV file and updates the
      * data map.
-     * 
+     *
      * @param zipCode The postal code to be saved.
      */
     public void saveNewPostCode(String zipCode) {
@@ -42,7 +43,7 @@ public class DataBaseReader extends APICaller {
 
     /**
      * Updates the CSV file with the new postal code and coordinates.
-     * 
+     *
      * @param zipCode   The postal code to save.
      * @param latitude  The latitude of the postal code.
      * @param longitude The longitude of the postal code.
@@ -75,11 +76,13 @@ public class DataBaseReader extends APICaller {
                 }
             }
         }
+        Accessibility accessibility = new Accessibility();
+        accessibility.newZipCodeAcc(zipCode);
     }
 
     /**
      * Extracts the latitude from the API response.
-     * 
+     *
      * @param apiResponse The response from the API.
      * @return The latitude extracted from the response.
      */
@@ -99,7 +102,7 @@ public class DataBaseReader extends APICaller {
 
     /**
      * Extracts the longitude from the API response.
-     * 
+     *
      * @param apiResponse The response from the API.
      * @return The longitude extracted from the response.
      */

@@ -676,19 +676,19 @@ public class createMap {
         LogicManager logicManager = new LogicManager();
         if (cachedPath1 != null && cachedStartPostCode.getLatitude() == startPostCode.getLatitude()
                 && cachedStartPostCode.getLongitude() == startPostCode.getLongitude()
-                && cachedEndBus.getLatitude() == endBus.getLatitude()
-                && cachedEndBus.getLongitude() == endBus.getLongitude()) {
+                && cachedStartBus.getLatitude() == startBus.getLatitude()
+                && cachedStartBus.getLongitude() == startBus.getLongitude()) {
             path1 = cachedPath1;
         } else {
             logicManager.calculateRoute(startPostCode, startBus, "Walk");
             path1 = logicManager.getShortestPath();
             cachedPath1 = path1;
             cachedStartPostCode = startPostCode;
-            cachedEndBus = endBus;
+            cachedStartBus = startBus;
         }
 
-        if (cachedPath2 != null && cachedStartBus.getLatitude() == startBus.getLatitude()
-                && cachedStartBus.getLongitude() == startBus.getLongitude()
+        if (cachedPath2 != null && cachedEndBus.getLatitude() == endBus.getLatitude()
+                && cachedEndBus.getLongitude() == endBus.getLongitude()
                 && cachedEndPostCode.getLatitude() == endPostCode.getLatitude()
                 && cachedEndPostCode.getLongitude() == endPostCode.getLongitude()) {
             path2 = cachedPath2;
@@ -696,7 +696,7 @@ public class createMap {
             logicManager.calculateRoute(endBus, endPostCode, "Walk");
             path2 = logicManager.getShortestPath();
             cachedPath2 = path2;
-            cachedStartBus = startBus;
+            cachedEndBus = endBus;
             cachedEndPostCode = endPostCode;
         }
         List<List<Node>> paths = new java.util.ArrayList<>();
